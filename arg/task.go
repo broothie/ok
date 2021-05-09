@@ -10,6 +10,11 @@ import (
 
 var dashStripper = regexp.MustCompile(`^-+`)
 
+type Arg struct {
+	Value string
+	Type  param.Type // TODO: Is there a better place to put param.Type?
+}
+
 type Task struct {
 	Positional []interface{}
 	Keyword    map[string]interface{}
@@ -23,38 +28,42 @@ func (p *Parser) ParseTaskArgs(params param.Params) error {
 		}
 	}
 
-	if len(p.TaskArgs.Positional) < len(p.params.PositionalRequired) {
-		return fmt.Errorf("missing required positional args [%s]", p.listMissingPositionalRequiredArgs())
-	}
-
-	if len(p.TaskArgs.Positional) > len(p.params.PositionalRequired)+len(p.params.PositionalOptional) {
-		// TODO: handle too many positional args case
-	}
-
-	if len(p.TaskArgs.Keyword) < len(p.params.KeywordRequired) {
-		return fmt.Errorf("missing required keyword args [%s]", p.listMissingKeywordRequiredArgs())
-	}
-
-	if len(p.TaskArgs.Keyword) > len(p.params.KeywordRequired)+len(p.params.KeywordOptional) {
-		// TODO: handle too many keyword args case
-	}
-
-	return nil
+	return p.checkNumberOfArgs()
 }
 
 func (p *Parser) processTaskArg() error {
-	arg := p.args[p.argCounter]
+	arg, _ := p.current()
 	if !strings.HasPrefix(arg, "-") {
-		p.TaskArgs.Positional = append(p.TaskArgs.Positional, arg)
-		p.argCounter++
-		return nil
+		return p.processPositionalTaskArg()
 	}
 
+	return p.processKeywordTaskArg()
+}
+
+func (p *Parser) processPositionalTaskArg() error {
+	arg, _ := p.current()
+	param, ok := p.params.PositionalAt(p.positionalCount())
+	if !ok {
+		return fmt.Errorf("too many positional args, expected max of %d", len(p.params.PositionalRequired)+len(p.params.PositionalOptional))
+	}
+
+	castArg, err := param.Type.CastString(arg)
+	if err != nil {
+		return err
+	}
+
+	p.TaskArgs.Positional = append(p.TaskArgs.Positional, castArg)
+	p.argCounter++
+	return nil
+}
+
+func (p *Parser) processKeywordTaskArg() error {
+	arg, _ := p.current()
 	dashlessArg := dashStripper.ReplaceAllString(arg, "")
-	param, found := p.findKeywordParam(dashlessArg)
+	parameter, found := p.findKeywordParam(dashlessArg)
 	if !found {
 		if len(dashlessArg) == 1 {
-			param, found = p.findKeywordPrefixParam(rune(dashlessArg[0]))
+			parameter, found = p.findKeywordPrefixParam(rune(dashlessArg[0]))
 			if !found {
 				return fmt.Errorf("no keyword param found with name '%s'", dashlessArg)
 			}
@@ -63,9 +72,32 @@ func (p *Parser) processTaskArg() error {
 		return fmt.Errorf("no keyword param found with name '%s'", dashlessArg)
 	}
 
-	// TODO: check that next arg even exists
-	p.TaskArgs.Keyword[param.Name] = p.args[p.argCounter+1]
+	if parameter.Type == param.Bool {
+		p.TaskArgs.Keyword[parameter.Name] = true
+		p.argCounter++
+		return nil
+	}
+
+	valueArg, ok := p.peek(1)
+	if !ok {
+		return fmt.Errorf("no value provided for keyword arg '%s'", arg)
+	}
+
+	castValue, err := parameter.Type.CastString(valueArg)
+	if err != nil {
+		return err
+	}
+
+	p.TaskArgs.Keyword[parameter.Name] = castValue
 	p.argCounter += 2
+	return nil
+}
+
+func (p *Parser) checkNumberOfArgs() error {
+	if len(p.TaskArgs.Positional) < len(p.params.PositionalRequired) {
+		return fmt.Errorf("missing required positional args: [%s]", p.listMissingPositionalRequiredArgs())
+	}
+
 	return nil
 }
 
@@ -104,18 +136,6 @@ func (p *Parser) findKeywordPrefixParam(char rune) (_ param.Param, found bool) {
 func (p *Parser) listMissingPositionalRequiredArgs() string {
 	diff := len(p.params.PositionalRequired) - len(p.TaskArgs.Positional)
 	missingParams := p.params.PositionalRequired[len(p.params.PositionalRequired)-diff:]
-
-	paramNames := make([]string, len(missingParams))
-	for i, missingParam := range missingParams {
-		paramNames[i] = missingParam.Name
-	}
-
-	return strings.Join(paramNames, ", ")
-}
-
-func (p *Parser) listMissingKeywordRequiredArgs() string {
-	diff := len(p.params.KeywordRequired) - len(p.TaskArgs.Keyword)
-	missingParams := p.params.KeywordRequired[len(p.params.KeywordRequired)-diff:]
 
 	paramNames := make([]string, len(missingParams))
 	for i, missingParam := range missingParams {

@@ -26,6 +26,9 @@ func (t Task) Invoke(args arg.Task) *os.Process {
 		positionalStrings[i] = fmt.Sprintf(`"%s"`, positional)
 	}
 
+	//builder := new(strings.Builder)
+	//builder.WriteString(strings.Join())
+
 	return tool.Exec(ToolName,
 		"-r", fmt.Sprintf("./%s", t.Filename()),
 		"-e", fmt.Sprintf("%s(%s)", t.Name(), strings.Join(positionalStrings, ", ")),

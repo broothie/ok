@@ -1,4 +1,4 @@
-package now
+package driver
 
 import (
 	"fmt"
@@ -8,10 +8,10 @@ import (
 	"text/tabwriter"
 )
 
-func (n Now) list() error {
+func (d Driver) list() error {
 	filenames := make(set)
 	toolNames := make(set)
-	for _, task := range n.Tasks {
+	for _, task := range d.Tasks {
 		filenames.insert(task.Filename())
 		toolNames.insert(task.ToolName())
 	}
@@ -19,9 +19,9 @@ func (n Now) list() error {
 	includeFilenames := len(filenames) > 1
 	includeToolNames := len(toolNames) > 1
 
-	lines := make([]string, len(n.Tasks))
+	lines := make([]string, len(d.Tasks))
 	counter := 0
-	for _, task := range n.Tasks {
+	for _, task := range d.Tasks {
 		columns := []string{fmt.Sprintf("%s %s", task.Name(), task.Params())}
 
 		if includeFilenames {

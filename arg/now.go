@@ -1,6 +1,10 @@
 package arg
 
-import "strings"
+import (
+	"errors"
+	"fmt"
+	"strings"
+)
 
 type Now struct {
 	Help     bool
@@ -17,30 +21,45 @@ func (n Now) WillRunTask() bool {
 	return n.TaskName != ""
 }
 
-func (p *Parser) ParseNowArgs() {
+func (p *Parser) ParseNowArgs() error {
 	for p.argCounter < len(p.args) && p.NowArgs.TaskName == "" {
-		p.processNowArg()
+		if err := p.processNowArg(); err != nil {
+			return err
+		}
 	}
+
+	return nil
 }
 
-func (p *Parser) processNowArg() {
-	arg := p.args[p.argCounter]
+func (p *Parser) processNowArg() error {
+	arg, _ := p.current()
 	if !strings.HasPrefix(arg, "-") {
 		p.NowArgs.TaskName = arg
 		p.argCounter++
-		return
+		return nil
 	}
 
 	switch arg {
 	case "-h", "--help":
 		p.NowArgs.Help = true
 		p.argCounter++
+
 	case "-e", "--explain":
 		p.NowArgs.Explain = true
 		p.argCounter++
+
 	case "-w", "--watch":
-		// TODO: check that next arg even exists
-		p.NowArgs.Watches = append(p.NowArgs.Watches, p.args[p.argCounter+1])
+		watchPattern, ok := p.peek(1)
+		if !ok {
+			return errors.New("no watch pattern provided to watch")
+		}
+
+		p.NowArgs.Watches = append(p.NowArgs.Watches, watchPattern)
 		p.argCounter += 2
+
+	default:
+		return fmt.Errorf("invalid arg '%s'", arg)
 	}
+
+	return nil
 }

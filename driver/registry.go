@@ -1,4 +1,4 @@
-package now
+package driver
 
 import (
 	"github.com/broothie/now/task"

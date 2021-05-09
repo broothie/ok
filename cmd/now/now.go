@@ -3,9 +3,9 @@ package main
 import (
 	"os"
 
-	"github.com/broothie/now/now"
+	"github.com/broothie/now/driver"
 )
 
 func main() {
-	now.Run(os.Args[1:])
+	driver.Run(os.Args[1:])
 }

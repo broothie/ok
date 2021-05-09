@@ -1,10 +1,10 @@
-package now
+package driver
 
 import (
 	"sync"
 )
 
-func (n Now) mount() {
+func (d Driver) mount() {
 	var mutex sync.Mutex
 	var wg sync.WaitGroup
 	defer wg.Wait()
@@ -24,7 +24,7 @@ func (n Now) mount() {
 				name := toolTask.Name()
 
 				mutex.Lock()
-				n.Tasks[name] = toolTask
+				d.Tasks[name] = toolTask
 				mutex.Unlock()
 			}
 		}(toolName, mount)
