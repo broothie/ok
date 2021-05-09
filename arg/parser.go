@@ -13,7 +13,8 @@ type Parser struct {
 
 func NewParser(args []string) Parser {
 	return Parser{
-		args: args,
+		TaskArgs: newTaskArgs(),
+		args:     args,
 		// Zero value works for everything else
 	}
 }

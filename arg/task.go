@@ -20,6 +20,10 @@ type Task struct {
 	Keyword    map[string]interface{}
 }
 
+func newTaskArgs() Task {
+	return Task{Keyword: make(map[string]interface{})}
+}
+
 func (p *Parser) ParseTaskArgs(params param.Params) error {
 	p.params = params
 	for p.argCounter < len(p.args) {
@@ -67,9 +71,9 @@ func (p *Parser) processKeywordTaskArg() error {
 			if !found {
 				return fmt.Errorf("no keyword param found with name '%s'", dashlessArg)
 			}
+		} else {
+			return fmt.Errorf("no keyword param found with name '%s'", dashlessArg)
 		}
-
-		return fmt.Errorf("no keyword param found with name '%s'", dashlessArg)
 	}
 
 	if parameter.Type == param.Bool {

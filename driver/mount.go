@@ -1,8 +1,6 @@
 package driver
 
-import (
-	"sync"
-)
+import "sync"
 
 func (d Driver) mount() {
 	var mutex sync.Mutex

@@ -26,11 +26,20 @@ func (t Task) Invoke(args arg.Task) *os.Process {
 		positionalStrings[i] = fmt.Sprintf(`"%s"`, positional)
 	}
 
-	//builder := new(strings.Builder)
-	//builder.WriteString(strings.Join())
+	keywordEntries := make([]string, len(args.Keyword))
+	counter := 0
+	for name, value := range args.Keyword {
+		keywordEntries[counter] = fmt.Sprintf(`%s: "%s"`, name, value)
+		counter++
+	}
+
+	builder := new(strings.Builder)
+	builder.WriteString(fmt.Sprintf("args = [%s]; ", strings.Join(positionalStrings, ", ")))
+	builder.WriteString(fmt.Sprintf("kwargs = {%s}; ", strings.Join(keywordEntries, ", ")))
+	builder.WriteString(fmt.Sprintf("%s(*args, **kwargs)", t.Name()))
 
 	return tool.Exec(ToolName,
 		"-r", fmt.Sprintf("./%s", t.Filename()),
-		"-e", fmt.Sprintf("%s(%s)", t.Name(), strings.Join(positionalStrings, ", ")),
+		"-e", builder.String(),
 	).Process
 }
