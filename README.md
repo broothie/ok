@@ -13,6 +13,7 @@ A command runner.
   - [ ] Python
   - [ ] Node
 - [ ] Set up goreleaser
+- [ ] Tool inits
 - [ ] Help
 - [ ] README
 - [ ] Cache in temp file?
