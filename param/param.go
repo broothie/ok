@@ -1,5 +1,7 @@
 package param
 
+import "fmt"
+
 type Param struct {
 	Name    string
 	Type    Type
@@ -21,4 +23,12 @@ func (p Params) PositionalAt(index int) (Param, bool) {
 	}
 
 	return Param{}, false
+}
+
+func (p Param) String() string {
+	if p.Default == nil {
+		return p.Name
+	}
+
+	return fmt.Sprintf("%s=%s", p.Name, p.Default)
 }

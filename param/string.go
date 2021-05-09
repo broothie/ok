@@ -11,7 +11,7 @@ func (p Params) String() string {
 	wrappedPositionalRequireds := make([]string, len(p.PositionalRequired))
 	counter := 0
 	for _, param := range p.PositionalRequired {
-		wrappedPositionalRequireds[counter] = chevronWrap(param.Name)
+		wrappedPositionalRequireds[counter] = chevronWrap(param)
 		counter++
 	}
 	sections = append(sections, wrappedPositionalRequireds...)
@@ -19,7 +19,7 @@ func (p Params) String() string {
 	wrappedPositionalOptionals := make([]string, len(p.PositionalOptional))
 	counter = 0
 	for _, param := range p.PositionalOptional {
-		wrappedPositionalOptionals[counter] = chevronWrap(fmt.Sprintf("%s=%v", param.Name, param.Default))
+		wrappedPositionalOptionals[counter] = chevronWrap(param)
 		counter++
 	}
 	sections = append(sections, wrappedPositionalOptionals...)
@@ -27,7 +27,7 @@ func (p Params) String() string {
 	prefixedKeywordRequireds := make([]string, len(p.KeywordRequired))
 	counter = 0
 	for _, param := range p.KeywordRequired {
-		prefixedKeywordRequireds[counter] = dashPrefix(param.Name)
+		prefixedKeywordRequireds[counter] = dashPrefix(param)
 		counter++
 	}
 	sections = append(sections, prefixedKeywordRequireds...)
@@ -35,7 +35,7 @@ func (p Params) String() string {
 	prefixedKeywordOptionals := make([]string, len(p.KeywordOptional))
 	counter = 0
 	for _, param := range p.KeywordOptional {
-		prefixedKeywordOptionals[counter] = dashPrefix(fmt.Sprintf("%s=%v", param.Name, param.Default))
+		prefixedKeywordOptionals[counter] = dashPrefix(param)
 		counter++
 	}
 	sections = append(sections, prefixedKeywordOptionals...)
@@ -43,14 +43,10 @@ func (p Params) String() string {
 	return strings.Join(sections, " ")
 }
 
-func chevronWrap(s string) string {
-	return fmt.Sprintf("<%s>", s)
+func chevronWrap(v interface{}) string {
+	return fmt.Sprintf("<%s>", v)
 }
 
-func dashPrefix(s string) string {
-	if len(s) == 1 {
-		return fmt.Sprintf("-%s", s)
-	} else {
-		return fmt.Sprintf("--%s", s)
-	}
+func dashPrefix(v interface{}) string {
+	return fmt.Sprintf("--%s", v)
 }
