@@ -56,6 +56,9 @@ func (Ruby) Mount() ([]task.Task, error) {
 
 func paramListFromParamString(paramsString string) param.Params {
 	paramStrings := paramSplitter.Split(paramsString, -1)
+	if len(paramStrings) == 1 && toolhelp.AllWhitespace(paramStrings[0]) {
+		paramStrings = nil
+	}
 
 	var params param.Params
 	for _, paramString := range paramStrings {
