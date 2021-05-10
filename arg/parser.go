@@ -3,8 +3,8 @@ package arg
 import "github.com/broothie/now/param"
 
 type Parser struct {
-	NowArgs  Now
-	TaskArgs Task
+	Options Options
+	Args    Args
 
 	args       []string
 	argCounter int
@@ -13,8 +13,8 @@ type Parser struct {
 
 func NewParser(args []string) Parser {
 	return Parser{
-		TaskArgs: newTaskArgs(),
-		args:     args,
+		Args: newTaskArgs(),
+		args: args,
 		// Zero value works for everything else
 	}
 }
@@ -33,5 +33,5 @@ func (p *Parser) peek(offset int) (string, bool) {
 }
 
 func (p *Parser) positionalCount() int {
-	return len(p.TaskArgs.Positional)
+	return len(p.Args.Positional)
 }

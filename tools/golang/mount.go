@@ -10,32 +10,23 @@ import (
 
 	"github.com/broothie/now/param"
 	"github.com/broothie/now/task"
-	"github.com/broothie/now/tool"
+	"github.com/broothie/now/toolhelp"
 )
 
-const (
-	ToolName = "go"
-	filename = "Nowfile.go"
-)
+var funcFinder = regexp.MustCompile(`(?m)^\s*func\s+(\w+)\s*\((.*)\)`)
 
-var (
-	funcFinder         = regexp.MustCompile(`(?m)^\s*func\s+(\w+)\s*\((.*)\)`)
-	whiteSpaceMatcher  = regexp.MustCompile(`^\s*$`)
-	whiteSpaceSplitter = regexp.MustCompile(`\s`)
-)
-
-func Mount() ([]task.Task, error) {
+func (Golang) Mount() ([]task.Task, error) {
 	if _, err := os.Open(filename); err != nil {
 		if os.IsNotExist(err) {
 			return nil, nil
 		}
 
-		return nil, tool.ReadToolFileError{Err: err, Filename: filename}
+		return nil, toolhelp.ReadToolFileError{Err: err, Filename: filename}
 	}
 
 	if _, err := exec.LookPath(ToolName); err != nil {
 		if err == exec.ErrNotFound {
-			return nil, tool.CommandNotFoundError{CommandName: ToolName}
+			return nil, toolhelp.CommandNotFoundError{CommandName: ToolName}
 		}
 
 		return nil, err
@@ -43,7 +34,7 @@ func Mount() ([]task.Task, error) {
 
 	fileBytes, err := ioutil.ReadFile(filename)
 	if err != nil {
-		return nil, tool.ReadToolFileError{Err: err, Filename: filename}
+		return nil, toolhelp.ReadToolFileError{Err: err, Filename: filename}
 	}
 
 	fileContents := string(fileBytes)
@@ -54,7 +45,7 @@ func Mount() ([]task.Task, error) {
 		taskName, paramsString := match[1], match[2]
 
 		var paramEntries []string
-		if !whiteSpaceMatcher.MatchString(paramsString) {
+		if !toolhelp.AllWhitespace(paramsString) {
 			paramEntries = strings.Split(paramsString, ",")
 		}
 
@@ -64,7 +55,7 @@ func Mount() ([]task.Task, error) {
 		for i := len(paramEntries) - 1; i >= 0; i-- {
 			paramEntry := strings.TrimSpace(paramEntries[i])
 
-			chunks := whiteSpaceSplitter.Split(paramEntry, 2)
+			chunks := toolhelp.WhitespaceSplitter.Split(paramEntry, 2)
 			if len(chunks) > 1 {
 				currentType = chunks[1]
 			}

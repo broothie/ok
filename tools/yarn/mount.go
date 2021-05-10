@@ -6,29 +6,24 @@ import (
 	"os/exec"
 
 	"github.com/broothie/now/task"
-	"github.com/broothie/now/tool"
+	"github.com/broothie/now/toolhelp"
 )
 
-const (
-	ToolName = "yarn"
-	filename = "package.json"
-)
-
-func Mount() ([]task.Task, error) {
+func (Yarn) Mount() ([]task.Task, error) {
 	file, err := os.Open(filename)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return nil, nil
 		}
 
-		return nil, tool.ReadToolFileError{Filename: filename, Err: err}
+		return nil, toolhelp.ReadToolFileError{Filename: filename, Err: err}
 	}
 
 	defer file.Close()
 
 	if _, err := exec.LookPath("yarn"); err != nil {
 		if err == exec.ErrNotFound {
-			return nil, tool.CommandNotFoundError{CommandName: ToolName}
+			return nil, toolhelp.CommandNotFoundError{CommandName: ToolName}
 		}
 
 		return nil, err
@@ -36,7 +31,7 @@ func Mount() ([]task.Task, error) {
 
 	var packageJSON map[string]interface{}
 	if err := json.NewDecoder(file).Decode(&packageJSON); err != nil {
-		return nil, tool.ReadToolFileError{Filename: filename, Err: err}
+		return nil, toolhelp.ReadToolFileError{Filename: filename, Err: err}
 	}
 
 	untypedScripts, scriptsPresent := packageJSON["scripts"]

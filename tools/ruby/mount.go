@@ -2,18 +2,15 @@ package ruby
 
 import (
 	"io/ioutil"
+	"os"
 	"os/exec"
-	"path/filepath"
 	"regexp"
-	"strconv"
 	"strings"
 
 	"github.com/broothie/now/param"
 	"github.com/broothie/now/task"
-	"github.com/broothie/now/tool"
+	"github.com/broothie/now/toolhelp"
 )
-
-const ToolName = "ruby"
 
 var (
 	methodFinder  = regexp.MustCompile(`(?m)^\s*def\s+(?P<taskName>\w+)\(?(?P<params>.*?)\)?$`)
@@ -23,34 +20,35 @@ var (
 	keywordMatcher    = regexp.MustCompile(`^(?P<paramName>\w+):(?:\s*(?P<default>.*))?$`)
 )
 
-func Mount() ([]task.Task, error) {
-	filenames, _ := filepath.Glob("Nowfile.rb")
-	if len(filenames) == 0 {
-		return nil, nil
+func (Ruby) Mount() ([]task.Task, error) {
+	if _, err := os.Stat(filename); err != nil {
+		if os.IsNotExist(err) {
+			return nil, nil
+		}
+
+		return nil, toolhelp.ReadToolFileError{Err: err, Filename: filename}
 	}
 
 	if _, err := exec.LookPath(ToolName); err != nil {
 		if err == exec.ErrNotFound {
-			return nil, tool.CommandNotFoundError{CommandName: ToolName}
+			return nil, toolhelp.CommandNotFoundError{CommandName: ToolName}
 		}
 
 		return nil, err
 	}
 
 	var tasks []task.Task
-	for _, filename := range filenames {
-		fileBytes, err := ioutil.ReadFile(filename)
-		if err != nil {
-			return nil, tool.ReadToolFileError{Filename: filename, Err: err}
-		}
+	fileBytes, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return nil, toolhelp.ReadToolFileError{Filename: filename, Err: err}
+	}
 
-		results := tool.NamedRegexpResults(string(fileBytes), methodFinder)
-		for _, result := range results {
-			tasks = append(tasks, Task{
-				Base:   task.NewBaseTask(result["taskName"], filename, ToolName),
-				params: paramListFromParamString(result["params"]),
-			})
-		}
+	results := toolhelp.NamedRegexpResults(string(fileBytes), methodFinder)
+	for _, result := range results {
+		tasks = append(tasks, Task{
+			Base:   task.NewBaseTask(result["taskName"], filename, ToolName),
+			params: paramListFromParamString(result["params"]),
+		})
 	}
 
 	return tasks, nil
@@ -74,14 +72,14 @@ func paramListFromParamString(paramsString string) param.Params {
 			paramListWithoutDefault = &params.KeywordRequired
 			paramListWithDefault = &params.KeywordOptional
 		} else {
-			tool.Warn(ToolName, "error parsing param '%s'", paramString)
+			toolhelp.Warn(ToolName, "error parsing param '%s'", paramString)
 			continue
 		}
 
 		var paramList *[]param.Param
 		var defaultString string
 		var defaultExists bool
-		result := tool.NamedRegexpResult(paramString, re)
+		result := toolhelp.NamedRegexpResult(paramString, re)
 		if defaultString, defaultExists = result["default"]; defaultExists && defaultString != "" {
 			paramList = paramListWithDefault
 		} else {
@@ -89,20 +87,11 @@ func paramListFromParamString(paramsString string) param.Params {
 		}
 
 		defaultString = strings.TrimSpace(defaultString)
-
-		var defaultValue interface{}
-		if defaultString != "" {
-			if strings.HasPrefix(defaultString, `"`) || strings.HasPrefix(defaultString, "'") {
-				defaultValue = strings.Trim(defaultString, `'"`)
-			} else if defaultString == "true" {
-				defaultValue = true
-			} else if defaultString == "false" {
-				defaultValue = false
-			} else if f, err := strconv.ParseFloat(defaultString, 64); err == nil {
-				defaultValue = f
-			} else if i, err := strconv.Atoi(defaultString); err == nil {
-				defaultValue = i
-			}
+		var defaultValue interface{} = defaultString
+		if strings.HasPrefix(defaultString, "'") || strings.HasPrefix(defaultString, `"`) {
+			defaultValue = strings.Trim(defaultString, `'"`)
+		} else if defaultString == "" {
+			defaultValue = nil
 		}
 
 		*paramList = append(*paramList, param.Param{

@@ -1,6 +1,15 @@
-package tool
+package toolhelp
 
 import "regexp"
+
+var (
+	WhitespaceSplitter = regexp.MustCompile(`\s`)
+	AllWhitespace      = regexp.MustCompile(`^\s*$`).MatchString
+)
+
+func SplitWhitespace(s string) []string {
+	return WhitespaceSplitter.Split(s, -1)
+}
 
 func NamedRegexpResults(s string, re *regexp.Regexp) []map[string]string {
 	matches := re.FindAllStringSubmatch(s, -1)

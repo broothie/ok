@@ -9,7 +9,7 @@ import (
 	"github.com/broothie/now/arg"
 	"github.com/broothie/now/param"
 	"github.com/broothie/now/task"
-	"github.com/broothie/now/tool"
+	"github.com/broothie/now/toolhelp"
 )
 
 type Task struct {
@@ -21,16 +21,16 @@ func (t Task) Params() param.Params {
 	return t.params
 }
 
-func (t Task) Invoke(args arg.Task) *os.Process {
+func (t Task) Invoke(args arg.Args) *os.Process {
 	positionalStrings := make([]string, len(args.Positional))
-	for i, positional := range args.Positional {
-		positionalStrings[i] = processArg(positional.(string))
+	for i, arg := range args.Positional {
+		positionalStrings[i] = processArg(arg.Value.(string))
 	}
 
 	keywordEntries := make([]string, len(args.Keyword))
 	counter := 0
-	for name, value := range args.Keyword {
-		keywordEntries[counter] = fmt.Sprintf("%s: %s", name, processArg(value.(string)))
+	for name, arg := range args.Keyword {
+		keywordEntries[counter] = fmt.Sprintf("%s: %s", name, processArg(arg.Value.(string)))
 		counter++
 	}
 
@@ -39,7 +39,7 @@ func (t Task) Invoke(args arg.Task) *os.Process {
 	builder.WriteString(fmt.Sprintf("kwargs = {%s}; ", strings.Join(keywordEntries, ", ")))
 	builder.WriteString(fmt.Sprintf("%s(*args, **kwargs)", t.Name()))
 
-	return tool.Exec(ToolName,
+	return toolhelp.Exec(ToolName,
 		"-r", fmt.Sprintf("./%s", t.Filename()),
 		"-e", builder.String(),
 	).Process

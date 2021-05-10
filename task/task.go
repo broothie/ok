@@ -12,5 +12,5 @@ type Task interface {
 	Filename() string
 	ToolName() string
 	Params() param.Params
-	Invoke(args arg.Task) *os.Process
+	Invoke(args arg.Args) *os.Process
 }

@@ -9,7 +9,7 @@ import (
 	"github.com/broothie/now/arg"
 	"github.com/broothie/now/param"
 	"github.com/broothie/now/task"
-	"github.com/broothie/now/tool"
+	"github.com/broothie/now/toolhelp"
 )
 
 var tmpl = template.Must(template.New("").Parse(`{{ .Source }}
@@ -39,21 +39,21 @@ func (t Task) Params() param.Params {
 	return t.params
 }
 
-func (t Task) Invoke(args arg.Task) *os.Process {
+func (t Task) Invoke(args arg.Args) *os.Process {
 	file, err := ioutil.TempFile("", "Nowfile-*.go")
 	if err != nil {
-		tool.Warn(ToolName, "failed to write go tempfile: %v", err)
+		toolhelp.Warn(ToolName, "failed to write go tempfile: %v", err)
 		return nil
 	}
 
 	argStrings := make([]string, len(args.Positional))
 	for i, positional := range args.Positional {
-		parameter := t.params.PositionalRequired[i]
-		switch parameter.Type {
+		//parameter := t.params.PositionalRequired[i]
+		switch positional.Param.Type {
 		case param.Untyped, param.String:
-			argStrings[i] = fmt.Sprintf(`"%v"`, positional)
+			argStrings[i] = fmt.Sprintf(`"%v"`, positional.Value)
 		case param.Bool, param.Int:
-			argStrings[i] = fmt.Sprint(positional)
+			argStrings[i] = fmt.Sprint(positional.Value)
 		}
 	}
 
@@ -62,13 +62,13 @@ func (t Task) Invoke(args arg.Task) *os.Process {
 		TaskName: t.Name(),
 		Args:     argStrings,
 	}); err != nil {
-		tool.Warn(ToolName, "failed to write go template: %v", err)
+		toolhelp.Warn(ToolName, "failed to write go template: %v", err)
 		return nil
 	}
 
 	go file.Close()
 
-	process := tool.Exec(ToolName, "run", file.Name()).Process
+	process := toolhelp.Exec(ToolName, "run", file.Name()).Process
 	go func() {
 		process.Wait()
 		os.Remove(file.Name())

@@ -1,4 +1,4 @@
-package driver
+package runner
 
 import (
 	"os"
@@ -8,10 +8,10 @@ import (
 	"github.com/radovskyb/watcher"
 )
 
-func (d Driver) handleWatches() {
+func (r Runner) handleWatches() {
 	watcher := watcher.New()
 	watcher.SetMaxEvents(1)
-	for _, watchPattern := range d.NowArgs.Watches {
+	for _, watchPattern := range r.Options.Watches {
 		filePaths, err := filepath.Glob(watchPattern)
 		if err != nil {
 			log("error globbing glob '%s': %v", watchPattern, err)
@@ -44,7 +44,7 @@ func (d Driver) handleWatches() {
 					process = nil
 				}
 
-				process = d.Task.Invoke(d.Parser.TaskArgs)
+				process = r.Task.Invoke(r.Parser.Args)
 
 			case <-watcher.Closed:
 				break

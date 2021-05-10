@@ -1,18 +1,22 @@
-package driver
+package runner
 
-import "sync"
+import (
+	"sync"
 
-func (d Driver) mount() {
+	"github.com/broothie/now/tool"
+)
+
+func (r Runner) mount() {
 	var mutex sync.Mutex
 	var wg sync.WaitGroup
 	defer wg.Wait()
 
-	for toolName, mount := range Registry {
+	for toolName, t := range tool.Registry {
 		wg.Add(1)
-		go func(toolName string, mount MountFunc) {
+		go func(toolName string, tool tool.Tool) {
 			defer wg.Done()
 
-			toolTasks, err := mount()
+			toolTasks, err := tool.Mount()
 			if err != nil {
 				log("error mounting tool '%s': %v", toolName, err)
 				return
@@ -22,9 +26,9 @@ func (d Driver) mount() {
 				name := toolTask.Name()
 
 				mutex.Lock()
-				d.Tasks[name] = toolTask
+				r.Tasks[name] = toolTask
 				mutex.Unlock()
 			}
-		}(toolName, mount)
+		}(toolName, t)
 	}
 }
