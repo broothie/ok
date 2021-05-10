@@ -91,29 +91,23 @@ func paramListFromParamString(paramsString string) param.Params {
 		defaultString = strings.TrimSpace(defaultString)
 
 		var defaultValue interface{}
-		t := param.Untyped
 		if defaultString != "" {
 			if strings.HasPrefix(defaultString, `"`) || strings.HasPrefix(defaultString, "'") {
-				t = param.String
 				defaultValue = strings.Trim(defaultString, `'"`)
 			} else if defaultString == "true" {
-				t = param.Bool
 				defaultValue = true
 			} else if defaultString == "false" {
-				t = param.Bool
 				defaultValue = false
 			} else if f, err := strconv.ParseFloat(defaultString, 64); err == nil {
-				t = param.Float
 				defaultValue = f
 			} else if i, err := strconv.Atoi(defaultString); err == nil {
-				t = param.Int
 				defaultValue = i
 			}
 		}
 
 		*paramList = append(*paramList, param.Param{
 			Name:    result["paramName"],
-			Type:    t,
+			Type:    param.Untyped,
 			Default: defaultValue,
 		})
 	}

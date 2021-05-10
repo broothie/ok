@@ -4,3 +4,6 @@ build: generate
 
 generate:
 	go generate ./...
+
+install:
+	go install cmd/now/now.go

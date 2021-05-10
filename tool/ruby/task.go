@@ -3,6 +3,7 @@ package ruby
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/broothie/now/arg"
@@ -23,13 +24,13 @@ func (t Task) Params() param.Params {
 func (t Task) Invoke(args arg.Task) *os.Process {
 	positionalStrings := make([]string, len(args.Positional))
 	for i, positional := range args.Positional {
-		positionalStrings[i] = fmt.Sprintf(`"%s"`, positional)
+		positionalStrings[i] = processArg(positional.(string))
 	}
 
 	keywordEntries := make([]string, len(args.Keyword))
 	counter := 0
 	for name, value := range args.Keyword {
-		keywordEntries[counter] = fmt.Sprintf(`%s: "%s"`, name, value)
+		keywordEntries[counter] = fmt.Sprintf("%s: %s", name, processArg(value.(string)))
 		counter++
 	}
 
@@ -42,4 +43,16 @@ func (t Task) Invoke(args arg.Task) *os.Process {
 		"-r", fmt.Sprintf("./%s", t.Filename()),
 		"-e", builder.String(),
 	).Process
+}
+
+func processArg(arg string) string {
+	if _, err := strconv.ParseFloat(arg, 64); err == nil {
+		return arg
+	} else if _, err := strconv.Atoi(arg); err == nil {
+		return arg
+	} else if _, err := strconv.ParseBool(arg); err == nil {
+		return arg
+	} else {
+		return fmt.Sprintf(`"%s"`, arg)
+	}
 }
