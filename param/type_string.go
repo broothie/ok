@@ -11,12 +11,13 @@ func _() {
 	_ = x[Untyped-0]
 	_ = x[Bool-1]
 	_ = x[Int-2]
-	_ = x[String-3]
+	_ = x[Float-3]
+	_ = x[String-4]
 }
 
-const _Type_name = "UntypedBoolIntString"
+const _Type_name = "UntypedBoolIntFloatString"
 
-var _Type_index = [...]uint8{0, 7, 11, 14, 20}
+var _Type_index = [...]uint8{0, 7, 11, 14, 19, 25}
 
 func (i Type) String() string {
 	if i < 0 || i >= Type(len(_Type_index)-1) {

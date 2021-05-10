@@ -66,7 +66,7 @@ func (t Task) Invoke(args arg.Task) *os.Process {
 		return nil
 	}
 
-	file.Close()
+	go file.Close()
 
 	process := tool.Exec(ToolName, "run", file.Name()).Process
 	go func() {

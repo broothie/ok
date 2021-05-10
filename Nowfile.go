@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 
@@ -21,5 +22,16 @@ func get(url string) {
 }
 
 func types() {
-	fmt.Println(param.Untyped, param.Bool, param.Int, param.String)
+	fmt.Println(param.Untyped, param.Bool, param.Int, param.Float, param.String)
+}
+
+func list() {
+	files, err := ioutil.ReadDir(".")
+	if err != nil {
+		panic(err)
+	}
+
+	for _, file := range files {
+		fmt.Println(file.Name())
+	}
 }

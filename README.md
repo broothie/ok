@@ -22,12 +22,20 @@ granny smith apple, yellow banana, maraschino cherry, stinky durian
 You can call `now` without a task name to list available tasks:
 ```bash
 $ now
-build                                                         Makefile    make
-example <apple> <banana='yellow'> --cherry --durian='smelly'  Nowfile.rb  ruby
-get <url>                                                     Nowfile.go  go
-greet <name='World'>                                          Nowfile.rb  ruby
-types                                                         Nowfile.go  go
+build                                                     Makefile    make
+example <apple> <banana=yellow> --cherry --durian=smelly  Nowfile.rb  ruby
+generate                                                  Makefile    make
+get <url>                                                 Nowfile.go  go
+greet <name=World>                                        Nowfile.rb  ruby
+list                                                      Nowfile.go  go
+types                                                     Nowfile.go  go
 ```
+
+## Current Supported Languages/Tools
+- Go
+- Make
+- Ruby
+- Yarn
 
 ## To do
 
@@ -35,10 +43,11 @@ types                                                         Nowfile.go  go
 - [ ] Tests
 - [ ] Scour error paths
 - [ ] Add more tools
-  - [ ] Go
+  - [x] Go
   - [ ] sh
   - [ ] Python
   - [ ] Node
+  - [ ] Rake
 - [ ] Set up goreleaser
 - [ ] Tool inits
 - [ ] Help
@@ -47,4 +56,4 @@ types                                                         Nowfile.go  go
 
 ## Attributions
 
-- [watcher](https://github.com/radovskyb/watcher)
+- [github.com/radovskyb/watcher](https://github.com/radovskyb/watcher)

@@ -12,6 +12,7 @@ const (
 	Untyped Type = iota
 	Bool
 	Int
+	Float
 	String
 )
 
@@ -23,6 +24,8 @@ func (t Type) CastString(s string) (interface{}, error) {
 		return strconv.ParseBool(s)
 	case Int:
 		return strconv.Atoi(s)
+	case Float:
+		return strconv.ParseFloat(s, 64)
 	case String:
 		return s, nil
 	default:
