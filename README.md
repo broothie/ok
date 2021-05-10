@@ -1,34 +1,34 @@
-# `now`
+# Okay
 
 A command runner.
 
 ## Usage
 
-Given a Nowfile in any supported language:
+Given a Okayfile in any supported language:
 ```ruby
-# Nowfile.rb
+# Okayfile.rb
 
 def example(apple, banana = 'yellow', cherry:, durian: 'smelly')
     puts "#{apple} apple, #{banana} banana, #{cherry} cherry, #{durian} durian"
 end
 ```
 
-You can use `now` to call methods directly from the command line:
+You can use `ok` to call methods directly from the command line:
 ```bash
-$ now example 'granny smith' --durian stinky -c maraschino
+$ ok example 'granny smith' --durian stinky -c maraschino
 granny smith apple, yellow banana, maraschino cherry, stinky durian
 ```
 
-You can call `now` without a task name to list available tasks:
+You can call `ok` without a task name to list available tasks:
 ```bash
-$ now
+$ ok
 build                                                     Makefile    make
-example <apple> <banana=yellow> --cherry --durian=smelly  Nowfile.rb  ruby
+example <apple> <banana=yellow> --cherry --durian=smelly  Okayfile.rb  ruby
 generate                                                  Makefile    make
-get <url>                                                 Nowfile.go  go
-greet <name=World>                                        Nowfile.rb  ruby
-list                                                      Nowfile.go  go
-types                                                     Nowfile.go  go
+get <url>                                                 Okayfile.go  go
+greet <name=World>                                        Okayfile.rb  ruby
+list                                                      Okayfile.go  go
+types                                                     Okayfile.go  go
 ```
 
 ## Current Supported Languages/Tools

@@ -1,9 +1,9 @@
 
 build: generate
-	go build cmd/now/now.go
+	go build cmd/ok/ok.go
 
 install: generate
-	go install cmd/now/now.go
+	go install cmd/ok/ok.go
 
 param/type_string.go:
 	go generate ./...

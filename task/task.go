@@ -3,8 +3,8 @@ package task
 import (
 	"os"
 
-	"github.com/broothie/now/arg"
-	"github.com/broothie/now/param"
+	"github.com/broothie/okay/arg"
+	"github.com/broothie/okay/param"
 )
 
 type Task interface {

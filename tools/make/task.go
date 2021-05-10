@@ -3,10 +3,10 @@ package make
 import (
 	"os"
 
-	"github.com/broothie/now/arg"
-	"github.com/broothie/now/param"
-	"github.com/broothie/now/task"
-	"github.com/broothie/now/toolhelp"
+	"github.com/broothie/okay/arg"
+	"github.com/broothie/okay/param"
+	"github.com/broothie/okay/task"
+	"github.com/broothie/okay/toolhelp"
 )
 
 type Task struct {

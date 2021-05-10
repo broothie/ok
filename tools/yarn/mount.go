@@ -5,8 +5,8 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/broothie/now/task"
-	"github.com/broothie/now/toolhelp"
+	"github.com/broothie/okay/task"
+	"github.com/broothie/okay/toolhelp"
 )
 
 func (Yarn) Mount() ([]task.Task, error) {

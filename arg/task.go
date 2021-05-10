@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/broothie/now/param"
+	"github.com/broothie/okay/param"
 )
 
 var dashStripper = regexp.MustCompile(`^-+`)

@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/broothie/now/tool"
+	"github.com/broothie/okay/tool"
 
-	"github.com/broothie/now/arg"
-	"github.com/broothie/now/task"
+	"github.com/broothie/okay/arg"
+	"github.com/broothie/okay/task"
 )
 
 func Run(args []string) {

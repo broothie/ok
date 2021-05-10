@@ -4,7 +4,7 @@ import "os"
 
 const (
 	ToolName = "ruby"
-	filename = "Nowfile.rb"
+	filename = "Okayfile.rb"
 )
 
 type Ruby struct{}

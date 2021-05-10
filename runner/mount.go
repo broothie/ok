@@ -3,7 +3,7 @@ package runner
 import (
 	"sync"
 
-	"github.com/broothie/now/tool"
+	"github.com/broothie/okay/tool"
 )
 
 func (r Runner) mount() {

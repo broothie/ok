@@ -1,6 +1,6 @@
 package arg
 
-import "github.com/broothie/now/param"
+import "github.com/broothie/okay/param"
 
 type Parser struct {
 	Options Options

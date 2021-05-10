@@ -1,10 +1,10 @@
 package tool
 
 import (
-	"github.com/broothie/now/tools/golang"
-	"github.com/broothie/now/tools/make" // NOTE: Collides with `make` builtin
-	"github.com/broothie/now/tools/ruby"
-	"github.com/broothie/now/tools/yarn"
+	"github.com/broothie/okay/tools/golang"
+	"github.com/broothie/okay/tools/make" // NOTE: Collides with `make` builtin
+	"github.com/broothie/okay/tools/ruby"
+	"github.com/broothie/okay/tools/yarn"
 )
 
 var Registry = map[string]Tool{

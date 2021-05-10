@@ -7,7 +7,7 @@ import (
 
 const (
 	ToolName = "go"
-	filename = "Nowfile.go"
+	filename = "Okayfile.go"
 )
 
 type Golang struct{}

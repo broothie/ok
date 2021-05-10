@@ -1,4 +1,4 @@
-module github.com/broothie/now
+module github.com/broothie/okay
 
 go 1.15
 

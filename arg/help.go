@@ -2,10 +2,10 @@ package arg
 
 import "fmt"
 
-const help = `now v0.1.0
+const help = `ok v0.1.0
 
 Usage:
-  $ now [options] <task> [args]
+  $ ok [options] <task> [args]
 
 Options:
   -h --help             Print this help menu.
