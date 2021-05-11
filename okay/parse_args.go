@@ -8,6 +8,10 @@ import (
 )
 
 func (p *Parser) ParseArgs(params task.Parameters) (task.Args, error) {
+	if params.Forward {
+		return task.Args{Forwards: p.rawArgs[p.argCounter:]}, nil
+	}
+
 	args := task.Args{Keyword: make(map[string]task.Arg)}
 
 	for p.argCounter < len(p.rawArgs) {
@@ -72,6 +76,12 @@ func (p *Parser) ParseArgs(params task.Parameters) (task.Args, error) {
 
 	return args, nil
 }
+
+//func (p *Parser) forward(params task.Parameters) (task.Args, error) {
+//	for p.argCounter < len(p.rawArgs) {
+//
+//	}
+//}
 
 func processArgWithParam(rawArg string, param task.Parameter) (task.Arg, error) {
 	processed, err := param.Type.Parse(rawArg)

@@ -1,4 +1,4 @@
-package golang
+package dockercompose
 
 import (
 	"fmt"
@@ -9,12 +9,11 @@ import (
 )
 
 const (
-	ToolName = "go"
-	filename = "Okayfile.go"
+	ToolName = "docker-compose"
+	filename = "docker-compose.yml"
 
-	initContents = `//+build okay
-
-package main
+	initContents = `version: "3"
+services:
 `
 )
 

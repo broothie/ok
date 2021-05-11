@@ -12,6 +12,7 @@ type Parameter struct {
 }
 
 type Parameters struct {
+	Forward            bool
 	PositionalRequired []Parameter
 	PositionalOptional []Parameter
 	KeywordRequired    []Parameter

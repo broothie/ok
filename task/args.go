@@ -6,6 +6,7 @@ type Arg struct {
 }
 
 type Args struct {
+	Forwards   []string
 	Positional []Arg
 	Keyword    map[string]Arg
 }

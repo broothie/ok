@@ -4,8 +4,9 @@ import (
 	"sync"
 
 	"github.com/broothie/okay/task"
+	dockercompose "github.com/broothie/okay/tool/docker-compose"
 	"github.com/broothie/okay/tool/golang"
-	"github.com/broothie/okay/tool/make" // NOTE: Collides with `make` builtin
+	maketool "github.com/broothie/okay/tool/make" // NOTE: Collides with `make` builtin
 	"github.com/broothie/okay/tool/node"
 	"github.com/broothie/okay/tool/ruby"
 	"github.com/broothie/okay/tool/yarn"
@@ -14,13 +15,14 @@ import (
 var Registry = []Tool{
 	ruby.Tool{},
 	golang.Tool{},
-	make.Tool{},
+	maketool.Tool{},
 	node.Tool{},
+	dockercompose.Tool{},
 	yarn.Tool{},
 }
 
 func Mount() map[string]task.Task {
-	tasks := map[string]task.Task{}
+	tasks := make(map[string]task.Task)
 	var mutex sync.Mutex
 	var wg sync.WaitGroup
 	defer wg.Wait()
