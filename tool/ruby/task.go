@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/broothie/okay/task"
-	"github.com/broothie/okay/tool"
+	"github.com/broothie/ok/task"
+	"github.com/broothie/ok/tool"
 )
 
 type Task struct {

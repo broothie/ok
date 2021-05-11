@@ -3,12 +3,12 @@ package node
 import (
 	"os"
 
-	"github.com/broothie/okay/tool"
+	"github.com/broothie/ok/tool"
 )
 
 const (
 	ToolName = "node"
-	filename = "Okayfile.js"
+	filename = "Okfile.js"
 )
 
 type Tool struct{}

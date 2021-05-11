@@ -5,8 +5,8 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/broothie/okay/task"
-	"github.com/broothie/okay/tool"
+	"github.com/broothie/ok/task"
+	"github.com/broothie/ok/tool"
 )
 
 func (t Tool) Mount() ([]task.Task, error) {

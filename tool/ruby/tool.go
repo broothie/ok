@@ -3,12 +3,12 @@ package ruby
 import (
 	"os"
 
-	"github.com/broothie/okay/tool"
+	"github.com/broothie/ok/tool"
 )
 
 const (
 	ToolName = "ruby"
-	filename = "Okayfile.rb"
+	filename = "Okfile.rb"
 )
 
 type Tool struct{}

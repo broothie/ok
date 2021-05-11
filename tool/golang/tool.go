@@ -4,15 +4,15 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/broothie/okay/tool"
+	"github.com/broothie/ok/tool"
 	"github.com/pkg/errors"
 )
 
 const (
 	ToolName = "go"
-	filename = "Okayfile.go"
+	filename = "Okfile.go"
 
-	initContents = `//+build okay
+	initContents = `//+build ok
 
 package main
 `

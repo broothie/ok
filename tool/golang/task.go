@@ -6,8 +6,8 @@ import (
 	"os"
 	"text/template"
 
-	"github.com/broothie/okay/task"
-	"github.com/broothie/okay/tool"
+	"github.com/broothie/ok/task"
+	"github.com/broothie/ok/tool"
 )
 
 var tmpl = template.Must(template.New("").Parse(`{{ .Source }}
@@ -38,7 +38,7 @@ func (t Task) Params() task.Parameters {
 }
 
 func (t Task) Invoke(args task.Args) *os.Process {
-	file, err := ioutil.TempFile("", "Okayfile-*.go")
+	file, err := ioutil.TempFile("", "Okfile-*.go")
 	if err != nil {
 		tool.Warn(ToolName, "failed to write go tempfile: %v", err)
 		return nil

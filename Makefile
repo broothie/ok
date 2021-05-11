@@ -1,15 +1,14 @@
 
-check: test build
-	rm -rf ok
+check: test build clean
 
 build: generate
-	go build cmd/ok/ok.go
+	go build -o _ok ok.go
 
 test: generate
 	go test -cover ./...
 
 install: generate
-	go install cmd/ok/ok.go
+	go install ok.go
 
 task/type_string.go: task/type.go
 	go generate ./...

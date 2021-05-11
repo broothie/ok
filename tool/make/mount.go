@@ -6,8 +6,8 @@ import (
 	"os/exec"
 	"regexp"
 
-	"github.com/broothie/okay/task"
-	"github.com/broothie/okay/tool"
+	"github.com/broothie/ok/task"
+	"github.com/broothie/ok/tool"
 )
 
 var ruleMatcher = regexp.MustCompile(`(?m)^\s*(.*):`)

@@ -3,7 +3,7 @@ package make
 import (
 	"os"
 
-	"github.com/broothie/okay/tool"
+	"github.com/broothie/ok/tool"
 )
 
 const (
