@@ -12,7 +12,7 @@ import (
 
 var ruleMatcher = regexp.MustCompile(`(?m)^\s*(.*):`)
 
-func (m Make) Mount() ([]task.Task, error) {
+func (t Tool) Mount() ([]task.Task, error) {
 	if _, err := os.Stat(filename); err != nil {
 		if os.IsNotExist(err) {
 			return nil, nil
@@ -21,7 +21,7 @@ func (m Make) Mount() ([]task.Task, error) {
 		return nil, tool.ReadToolFileError{Filename: filename, Err: err}
 	}
 
-	if err := m.Check(); err != nil {
+	if err := t.Check(); err != nil {
 		if err == exec.ErrNotFound {
 			return nil, tool.CommandNotFoundError{CommandName: ToolName}
 		}

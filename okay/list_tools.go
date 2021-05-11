@@ -6,11 +6,11 @@ import (
 )
 
 func ListTools(w io.Writer) {
-	for toolName, tool := range Registry {
+	for _, tool := range Registry {
 		if err := tool.Check(); err != nil {
-			fmt.Fprintf(w, "𝘹 %s %v\n", toolName, err)
+			fmt.Fprintf(w, "𝘹 %s %v\n", tool.Name(), err)
 		} else {
-			fmt.Fprintf(w, "✔ %s\n", toolName)
+			fmt.Fprintf(w, "✔ %s\n", tool.Name())
 		}
 	}
 }

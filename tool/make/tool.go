@@ -11,13 +11,17 @@ const (
 	filename = "Makefile"
 )
 
-type Make struct{}
+type Tool struct{}
 
-func (Make) Init() error {
+func (Tool) Name() string {
+	return ToolName
+}
+
+func (Tool) Init() error {
 	_, err := os.Create(filename)
 	return err
 }
 
-func (Make) Check() error {
+func (Tool) Check() error {
 	return tool.Check(ToolName)
 }

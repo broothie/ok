@@ -12,9 +12,13 @@ const (
 	filename = "Okayfile.go"
 )
 
-type Golang struct{}
+type Tool struct{}
 
-func (Golang) Init() error {
+func (Tool) Name() string {
+	return ToolName
+}
+
+func (Tool) Init() error {
 	file, err := os.Create(filename)
 	if err != nil {
 		return err
@@ -26,6 +30,6 @@ func (Golang) Init() error {
 	return err
 }
 
-func (Golang) Check() error {
+func (Tool) Check() error {
 	return tool.Check(ToolName)
 }

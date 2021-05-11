@@ -26,15 +26,7 @@ func main() {
 		fmt.Printf("ok v%s", okay.Version)
 
 	case options.Init != "":
-		toolName := options.Init
-		tool, toolExists := okay.Registry[toolName]
-		if !toolExists {
-			okay.Logger.Printf("no tool called '%s'", toolName)
-			os.Exit(1)
-			return
-		}
-
-		if err := tool.Init(); err != nil {
+		if err := okay.InitTool(options.Init); err != nil {
 			okay.Logger.Println(err)
 			os.Exit(1)
 			return

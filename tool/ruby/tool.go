@@ -11,13 +11,17 @@ const (
 	filename = "Okayfile.rb"
 )
 
-type Ruby struct{}
+type Tool struct{}
 
-func (Ruby) Init() error {
+func (Tool) Name() string {
+	return ToolName
+}
+
+func (Tool) Init() error {
 	_, err := os.Create(filename)
 	return err
 }
 
-func (Ruby) Check() error {
+func (Tool) Check() error {
 	return tool.Check(ToolName)
 }

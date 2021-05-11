@@ -13,7 +13,7 @@ import (
 
 var funcFinder = regexp.MustCompile(`(?m)^\s*func\s+(\w+)\s*\((.*)\)`)
 
-func (g Golang) Mount() ([]task.Task, error) {
+func (t Tool) Mount() ([]task.Task, error) {
 	if _, err := os.Open(filename); err != nil {
 		if os.IsNotExist(err) {
 			return nil, nil
@@ -22,7 +22,7 @@ func (g Golang) Mount() ([]task.Task, error) {
 		return nil, tool.ReadToolFileError{Err: err, Filename: filename}
 	}
 
-	if err := g.Check(); err != nil {
+	if err := t.Check(); err != nil {
 		return nil, err
 	}
 

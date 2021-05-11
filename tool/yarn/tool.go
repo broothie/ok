@@ -11,13 +11,17 @@ const (
 	filename = "package.json"
 )
 
-type Yarn struct{}
+type Tool struct{}
 
-func (Yarn) Init() error {
+func (Tool) Name() string {
+	return ToolName
+}
+
+func (Tool) Init() error {
 	_, err := os.Create(filename)
 	return err
 }
 
-func (Yarn) Check() error {
+func (Tool) Check() error {
 	return tool.Check(ToolName)
 }

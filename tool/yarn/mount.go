@@ -9,7 +9,7 @@ import (
 	"github.com/broothie/okay/tool"
 )
 
-func (y Yarn) Mount() ([]task.Task, error) {
+func (t Tool) Mount() ([]task.Task, error) {
 	file, err := os.Open(filename)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -21,7 +21,7 @@ func (y Yarn) Mount() ([]task.Task, error) {
 
 	defer file.Close()
 
-	if err := y.Check(); err != nil {
+	if err := t.Check(); err != nil {
 		if err == exec.ErrNotFound {
 			return nil, tool.CommandNotFoundError{CommandName: ToolName}
 		}

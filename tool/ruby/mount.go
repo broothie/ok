@@ -19,7 +19,7 @@ var (
 	keywordMatcher    = regexp.MustCompile(`^(?P<paramName>\w+):(?:\s*(?P<default>.*))?$`)
 )
 
-func (r Ruby) Mount() ([]task.Task, error) {
+func (t Tool) Mount() ([]task.Task, error) {
 	if _, err := os.Stat(filename); err != nil {
 		if os.IsNotExist(err) {
 			return nil, nil
@@ -28,7 +28,7 @@ func (r Ruby) Mount() ([]task.Task, error) {
 		return nil, tool.ReadToolFileError{Err: err, Filename: filename}
 	}
 
-	if err := r.Check(); err != nil {
+	if err := t.Check(); err != nil {
 		if err == exec.ErrNotFound {
 			return nil, tool.CommandNotFoundError{CommandName: ToolName}
 		}
