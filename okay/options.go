@@ -24,18 +24,18 @@ type Option struct {
 }
 
 func (p *Parser) ParseOptions() (Options, error) {
-	optionTable := make(map[string]Option)
+	options := make(map[string]Option)
 	for _, option := range p.availableOptions {
-		optionTable[fmt.Sprintf("--%s", option.Name)] = option
+		options[fmt.Sprintf("--%s", option.Name)] = option
 		if option.Short {
-			optionTable[fmt.Sprintf("-%c", option.Name[0])] = option
+			options[fmt.Sprintf("-%c", option.Name[0])] = option
 		}
 	}
 
 	for p.argCounter < len(p.rawArgs) && p.options.TaskName == "" {
 		rawArg, _ := p.current()
 		if dashPrefix.MatchString(rawArg) {
-			option, optionFound := optionTable[rawArg]
+			option, optionFound := options[rawArg]
 			if !optionFound {
 				return Options{}, fmt.Errorf("invalid option: '%s'", rawArg)
 			}

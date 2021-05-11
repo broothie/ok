@@ -3,6 +3,16 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/signal"
+	"path/filepath"
+	"sync"
+	"time"
+
+	"github.com/pkg/errors"
+
+	"github.com/broothie/okay/task"
+
+	watcher "github.com/radovskyb/watcher"
 
 	"github.com/broothie/okay/okay"
 )
@@ -67,8 +77,83 @@ func main() {
 	}
 
 	// Run task
-	if _, err := task.Invoke(args).Wait(); err != nil {
-		okay.Logger.Println(err)
-		os.Exit(1)
+	if len(options.Watches) > 0 {
+		if err := runWatcher(task, args, options.Watches); err != nil {
+			okay.Logger.Println(err)
+			os.Exit(1)
+		}
+	} else {
+		if _, err := task.Invoke(args).Wait(); err != nil {
+			okay.Logger.Println(err)
+			os.Exit(1)
+		}
 	}
+}
+
+func runWatcher(task task.Task, args task.Args, watches []string) error {
+	var wg sync.WaitGroup
+	defer wg.Wait()
+	watcher := watcher.New()
+	watcher.SetMaxEvents(1)
+
+	for _, watchPattern := range watches {
+		filenames, err := filepath.Glob(watchPattern)
+		if err != nil {
+			return errors.Wrapf(err, "failed to glob '%s'", watchPattern)
+		}
+
+		for _, filename := range filenames {
+			if err := watcher.Add(filename); err != nil {
+				return errors.Wrapf(err, "failed to add file '%s' to watches", filename)
+			}
+		}
+	}
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var process *os.Process
+
+		for {
+			select {
+			case <-watcher.Event:
+				if process != nil {
+					process.Kill()
+				}
+
+				process = task.Invoke(args)
+
+			case err := <-watcher.Error:
+				if process != nil {
+					process.Kill()
+				}
+
+				okay.Logger.Println(err)
+				return
+
+			case <-watcher.Closed:
+				if process != nil {
+					process.Kill()
+				}
+
+				return
+			}
+		}
+	}()
+
+	kill := make(chan os.Signal)
+	signal.Notify(kill, os.Interrupt)
+	signal.Notify(kill, os.Kill)
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		<-kill
+		watcher.Close()
+	}()
+
+	if err := watcher.Start(100 * time.Millisecond); err != nil {
+		return errors.Wrap(err, "failed to start watcher")
+	}
+
+	return nil
 }
