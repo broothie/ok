@@ -1,7 +1,4 @@
-
-def greet(name = 'World')
-    puts "Hello, #{name}!"
-end
+require 'pry'
 
 def example(apple, banana = 'yellow', cherry:, durian: 'smelly')
     puts "#{apple} apple, #{banana} banana, #{cherry} cherry, #{durian} durian"
@@ -11,6 +8,11 @@ def repeat(message, n = 3)
     n.times { puts message }
 end
 
-# def pry
-#     `pry`
-# end
+def fix_imports
+    filenames = Dir['**/*.go']
+    filenames
+end
+
+def repl
+    binding.pry
+end

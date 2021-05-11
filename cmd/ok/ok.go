@@ -4,17 +4,14 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"path/filepath"
 	"sync"
 	"time"
 
-	"github.com/pkg/errors"
-
-	"github.com/broothie/okay/task"
-
-	watcher "github.com/radovskyb/watcher"
-
+	"github.com/bmatcuk/doublestar"
 	"github.com/broothie/okay/okay"
+	"github.com/broothie/okay/task"
+	"github.com/pkg/errors"
+	"github.com/radovskyb/watcher"
 )
 
 func main() {
@@ -97,7 +94,7 @@ func runWatcher(task task.Task, args task.Args, watches []string) error {
 	watcher.SetMaxEvents(1)
 
 	for _, watchPattern := range watches {
-		filenames, err := filepath.Glob(watchPattern)
+		filenames, err := doublestar.Glob(watchPattern)
 		if err != nil {
 			return errors.Wrapf(err, "failed to glob '%s'", watchPattern)
 		}
