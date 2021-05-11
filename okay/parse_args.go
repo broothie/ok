@@ -2,6 +2,7 @@ package okay
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/broothie/okay/task"
 )
@@ -61,6 +62,14 @@ func (p *Parser) ParseArgs(params task.Parameters) (task.Args, error) {
 		}
 	}
 
+	if len(args.Positional) < len(params.PositionalRequired) {
+		return task.Args{}, missingPositionalError(params.PositionalRequired, args.Positional)
+	}
+
+	if len(args.Keyword) < len(params.KeywordRequired) {
+		return task.Args{}, missingKeywordArgError(params.KeywordRequired, args.Keyword)
+	}
+
 	return args, nil
 }
 
@@ -71,4 +80,24 @@ func processArgWithParam(rawArg string, param task.Parameter) (task.Arg, error) 
 	}
 
 	return task.Arg{Parameter: param, Value: processed}, nil
+}
+
+func missingPositionalError(params []task.Parameter, args []task.Arg) error {
+	missingArgs := make([]string, 0, len(params))
+	for _, param := range params[len(args):] {
+		missingArgs = append(missingArgs, param.Name)
+	}
+
+	return fmt.Errorf("missing positional args: [%s]", strings.Join(missingArgs, ", "))
+}
+
+func missingKeywordArgError(params []task.Parameter, args map[string]task.Arg) error {
+	missingArgs := make([]string, 0, len(args))
+	for _, param := range params {
+		if _, argPresent := args[param.Name]; !argPresent {
+			missingArgs = append(missingArgs, param.Name)
+		}
+	}
+
+	return fmt.Errorf("missing keyword args: [%s]", strings.Join(missingArgs, ", "))
 }
