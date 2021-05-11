@@ -9,3 +9,7 @@ task/type_string.go: task/type.go
 	go generate ./...
 
 generate: task/type_string.go
+
+clean:
+	go clean
+	rm -rf ok

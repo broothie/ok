@@ -8,5 +8,5 @@ import (
 const Version = "0.1.0"
 
 func WriteVersion(w io.Writer) {
-	fmt.Fprintf(w, "ok v%s\n", Version)
+	fmt.Fprintf(w, "ok v%s 👌\n", Version)
 }

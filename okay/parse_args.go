@@ -4,11 +4,11 @@ import (
 	"fmt"
 
 	"github.com/broothie/okay/task"
-	"github.com/pkg/errors"
 )
 
 func (p *Parser) ParseArgs(params task.Parameters) (task.Args, error) {
 	args := task.Args{Keyword: make(map[string]task.Arg)}
+
 	for p.argCounter < len(p.rawArgs) {
 		rawArg, _ := p.current()
 		if dashPrefix.MatchString(rawArg) {
@@ -27,7 +27,7 @@ func (p *Parser) ParseArgs(params task.Parameters) (task.Args, error) {
 					value = true
 				}
 
-				args.Keyword[argSansDash] = task.Arg{Parameter: param, Value: value}
+				args.Keyword[param.Name] = task.Arg{Parameter: param, Value: value}
 				p.argCounter++
 				continue
 			}
@@ -42,12 +42,13 @@ func (p *Parser) ParseArgs(params task.Parameters) (task.Args, error) {
 				return task.Args{}, err
 			}
 
-			args.Keyword[argSansDash] = arg
+			args.Keyword[param.Name] = arg
+			p.argCounter += 2
 		} else {
 			// Positional
 			param, paramPresent := params.PositionalAt(len(args.Positional))
 			if !paramPresent {
-				return task.Args{}, errors.New("too many positional args provided")
+				return task.Args{}, fmt.Errorf("too many positional args provided, expected max of %d", len(params.PositionalRequired)+len(params.PositionalOptional))
 			}
 
 			arg, err := processArgWithParam(rawArg, param)

@@ -38,7 +38,18 @@ func ListTasks(w io.Writer, tasks map[string]task.Task) error {
 		counter++
 	}
 
+	headerSlice := []string{"TASK"}
+	if includeFilenames {
+		headerSlice = append(headerSlice, "FILE")
+	}
+
+	if includeToolNames {
+		headerSlice = append(headerSlice, "TOOL")
+	}
+
 	sort.Strings(lines)
+	lines = append([]string{strings.Join(headerSlice, "\t") + "\n"}, lines...)
+
 	table := tabwriter.NewWriter(w, 0, 0, 2, ' ', 0)
 	for _, line := range lines {
 		if _, err := fmt.Fprint(table, line); err != nil {

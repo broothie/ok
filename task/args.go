@@ -1,8 +1,8 @@
 package task
 
 type Arg struct {
-	Parameter
-	Value interface{}
+	Parameter Parameter
+	Value     interface{}
 }
 
 type Args struct {
