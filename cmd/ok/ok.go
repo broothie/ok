@@ -81,6 +81,10 @@ func main() {
 		}
 	} else {
 		if _, err := task.Invoke(args).Wait(); err != nil {
+			if err.Error() == "wait: no child processes" {
+				return
+			}
+
 			okay.Logger.Println(err)
 			os.Exit(1)
 		}

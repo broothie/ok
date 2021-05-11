@@ -6,6 +6,7 @@ import (
 	"github.com/broothie/okay/task"
 	"github.com/broothie/okay/tool/golang"
 	"github.com/broothie/okay/tool/make" // NOTE: Collides with `make` builtin
+	"github.com/broothie/okay/tool/node"
 	"github.com/broothie/okay/tool/ruby"
 	"github.com/broothie/okay/tool/yarn"
 )
@@ -14,6 +15,7 @@ var Registry = []Tool{
 	ruby.Tool{},
 	golang.Tool{},
 	make.Tool{},
+	node.Tool{},
 	yarn.Tool{},
 }
 

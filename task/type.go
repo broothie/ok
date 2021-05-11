@@ -22,7 +22,7 @@ func (t Type) Parse(s string) (interface{}, error) {
 	case Int:
 		return strconv.Atoi(s)
 	case Float:
-		return strconv.ParseFloat(s, 64)
+		return strconv.ParseFloat(s, 32)
 	default:
 		return s, nil
 	}

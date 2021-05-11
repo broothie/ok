@@ -46,11 +46,10 @@ func (t Task) Invoke(args task.Args) *os.Process {
 
 	argStrings := make([]string, len(args.Positional))
 	for i, positional := range args.Positional {
-		//parameter := t.params.PositionalRequired[i]
 		switch positional.Parameter.Type {
 		case task.String:
 			argStrings[i] = fmt.Sprintf(`"%v"`, positional.Value)
-		case task.Bool, task.Int:
+		case task.Bool, task.Int, task.Float:
 			argStrings[i] = fmt.Sprint(positional.Value)
 		}
 	}
@@ -64,7 +63,7 @@ func (t Task) Invoke(args task.Args) *os.Process {
 		return nil
 	}
 
-	go file.Close()
+	defer file.Close()
 
 	process := tool.Exec(ToolName, "run", file.Name()).Process
 	go func() {

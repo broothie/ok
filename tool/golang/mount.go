@@ -63,6 +63,8 @@ func (t Tool) Mount() ([]task.Task, error) {
 				paramType = task.Bool
 			case "int":
 				paramType = task.Int
+			case "float64", "float32":
+				paramType = task.Float
 			case "string":
 				paramType = task.String
 			default:

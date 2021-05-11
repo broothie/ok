@@ -22,9 +22,9 @@ granny smith apple, yellow banana, maraschino cherry, stinky durian
 You can call `ok` without a task name to list available tasks:
 ```bash
 $ ok
-build                                                     Makefile    make
+build                                                     Makefile     make
 example <apple> <banana=yellow> --cherry --durian=smelly  Okayfile.rb  ruby
-generate                                                  Makefile    make
+generate                                                  Makefile     make
 get <url>                                                 Okayfile.go  go
 greet <name=World>                                        Okayfile.rb  ruby
 list                                                      Okayfile.go  go
@@ -35,6 +35,7 @@ types                                                     Okayfile.go  go
 - Go
 - Make
 - Ruby
+- Node
 - Yarn
 
 ## To do
@@ -46,14 +47,14 @@ types                                                     Okayfile.go  go
   - [x] Go
   - [ ] sh
   - [ ] Python
-  - [ ] Node
+  - [x] Node
   - [ ] Rake
+  - [ ] docker-compose
+  - [ ] npm
 - [ ] Set up goreleaser
-- [ ] Tool inits
-- [ ] Help
+- [x] Tool inits
+- [x] Help
 - [ ] README
 - [ ] Cache in temp file?
-
-## Attributions
-
-- [github.com/radovskyb/watcher](https://github.com/radovskyb/watcher)
+- [ ] Tab completion
+- [ ] Task inspect
