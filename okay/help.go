@@ -23,11 +23,11 @@ func (p *Parser) WriteHelp(w io.Writer) {
 			short = fmt.Sprintf("-%c", option.Name[0])
 		}
 
-		var example string
-		if option.Example != "" {
-			example = fmt.Sprintf(" <%s>", option.Example)
+		var argName string
+		if option.ArgName != "" {
+			argName = fmt.Sprintf(" <%s>", option.ArgName)
 		}
 
-		fmt.Fprintf(t, "\t%s\t--%s%s\t%s\n", short, option.Name, example, option.Description)
+		fmt.Fprintf(t, "\t%s\t--%s%s\t%s\n", short, option.Name, argName, option.Description)
 	}
 }

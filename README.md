@@ -43,6 +43,9 @@ types                                                     Okayfile.go  go
 - [ ] Improve tool interface
 - [ ] Tests
 - [ ] Scour error paths
+- [ ] Support .rc or something
+- [ ] Task inspect
+- [ ] Param validator (validates tool param output)
 - [ ] Add more tools
   - [x] Go
   - [ ] sh
@@ -57,4 +60,3 @@ types                                                     Okayfile.go  go
 - [ ] README
 - [ ] Cache in temp file?
 - [ ] Tab completion
-- [ ] Task inspect

@@ -2,6 +2,8 @@ package okay
 
 import (
 	"fmt"
+
+	"github.com/pkg/errors"
 )
 
 type Options struct {
@@ -18,7 +20,7 @@ type Option struct {
 	Name         string
 	Short        bool
 	Description  string
-	Example      string
+	ArgName      string
 	Stop         bool
 	OptionSetter func() error
 }
@@ -53,6 +55,14 @@ func (p *Parser) ParseOptions() (Options, error) {
 		}
 	}
 
+	if len(p.options.Watches) > 0 && p.options.TaskName == "" {
+		return Options{}, errors.New("watches provided without task")
+	}
+
+	if p.options.TaskName == "" {
+		p.options.Stop = true
+	}
+
 	return p.options, nil
 }
 
@@ -76,7 +86,7 @@ func (p *Parser) setupOptions() {
 			Name:         "init",
 			Short:        true,
 			Description:  "Initialize a tool.",
-			Example:      "tool",
+			ArgName:      "tool",
 			Stop:         true,
 			OptionSetter: p.initSetter,
 		},
@@ -91,7 +101,7 @@ func (p *Parser) setupOptions() {
 			Name:         "watch",
 			Short:        true,
 			Description:  "Provide files or glob pattern to have a task run on file change.",
-			Example:      "glob",
+			ArgName:      "glob",
 			Stop:         false,
 			OptionSetter: p.watchSetter,
 		},

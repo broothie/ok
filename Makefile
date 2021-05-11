@@ -1,6 +1,12 @@
 
+check: test build
+	rm -rf ok
+
 build: generate
 	go build cmd/ok/ok.go
+
+test: generate
+	go test ./...
 
 install: generate
 	go install cmd/ok/ok.go

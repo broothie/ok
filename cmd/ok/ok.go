@@ -43,7 +43,6 @@ func main() {
 		okay.ListTools(os.Stdout)
 
 	case options.TaskName == "":
-		options.Stop = true
 		if err := okay.ListTasks(os.Stdout, okay.Mount()); err != nil {
 			okay.Logger.Println(err)
 			os.Exit(1)

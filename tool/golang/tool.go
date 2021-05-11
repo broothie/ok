@@ -26,7 +26,7 @@ func (Tool) Init() error {
 
 	defer file.Close()
 
-	_, err = fmt.Fprint(file, "//+build okay\npackage main\n")
+	_, err = fmt.Fprint(file, "//+build okay\n\npackage main\n")
 	return err
 }
 

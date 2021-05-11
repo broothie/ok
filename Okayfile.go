@@ -1,4 +1,5 @@
 //+build okay
+
 package main
 
 import (
