@@ -4,8 +4,8 @@ require 'pry'
 def release(message, dry: true)
     bump
     version = get_version
-    tag version
-    push_tag version, message
+    tag version, message
+    push_tag version
 
     if dry
         puts `goreleaser --snapshot --skip-publish --rm-dist`
