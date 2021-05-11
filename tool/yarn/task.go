@@ -3,9 +3,8 @@ package yarn
 import (
 	"os"
 
-	"github.com/broothie/okay/tool"
-
 	"github.com/broothie/okay/task"
+	"github.com/broothie/okay/tool"
 )
 
 type Task struct {

@@ -6,9 +6,8 @@ import (
 	"os"
 	"text/template"
 
-	"github.com/broothie/okay/tool"
-
 	"github.com/broothie/okay/task"
+	"github.com/broothie/okay/tool"
 )
 
 var tmpl = template.Must(template.New("").Parse(`{{ .Source }}
