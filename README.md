@@ -1,6 +1,6 @@
 # Okay
 
-A command runner.
+A task runner.
 
 ## Usage
 
@@ -36,6 +36,7 @@ types                                                     Okayfile.go  go
 - Make
 - Ruby
 - Node
+- docker-compose
 - Yarn
 
 ## To do
@@ -52,7 +53,7 @@ types                                                     Okayfile.go  go
   - [ ] Python
   - [x] Node
   - [ ] Rake
-  - [ ] docker-compose
+  - [x] docker-compose
   - [ ] npm
 - [ ] Set up goreleaser
 - [x] Tool inits
