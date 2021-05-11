@@ -5,7 +5,7 @@ build: generate
 install: generate
 	go install cmd/ok/ok.go
 
-param/type_string.go:
+task/type_string.go: task/type.go
 	go generate ./...
 
-generate: param/type_string.go
+generate: task/type_string.go

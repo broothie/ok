@@ -6,7 +6,7 @@ type Base struct {
 	toolName string
 }
 
-func NewBaseTask(name, filename, toolName string) Base {
+func NewBase(name, filename, toolName string) Base {
 	return Base{name: name, filename: filename, toolName: toolName}
 }
 
