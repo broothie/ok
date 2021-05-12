@@ -8,6 +8,7 @@ import (
 
 func (p *Parser) PrintHelp(version string) error {
 	PrintVersion(version)
+	fmt.Println()
 	fmt.Println("Usage:")
 	fmt.Println("  $ ok [options] <task> [args]")
 	fmt.Println()

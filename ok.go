@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"os"
 	"os/signal"
+	"strings"
 	"sync"
 	"time"
 
@@ -15,7 +16,11 @@ import (
 )
 
 //go:embed VERSION
-var Version string
+var version string
+
+func Version() string {
+	return strings.TrimSpace(version)
+}
 
 func main() {
 	// Parse options
@@ -30,14 +35,14 @@ func main() {
 	// Process options
 	switch {
 	case options.Help:
-		if err := parser.PrintHelp(Version); err != nil {
+		if err := parser.PrintHelp(Version()); err != nil {
 			ok.Logger.Println(err)
 			os.Exit(1)
 			return
 		}
 
 	case options.Version:
-		ok.PrintVersion(Version)
+		ok.PrintVersion(Version())
 
 	case options.Init != "":
 		if err := ok.InitTool(options.Init); err != nil {

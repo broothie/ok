@@ -26,8 +26,6 @@ func (p *Parser) ParseOptions() (Options, error) {
 				return Options{}, err
 			}
 
-			fmt.Printf("%+v\n", p.options)
-
 			if !p.options.Stop {
 				p.options.Stop = option.Stop
 			}
