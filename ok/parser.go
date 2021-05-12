@@ -7,17 +7,9 @@ import (
 var dashPrefix = regexp.MustCompile(`^-+`)
 
 type Parser struct {
-	rawArgs    []string
+	Args       []string
 	argCounter int
-
-	options          Options
-	availableOptions []Option
-}
-
-func NewParser(rawArgs []string) *Parser {
-	parser := &Parser{rawArgs: rawArgs}
-	parser.setupOptions()
-	return parser
+	options    Options
 }
 
 func (p *Parser) current() (string, bool) {
@@ -26,8 +18,8 @@ func (p *Parser) current() (string, bool) {
 
 func (p *Parser) peek(offset int) (string, bool) {
 	index := p.argCounter + offset
-	if index < len(p.rawArgs) {
-		return p.rawArgs[index], true
+	if index < len(p.Args) {
+		return p.Args[index], true
 	}
 
 	return "", false

@@ -9,7 +9,7 @@ import (
 
 func (p *Parser) ParseArgs(params task.Parameters) (task.Args, error) {
 	if params.Forward {
-		return task.Args{Forwards: p.rawArgs[p.argCounter:]}, nil
+		return task.Args{Forwards: p.Args[p.argCounter:]}, nil
 	}
 
 	positional := params.Positional()
@@ -18,7 +18,7 @@ func (p *Parser) ParseArgs(params task.Parameters) (task.Args, error) {
 	keywordRequired := params.Keyword().Required()
 
 	args := task.Args{Keyword: make(map[string]task.Arg)}
-	for p.argCounter < len(p.rawArgs) {
+	for p.argCounter < len(p.Args) {
 		rawArg, _ := p.current()
 		if dashPrefix.MatchString(rawArg) {
 			// Keyword

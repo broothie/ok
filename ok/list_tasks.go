@@ -2,15 +2,15 @@ package ok
 
 import (
 	"fmt"
-	"io"
+	"os"
 	"sort"
 	"strings"
 	"text/tabwriter"
-
-	"github.com/broothie/ok/task"
 )
 
-func ListTasks(w io.Writer, tasks map[string]task.Task) error {
+func ListTasks() error {
+	tasks := Mount()
+
 	paramsPresent := false
 	filenames := make(set)
 	toolNames := make(set)
@@ -62,7 +62,7 @@ func ListTasks(w io.Writer, tasks map[string]task.Task) error {
 	sort.Strings(lines)
 	lines = append([]string{strings.Join(headerSlice, "\t") + "\n"}, lines...)
 
-	table := tabwriter.NewWriter(w, 0, 0, 2, ' ', 0)
+	table := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
 	for _, line := range lines {
 		if _, err := fmt.Fprint(table, line); err != nil {
 			return err

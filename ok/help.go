@@ -2,22 +2,19 @@ package ok
 
 import (
 	"fmt"
-	"io"
+	"os"
 	"text/tabwriter"
 )
 
-func (p *Parser) WriteHelp(w io.Writer) {
-	WriteVersion(w)
-	fmt.Fprintln(w)
-	fmt.Fprintln(w, "Usage:")
-	fmt.Fprintln(w, "  $ ok [options] <task> [args]")
-	fmt.Fprintln(w)
-	fmt.Fprintln(w, "Options:")
+func (p *Parser) PrintHelp(version string) error {
+	PrintVersion(version)
+	fmt.Println("Usage:")
+	fmt.Println("  $ ok [options] <task> [args]")
+	fmt.Println()
+	fmt.Println("Options:")
 
-	t := tabwriter.NewWriter(w, 0, 0, 2, ' ', 0)
-	defer t.Flush()
-
-	for _, option := range p.availableOptions {
+	t := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
+	for _, option := range options {
 		var short string
 		if option.Short {
 			short = fmt.Sprintf("-%c", option.Name[0])
@@ -30,4 +27,6 @@ func (p *Parser) WriteHelp(w io.Writer) {
 
 		fmt.Fprintf(t, "\t%s\t--%s%s\t%s\n", short, option.Name, argName, option.Description)
 	}
+
+	return t.Flush()
 }

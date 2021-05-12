@@ -1,3 +1,10 @@
 package ok
 
-const Version = "v0.1.10"
+import (
+	_ "embed"
+	"fmt"
+)
+
+func PrintVersion(version string) {
+	fmt.Printf("👌 ok %s\n", version)
+}

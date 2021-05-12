@@ -10,6 +10,8 @@ import (
 )
 
 func TestParser_ParseOptions(t *testing.T) {
+	taskName := "asdf"
+
 	t.Run("no options", func(t *testing.T) {
 		expected := Options{Stop: true}
 		actual, err := parserWithArgs().ParseOptions()
@@ -18,20 +20,16 @@ func TestParser_ParseOptions(t *testing.T) {
 	})
 
 	t.Run("task provided", func(t *testing.T) {
-		task := "asdf"
-		expected := Options{Stop: false, TaskName: task}
-		actual, err := parserWithArgs(task).ParseOptions()
+		expected := Options{Stop: false, TaskName: taskName}
+		actual, err := parserWithArgs(taskName).ParseOptions()
 		assert.NoError(t, err)
-
 		assert.Equal(t, expected, actual)
 	})
 
 	t.Run("task provided with help", func(t *testing.T) {
-		task := "asdf"
-		expected := Options{Stop: true, TaskName: task, Help: true}
-		actual, err := parserWithArgs("-h", task).ParseOptions()
+		expected := Options{Stop: true, TaskName: taskName, Help: true}
+		actual, err := parserWithArgs("-h", taskName).ParseOptions()
 		assert.NoError(t, err)
-
 		assert.Equal(t, expected, actual)
 	})
 
@@ -41,7 +39,6 @@ func TestParser_ParseOptions(t *testing.T) {
 				expected := Options{Stop: true, Help: true}
 				actual, err := parserWithArgs(flag).ParseOptions()
 				assert.NoError(t, err)
-
 				assert.Equal(t, expected, actual)
 			})
 		}
@@ -51,7 +48,6 @@ func TestParser_ParseOptions(t *testing.T) {
 		expected := Options{Stop: true, Version: true}
 		actual, err := parserWithArgs("--version").ParseOptions()
 		assert.NoError(t, err)
-
 		assert.Equal(t, expected, actual)
 	})
 
@@ -62,7 +58,6 @@ func TestParser_ParseOptions(t *testing.T) {
 				expected := Options{Stop: true, Init: toolName}
 				actual, err := parserWithArgs(flag, toolName).ParseOptions()
 				assert.NoError(t, err)
-
 				assert.Equal(t, expected, actual)
 			})
 		}
@@ -72,17 +67,14 @@ func TestParser_ParseOptions(t *testing.T) {
 		expected := Options{Stop: true, ListTools: true}
 		actual, err := parserWithArgs("--list-tools").ParseOptions()
 		assert.NoError(t, err)
-
 		assert.Equal(t, expected, actual)
 	})
 
 	t.Run("watches", func(t *testing.T) {
 		t.Run("task provided with watches", func(t *testing.T) {
-			task := "asdf"
-			expected := Options{Stop: false, TaskName: task, Watches: []string{"a", "b"}}
-			actual, err := parserWithArgs("--watch", "a", "-w", "b", task).ParseOptions()
+			expected := Options{Stop: false, TaskName: taskName, Watches: []string{"a", "b"}}
+			actual, err := parserWithArgs("--watch", "a", "-w", "b", taskName).ParseOptions()
 			assert.NoError(t, err)
-
 			assert.Equal(t, expected, actual)
 		})
 
@@ -111,7 +103,7 @@ func TestParser_ParseOptions(t *testing.T) {
 
 		for arg, expectedStop := range argStops {
 			t.Run(fmt.Sprintf("%s stops execution", arg), func(t *testing.T) {
-				actual, err := parserWithArgs(append(tool.SplitOnWhitespace(arg), "taskName")...).ParseOptions()
+				actual, err := parserWithArgs(append(tool.SplitOnWhitespace(arg), taskName)...).ParseOptions()
 				require.NoError(t, err)
 
 				assert.Equal(t, expectedStop, actual.Stop)

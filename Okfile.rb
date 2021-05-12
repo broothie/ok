@@ -4,12 +4,12 @@ require 'pry'
 def publish(message)
     bump
     puts `git add -A`
-    puts `git commit -m "{message}"`
+    puts `git commit -m "#{message}"`
     puts `git push`
 end
 
 def bump
-    puts `bump ok/version.go`
+    puts `bump VERSION`
 end
 
 def fix_imports

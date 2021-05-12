@@ -1,6 +1,7 @@
 package main
 
 import (
+	_ "embed"
 	"os"
 	"os/signal"
 	"sync"
@@ -13,9 +14,12 @@ import (
 	"github.com/radovskyb/watcher"
 )
 
+//go:embed VERSION
+var Version string
+
 func main() {
 	// Parse options
-	parser := ok.NewParser(os.Args[1:])
+	parser := &ok.Parser{Args: os.Args[1:]}
 	options, err := parser.ParseOptions()
 	if err != nil {
 		ok.Logger.Println(err)
@@ -26,10 +30,14 @@ func main() {
 	// Process options
 	switch {
 	case options.Help:
-		parser.WriteHelp(os.Stdout)
+		if err := parser.PrintHelp(Version); err != nil {
+			ok.Logger.Println(err)
+			os.Exit(1)
+			return
+		}
 
 	case options.Version:
-		ok.WriteVersion(os.Stdout)
+		ok.PrintVersion(Version)
 
 	case options.Init != "":
 		if err := ok.InitTool(options.Init); err != nil {
@@ -39,10 +47,10 @@ func main() {
 		}
 
 	case options.ListTools:
-		ok.ListTools(os.Stdout)
+		ok.ListTools()
 
 	case options.TaskName == "":
-		if err := ok.ListTasks(os.Stdout, ok.Mount()); err != nil {
+		if err := ok.ListTasks(); err != nil {
 			ok.Logger.Println(err)
 			os.Exit(1)
 			return

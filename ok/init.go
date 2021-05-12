@@ -12,7 +12,7 @@ func InitTool(toolName string) error {
 		return fmt.Errorf("no tool called '%s'", toolName)
 	}
 
-	Logger.Printf("initializing '%s'...", toolName)
+	Logger.Printf("initializing %s...", toolName)
 	if err := tool.Init(); err != nil {
 		return errors.Wrapf(err, "failed to init tool '%s'", toolName)
 	}

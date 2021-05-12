@@ -1,5 +1,5 @@
 package ok
 
 func parserWithArgs(args ...string) *Parser {
-	return NewParser(args)
+	return &Parser{Args: args}
 }
