@@ -33,6 +33,6 @@ changelog:
 brews:
   - homepage: https://github.com/broothie/ok
     description: A task runner
-    github:
+    tap:
       owner: broothie
       name: homebrew-ok
