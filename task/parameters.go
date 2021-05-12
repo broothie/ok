@@ -6,17 +6,46 @@ import (
 )
 
 type Parameter struct {
-	Name    string
-	Default interface{}
-	Type    Type
+	Name      string
+	IsKeyword bool
+	Default   interface{}
 }
 
+func (p Parameter) IsRequired() bool {
+	return p.Default == nil
+}
+
+type ParamList []Parameter
+
 type Parameters struct {
-	Forward            bool
-	PositionalRequired []Parameter
-	PositionalOptional []Parameter
-	KeywordRequired    []Parameter
-	KeywordOptional    []Parameter
+	ParamList
+	Forward bool
+
+	// PositionalRequired []Parameter
+	// PositionalOptional []Parameter
+	// KeywordRequired    []Parameter
+	// KeywordOptional    []Parameter
+}
+
+func (l ParamList) Lookup(name string) (Parameter, bool) {
+	for _, param := range l {
+		if param.Name == name {
+			return param, true
+		}
+	}
+
+	return Parameter{}, false
+}
+
+func (l ParamList) Select(isKeyword, isRequired bool) []Parameter {
+	params := make([]Parameter, 0, len(l))
+	for _, param := range l {
+		if param.IsKeyword == isKeyword && param.IsRequired() == isRequired {
+			params = append(params, param)
+		}
+	}
+
+	return params
 }
 
 func (p Parameters) PositionalAt(index int) (Parameter, bool) {
