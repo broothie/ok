@@ -1,4 +1,4 @@
-package ok
+package task
 
 import (
 	"fmt"
@@ -8,9 +8,7 @@ import (
 	"text/tabwriter"
 )
 
-func ListTasks() error {
-	tasks := Mount()
-
+func List(tasks map[string]Task) error {
 	paramsPresent := false
 	filenames := make(set)
 	toolNames := make(set)

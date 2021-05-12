@@ -1,4 +1,4 @@
-package ok
+package cli
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"text/tabwriter"
 )
 
-func (p *Parser) PrintHelp(version string) error {
+func PrintHelp(version string) error {
 	PrintVersion(version)
 	fmt.Println()
 	fmt.Println("Usage:")
@@ -15,7 +15,7 @@ func (p *Parser) PrintHelp(version string) error {
 	fmt.Println("Options:")
 
 	t := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-	for _, option := range options {
+	for _, option := range Options {
 		var short string
 		if option.Short {
 			short = fmt.Sprintf("-%c", option.Name[0])

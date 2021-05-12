@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/broothie/ok/task"
-	"github.com/broothie/ok/tool"
+	"github.com/broothie/ok/toolhelp"
 )
 
 type Task struct {
@@ -17,5 +17,5 @@ func (Task) Params() task.Parameters {
 
 func (t Task) Invoke(args task.Args) *os.Process {
 	argStrings := []string{"run", t.Name()}
-	return tool.Exec(ToolName, append(argStrings, args.Forwards...)...).Process
+	return toolhelp.Exec(ToolName, append(argStrings, args.Forwards...)...).Process
 }

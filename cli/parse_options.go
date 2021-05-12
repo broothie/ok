@@ -1,13 +1,15 @@
-package ok
+package cli
 
 import (
 	"errors"
 	"fmt"
+
+	"github.com/broothie/ok/ok"
 )
 
-func (p *Parser) ParseOptions() (Options, error) {
+func (p *Parser) ParseOptions() (ok.Options, error) {
 	optionMap := make(map[string]Option)
-	for _, option := range options {
+	for _, option := range Options {
 		optionMap[fmt.Sprintf("--%s", option.Name)] = option
 		if option.Short {
 			optionMap[fmt.Sprintf("-%c", option.Name[0])] = option
@@ -19,11 +21,11 @@ func (p *Parser) ParseOptions() (Options, error) {
 		if dashPrefix.MatchString(rawArg) {
 			option, optionFound := optionMap[rawArg]
 			if !optionFound {
-				return Options{}, fmt.Errorf("invalid option: '%s'", rawArg)
+				return ok.Options{}, fmt.Errorf("invalid option: '%s'", rawArg)
 			}
 
 			if err := option.OptionSetter(p); err != nil {
-				return Options{}, err
+				return ok.Options{}, err
 			}
 
 			if !p.options.Stop {
@@ -36,7 +38,7 @@ func (p *Parser) ParseOptions() (Options, error) {
 	}
 
 	if len(p.options.Watches) > 0 && p.options.TaskName == "" {
-		return Options{}, errors.New("watches provided without task")
+		return ok.Options{}, errors.New("watches provided without task")
 	}
 
 	if p.options.TaskName == "" {

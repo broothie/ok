@@ -5,4 +5,4 @@ import (
 	"os"
 )
 
-var Logger = log.New(os.Stdout, "[now] ", 0)
+var Logger = log.New(os.Stdout, "[ok] ", 0)

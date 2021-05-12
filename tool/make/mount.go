@@ -7,7 +7,7 @@ import (
 	"regexp"
 
 	"github.com/broothie/ok/task"
-	"github.com/broothie/ok/tool"
+	"github.com/broothie/ok/toolhelp"
 )
 
 var ruleMatcher = regexp.MustCompile(`(?m)^\s*(.*):`)
@@ -18,12 +18,12 @@ func (t Tool) Mount() ([]task.Task, error) {
 			return nil, nil
 		}
 
-		return nil, tool.ReadToolFileError{Filename: filename, Err: err}
+		return nil, toolhelp.ReadToolFileError{Filename: filename, Err: err}
 	}
 
 	if err := t.Check(); err != nil {
 		if err == exec.ErrNotFound {
-			return nil, tool.CommandNotFoundError{CommandName: ToolName}
+			return nil, toolhelp.CommandNotFoundError{CommandName: ToolName}
 		}
 
 		return nil, err
@@ -31,7 +31,7 @@ func (t Tool) Mount() ([]task.Task, error) {
 
 	fileBytes, err := ioutil.ReadFile(filename)
 	if err != nil {
-		return nil, tool.ReadToolFileError{Filename: filename, Err: err}
+		return nil, toolhelp.ReadToolFileError{Filename: filename, Err: err}
 	}
 
 	matches := ruleMatcher.FindAllStringSubmatch(string(fileBytes), -1)

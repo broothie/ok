@@ -1,8 +1,9 @@
-package ok
+package tool
 
 import (
 	"fmt"
 
+	"github.com/broothie/ok/ok"
 	"github.com/pkg/errors"
 )
 
@@ -12,7 +13,7 @@ func InitTool(toolName string) error {
 		return fmt.Errorf("no tool called '%s'", toolName)
 	}
 
-	Logger.Printf("initializing %s...", toolName)
+	ok.Logger.Printf("initializing %s...", toolName)
 	if err := tool.Init(); err != nil {
 		return errors.Wrapf(err, "failed to init tool '%s'", toolName)
 	}

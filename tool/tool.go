@@ -1,4 +1,4 @@
-package ok
+package tool
 
 import "github.com/broothie/ok/task"
 

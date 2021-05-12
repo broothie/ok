@@ -1,8 +1,9 @@
-package ok
+package cli
 
 import (
 	"testing"
 
+	"github.com/broothie/ok/ok"
 	"github.com/broothie/ok/task"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -70,7 +71,7 @@ func TestParser_ParseArgs(t *testing.T) {
 	})
 }
 
-func parserWithArgsAndOptionsParsed(t *testing.T, args ...string) (*Parser, Options) {
+func parserWithArgsAndOptionsParsed(t *testing.T, args ...string) (*Parser, ok.Options) {
 	parser := parserWithArgs(args...)
 	options, err := parser.ParseOptions()
 	require.NoError(t, err)

@@ -1,7 +1,9 @@
-package ok
+package cli
 
 import (
 	"regexp"
+
+	"github.com/broothie/ok/ok"
 )
 
 var dashPrefix = regexp.MustCompile(`^-+`)
@@ -9,7 +11,11 @@ var dashPrefix = regexp.MustCompile(`^-+`)
 type Parser struct {
 	Args       []string
 	argCounter int
-	options    Options
+	options    ok.Options
+}
+
+func NewParser(args []string) *Parser {
+	return &Parser{Args: args}
 }
 
 func (p *Parser) current() (string, bool) {

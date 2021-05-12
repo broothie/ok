@@ -3,7 +3,7 @@ package make
 import (
 	"os"
 
-	"github.com/broothie/ok/tool"
+	"github.com/broothie/ok/toolhelp"
 )
 
 const (
@@ -23,5 +23,5 @@ func (Tool) Init() error {
 }
 
 func (Tool) Check() error {
-	return tool.Check(ToolName)
+	return toolhelp.Check(ToolName)
 }

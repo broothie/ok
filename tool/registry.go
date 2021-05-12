@@ -1,8 +1,9 @@
-package ok
+package tool
 
 import (
 	"sync"
 
+	"github.com/broothie/ok/ok"
 	"github.com/broothie/ok/task"
 	dockercompose "github.com/broothie/ok/tool/docker-compose"
 	"github.com/broothie/ok/tool/golang"
@@ -34,7 +35,7 @@ func Mount() map[string]task.Task {
 
 			toolTasks, err := tool.Mount()
 			if err != nil {
-				Logger.Printf("error mounting tool '%s': %v", tool.Name(), err)
+				ok.Logger.Printf("error mounting tool '%s': %v", tool.Name(), err)
 				return
 			}
 

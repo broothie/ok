@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/broothie/ok/task"
-	"github.com/broothie/ok/tool"
+	"github.com/broothie/ok/toolhelp"
 )
 
 type Task struct {
@@ -28,7 +28,7 @@ func (t Task) Invoke(args task.Args) *os.Process {
 
 	argString := strings.Join(positionalStrings, ", ")
 	script := fmt.Sprintf("%s; %s(%s)", *t.fileContents, t.Name(), argString)
-	return tool.Exec(ToolName, "-e", script).Process
+	return toolhelp.Exec(ToolName, "-e", script).Process
 }
 
 func processArg(arg string) string {

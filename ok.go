@@ -9,8 +9,10 @@ import (
 	"time"
 
 	"github.com/bmatcuk/doublestar"
+	"github.com/broothie/ok/cli"
 	"github.com/broothie/ok/ok"
 	"github.com/broothie/ok/task"
+	"github.com/broothie/ok/tool"
 	"github.com/pkg/errors"
 	"github.com/radovskyb/watcher"
 )
@@ -24,7 +26,7 @@ func Version() string {
 
 func main() {
 	// Parse options
-	parser := &ok.Parser{Args: os.Args[1:]}
+	parser := cli.NewParser(os.Args[1:])
 	options, err := parser.ParseOptions()
 	if err != nil {
 		ok.Logger.Println(err)
@@ -35,27 +37,27 @@ func main() {
 	// Process options
 	switch {
 	case options.Help:
-		if err := parser.PrintHelp(Version()); err != nil {
+		if err := cli.PrintHelp(Version()); err != nil {
 			ok.Logger.Println(err)
 			os.Exit(1)
 			return
 		}
 
 	case options.Version:
-		ok.PrintVersion(Version())
+		cli.PrintVersion(Version())
 
 	case options.Init != "":
-		if err := ok.InitTool(options.Init); err != nil {
+		if err := tool.InitTool(options.Init); err != nil {
 			ok.Logger.Println(err)
 			os.Exit(1)
 			return
 		}
 
 	case options.ListTools:
-		ok.ListTools()
+		tool.List()
 
 	case options.TaskName == "":
-		if err := ok.ListTasks(); err != nil {
+		if err := task.List(tool.Mount()); err != nil {
 			ok.Logger.Println(err)
 			os.Exit(1)
 			return
@@ -68,7 +70,7 @@ func main() {
 
 	// Get task
 	taskName := options.TaskName
-	tasks := ok.Mount()
+	tasks := tool.Mount()
 	task, taskExists := tasks[options.TaskName]
 	if !taskExists {
 		ok.Logger.Printf("no task called '%s'", taskName)

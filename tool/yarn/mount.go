@@ -6,7 +6,7 @@ import (
 	"os/exec"
 
 	"github.com/broothie/ok/task"
-	"github.com/broothie/ok/tool"
+	"github.com/broothie/ok/toolhelp"
 )
 
 func (t Tool) Mount() ([]task.Task, error) {
@@ -16,14 +16,14 @@ func (t Tool) Mount() ([]task.Task, error) {
 			return nil, nil
 		}
 
-		return nil, tool.ReadToolFileError{Filename: filename, Err: err}
+		return nil, toolhelp.ReadToolFileError{Filename: filename, Err: err}
 	}
 
 	defer file.Close()
 
 	if err := t.Check(); err != nil {
 		if err == exec.ErrNotFound {
-			return nil, tool.CommandNotFoundError{CommandName: ToolName}
+			return nil, toolhelp.CommandNotFoundError{CommandName: ToolName}
 		}
 
 		return nil, err
@@ -31,7 +31,7 @@ func (t Tool) Mount() ([]task.Task, error) {
 
 	var packageJSON map[string]interface{}
 	if err := json.NewDecoder(file).Decode(&packageJSON); err != nil {
-		return nil, tool.ReadToolFileError{Filename: filename, Err: err}
+		return nil, toolhelp.ReadToolFileError{Filename: filename, Err: err}
 	}
 
 	untypedScripts, scriptsPresent := packageJSON["scripts"]

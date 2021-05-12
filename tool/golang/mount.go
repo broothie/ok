@@ -7,8 +7,9 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/broothie/ok/stringhelp"
 	"github.com/broothie/ok/task"
-	"github.com/broothie/ok/tool"
+	"github.com/broothie/ok/toolhelp"
 )
 
 var funcFinder = regexp.MustCompile(`(?m)^\s*func\s+(\w+)\s*\((.*)\)`)
@@ -19,7 +20,7 @@ func (t Tool) Mount() ([]task.Task, error) {
 			return nil, nil
 		}
 
-		return nil, tool.ReadToolFileError{Err: err, Filename: filename}
+		return nil, toolhelp.ReadToolFileError{Err: err, Filename: filename}
 	}
 
 	if err := t.Check(); err != nil {
@@ -28,7 +29,7 @@ func (t Tool) Mount() ([]task.Task, error) {
 
 	fileBytes, err := ioutil.ReadFile(filename)
 	if err != nil {
-		return nil, tool.ReadToolFileError{Err: err, Filename: filename}
+		return nil, toolhelp.ReadToolFileError{Err: err, Filename: filename}
 	}
 
 	fileContents := string(fileBytes)
@@ -39,7 +40,7 @@ func (t Tool) Mount() ([]task.Task, error) {
 		taskName, paramsString := match[1], match[2]
 
 		var paramEntries []string
-		if !tool.AllWhitespace(paramsString) {
+		if !stringhelp.AllWhitespace(paramsString) {
 			paramEntries = strings.Split(paramsString, ",")
 		}
 
@@ -49,7 +50,7 @@ func (t Tool) Mount() ([]task.Task, error) {
 		for i := len(paramEntries) - 1; i >= 0; i-- {
 			paramEntry := strings.TrimSpace(paramEntries[i])
 
-			chunks := tool.WhitespaceSplitter.Split(paramEntry, 2)
+			chunks := stringhelp.WhitespaceSplitter.Split(paramEntry, 2)
 			if len(chunks) > 1 {
 				currentType = chunks[1]
 			}

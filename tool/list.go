@@ -1,10 +1,8 @@
-package ok
+package tool
 
-import (
-	"fmt"
-)
+import "fmt"
 
-func ListTools() {
+func List() {
 	for _, tool := range Registry {
 		if err := tool.Check(); err != nil {
 			fmt.Printf("𝘹 %s %v\n", tool.Name(), err)
