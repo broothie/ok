@@ -54,52 +54,45 @@ func (t Tool) Mount() ([]task.Task, error) {
 }
 
 func paramListFromParamString(paramsString string) task.Parameters {
-	paramStrings := paramSplitter.Split(paramsString, -1)
+	paramStrings := tool.SplitOnCommas(paramsString)
 	if len(paramStrings) == 1 && tool.AllWhitespace(paramStrings[0]) {
-		paramStrings = nil
+		return task.Parameters{}
 	}
 
 	var params task.Parameters
 	for _, paramString := range paramStrings {
 		var re *regexp.Regexp
-		var paramListWithoutDefault *[]task.Parameter
-		var paramListWithDefault *[]task.Parameter
+		var isKeyword bool
 
 		if positionalMatcher.MatchString(paramString) {
 			re = positionalMatcher
-			paramListWithoutDefault = &params.PositionalRequired
-			paramListWithDefault = &params.PositionalOptional
+			isKeyword = false
 		} else if keywordMatcher.MatchString(paramString) {
 			re = keywordMatcher
-			paramListWithoutDefault = &params.KeywordRequired
-			paramListWithDefault = &params.KeywordOptional
+			isKeyword = true
 		} else {
 			tool.Warn(ToolName, "error parsing param '%s'", paramString)
 			continue
 		}
 
-		var paramList *[]task.Parameter
-		var defaultString string
-		var defaultExists bool
 		result := tool.NamedRegexpResult(paramString, re)
-		if defaultString, defaultExists = result["default"]; defaultExists && defaultString != "" {
-			paramList = paramListWithDefault
-		} else {
-			paramList = paramListWithoutDefault
+
+		var defaultValue interface{}
+		defaultString, defaultPresent := result["default"]
+		if defaultPresent && defaultString != "" {
+			defaultValue = defaultString
 		}
 
 		defaultString = strings.TrimSpace(defaultString)
-		var defaultValue interface{} = defaultString
 		if strings.HasPrefix(defaultString, "'") || strings.HasPrefix(defaultString, `"`) {
 			defaultValue = strings.Trim(defaultString, `'"`)
-		} else if defaultString == "" {
-			defaultValue = nil
 		}
 
-		*paramList = append(*paramList, task.Parameter{
-			Name:    result["paramName"],
-			Type:    task.Untyped,
-			Default: defaultValue,
+		params.ParamList = append(params.ParamList, task.Parameter{
+			Name:      result["paramName"],
+			Type:      task.Untyped,
+			Default:   defaultValue,
+			IsKeyword: isKeyword,
 		})
 	}
 

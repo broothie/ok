@@ -2,6 +2,16 @@
 
 A task runner.
 
+## Installation
+
+Check out the [releases page](https://github.com/broothie/okay/releases)
+
+Or install with `go`:
+```shell
+$ go install github.com/broothie/okay/cmd/ok
+```
+
+
 ## Usage
 
 Given a Okfile in any supported language:

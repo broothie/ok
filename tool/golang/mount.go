@@ -76,7 +76,7 @@ func (t Tool) Mount() ([]task.Task, error) {
 
 		tasks[i] = Task{
 			Base:         task.NewBase(taskName, filename, ToolName),
-			params:       task.Parameters{PositionalRequired: params},
+			params:       task.Parameters{ParamList: params},
 			fileContents: &fileContents,
 		}
 	}

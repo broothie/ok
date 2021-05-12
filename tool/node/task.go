@@ -39,6 +39,6 @@ func processArg(arg string) string {
 	} else if _, err := strconv.ParseBool(arg); err == nil {
 		return arg
 	} else {
-		return fmt.Sprintf(`"%s"`, arg)
+		return strconv.Quote(arg)
 	}
 }

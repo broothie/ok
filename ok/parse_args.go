@@ -12,8 +12,12 @@ func (p *Parser) ParseArgs(params task.Parameters) (task.Args, error) {
 		return task.Args{Forwards: p.rawArgs[p.argCounter:]}, nil
 	}
 
-	args := task.Args{Keyword: make(map[string]task.Arg)}
+	positional := params.Positional()
+	positionalRequired := positional.Required()
+	positionalOptional := positional.Optional()
+	keywordRequired := params.Keyword().Required()
 
+	args := task.Args{Keyword: make(map[string]task.Arg)}
 	for p.argCounter < len(p.rawArgs) {
 		rawArg, _ := p.current()
 		if dashPrefix.MatchString(rawArg) {
@@ -53,7 +57,7 @@ func (p *Parser) ParseArgs(params task.Parameters) (task.Args, error) {
 			// Positional
 			param, paramPresent := params.PositionalAt(len(args.Positional))
 			if !paramPresent {
-				return task.Args{}, fmt.Errorf("too many positional args provided, expected max of %d", len(params.PositionalRequired)+len(params.PositionalOptional))
+				return task.Args{}, fmt.Errorf("too many positional args provided, expected max of %d", len(positionalRequired)+len(positionalOptional))
 			}
 
 			arg, err := processArgWithParam(rawArg, param)
@@ -66,22 +70,16 @@ func (p *Parser) ParseArgs(params task.Parameters) (task.Args, error) {
 		}
 	}
 
-	if len(args.Positional) < len(params.PositionalRequired) {
-		return task.Args{}, missingPositionalError(params.PositionalRequired, args.Positional)
+	if len(args.Positional) < len(positionalRequired) {
+		return task.Args{}, missingPositionalError(positionalRequired, args.Positional)
 	}
 
-	if len(args.Keyword) < len(params.KeywordRequired) {
-		return task.Args{}, missingKeywordArgError(params.KeywordRequired, args.Keyword)
+	if len(args.Keyword) < len(keywordRequired) {
+		return task.Args{}, missingKeywordArgError(keywordRequired, args.Keyword)
 	}
 
 	return args, nil
 }
-
-//func (p *Parser) forward(params task.Parameters) (task.Args, error) {
-//	for p.argCounter < len(p.rawArgs) {
-//
-//	}
-//}
 
 func processArgWithParam(rawArg string, param task.Parameter) (task.Arg, error) {
 	processed, err := param.Type.Parse(rawArg)

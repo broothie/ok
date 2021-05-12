@@ -55,32 +55,26 @@ func (t Tool) Mount() ([]task.Task, error) {
 }
 
 func paramListFromParamString(paramsString string) task.Parameters {
-	paramStrings := paramSplitter.Split(paramsString, -1)
+	paramStrings := tool.SplitOnCommas(paramsString)
 	if len(paramStrings) == 1 && tool.AllWhitespace(paramStrings[0]) {
-		paramStrings = nil
+		return task.Parameters{}
 	}
 
 	var params task.Parameters
 	for _, paramString := range paramStrings {
-		var paramList *[]task.Parameter
-		var defaultString string
-		var defaultExists bool
 		result := tool.NamedRegexpResult(paramString, positionalMatcher)
-		if defaultString, defaultExists = result["default"]; defaultExists && defaultString != "" {
-			paramList = &params.PositionalOptional
-		} else {
-			paramList = &params.PositionalRequired
+
+		var defaultValue interface{}
+		defaultString, defaultPresent := result["default"]
+		if defaultPresent && defaultString != "" {
+			defaultValue = defaultString
 		}
 
-		defaultString = strings.TrimSpace(defaultString)
-		var defaultValue interface{} = defaultString
 		if strings.HasPrefix(defaultString, "'") || strings.HasPrefix(defaultString, `"`) || strings.HasPrefix(defaultString, "`") {
 			defaultValue = strings.Trim(defaultString, "`'\"")
-		} else if defaultString == "" {
-			defaultValue = nil
 		}
 
-		*paramList = append(*paramList, task.Parameter{
+		params.ParamList = append(params.ParamList, task.Parameter{
 			Name:    result["paramName"],
 			Type:    task.Untyped,
 			Default: defaultValue,

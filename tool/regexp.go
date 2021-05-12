@@ -3,12 +3,17 @@ package tool
 import "regexp"
 
 var (
-	WhitespaceSplitter = regexp.MustCompile(`\s`)
+	WhitespaceSplitter = regexp.MustCompile(`\s+`)
+	CommaSplitter      = regexp.MustCompile(`\s*,\s*`)
 	AllWhitespace      = regexp.MustCompile(`^\s*$`).MatchString
 )
 
-func SplitWhitespace(s string) []string {
+func SplitOnWhitespace(s string) []string {
 	return WhitespaceSplitter.Split(s, -1)
+}
+
+func SplitOnCommas(s string) []string {
+	return CommaSplitter.Split(s, -1)
 }
 
 func NamedRegexpResults(s string, re *regexp.Regexp) []map[string]string {
@@ -22,6 +27,10 @@ func NamedRegexpResults(s string, re *regexp.Regexp) []map[string]string {
 }
 
 func NamedRegexpResult(s string, re *regexp.Regexp) map[string]string {
+	if !re.MatchString(s) {
+		return nil
+	}
+
 	return NamedRegexpResultFromMatches(re.FindStringSubmatch(s), re)
 }
 

@@ -5,26 +5,40 @@ import (
 	"strings"
 )
 
+type Parameters struct {
+	ParamList
+	Forward bool
+}
+
 type Parameter struct {
 	Name      string
-	IsKeyword bool
+	Type      Type
 	Default   interface{}
+	IsKeyword bool
 }
 
 func (p Parameter) IsRequired() bool {
 	return p.Default == nil
 }
 
+func (p Parameter) String() string {
+	inner := p.Name
+	if !p.IsRequired() {
+		inner = fmt.Sprintf("%s=%s", p.Name, p.Default)
+	}
+
+	wrapper := chevronWrap
+	if p.IsKeyword {
+		wrapper = dashPrefix
+	}
+
+	return wrapper(inner)
+}
+
 type ParamList []Parameter
 
-type Parameters struct {
-	ParamList
-	Forward bool
-
-	// PositionalRequired []Parameter
-	// PositionalOptional []Parameter
-	// KeywordRequired    []Parameter
-	// KeywordOptional    []Parameter
+func (l ParamList) ToParameters(forward bool) Parameters {
+	return Parameters{ParamList: l, Forward: forward}
 }
 
 func (l ParamList) Lookup(name string) (Parameter, bool) {
@@ -37,29 +51,62 @@ func (l ParamList) Lookup(name string) (Parameter, bool) {
 	return Parameter{}, false
 }
 
-func (l ParamList) Select(isKeyword, isRequired bool) []Parameter {
-	params := make([]Parameter, 0, len(l))
+func (l ParamList) Positional() ParamList {
+	positionalParams := make([]Parameter, 0, len(l))
 	for _, param := range l {
-		if param.IsKeyword == isKeyword && param.IsRequired() == isRequired {
-			params = append(params, param)
+		if !param.IsKeyword {
+			positionalParams = append(positionalParams, param)
 		}
 	}
 
-	return params
+	return positionalParams
 }
 
-func (p Parameters) PositionalAt(index int) (Parameter, bool) {
-	concatenated := append(p.PositionalRequired, p.PositionalOptional...)
-	if index < len(concatenated) {
-		return concatenated[index], true
+func (l ParamList) Keyword() ParamList {
+	positionalParams := make([]Parameter, 0, len(l))
+	for _, param := range l {
+		if param.IsKeyword {
+			positionalParams = append(positionalParams, param)
+		}
+	}
+
+	return positionalParams
+}
+
+func (l ParamList) Required() ParamList {
+	requiredParams := make([]Parameter, 0, len(l))
+	for _, param := range l {
+		if param.IsRequired() {
+			requiredParams = append(requiredParams, param)
+		}
+	}
+
+	return requiredParams
+}
+
+func (l ParamList) Optional() ParamList {
+	optionalParams := make([]Parameter, 0, len(l))
+	for _, param := range l {
+		if !param.IsRequired() {
+			optionalParams = append(optionalParams, param)
+		}
+	}
+
+	return optionalParams
+}
+
+func (l ParamList) PositionalAt(index int) (Parameter, bool) {
+	positional := l.Positional()
+	if index < len(positional) {
+		return positional[index], true
 	}
 
 	return Parameter{}, false
 }
 
-func (p Parameters) KeywordAt(name string) (Parameter, bool) {
-	concatenated := append(p.KeywordRequired, p.KeywordOptional...)
-	for _, param := range concatenated {
+func (l ParamList) KeywordAt(name string) (Parameter, bool) {
+	keywordParams := l.Keyword()
+	for _, param := range keywordParams {
 		if param.Name == name {
 			return param, true
 		}
@@ -67,7 +114,7 @@ func (p Parameters) KeywordAt(name string) (Parameter, bool) {
 
 	// Try with single character
 	if len(name) == 1 {
-		for _, param := range concatenated {
+		for _, param := range keywordParams {
 			if strings.HasPrefix(param.Name, name[:1]) {
 				return param, true
 			}
@@ -77,50 +124,8 @@ func (p Parameters) KeywordAt(name string) (Parameter, bool) {
 	return Parameter{}, false
 }
 
-func (p Parameter) String() string {
-	if p.Default == nil {
-		return p.Name
-	}
-
-	return fmt.Sprintf("%s=%s", p.Name, p.Default)
-}
-
-func (p Parameters) String() string {
-	var sections []string
-
-	wrappedPositionalRequireds := make([]string, len(p.PositionalRequired))
-	counter := 0
-	for _, param := range p.PositionalRequired {
-		wrappedPositionalRequireds[counter] = chevronWrap(param)
-		counter++
-	}
-	sections = append(sections, wrappedPositionalRequireds...)
-
-	wrappedPositionalOptionals := make([]string, len(p.PositionalOptional))
-	counter = 0
-	for _, param := range p.PositionalOptional {
-		wrappedPositionalOptionals[counter] = chevronWrap(param)
-		counter++
-	}
-	sections = append(sections, wrappedPositionalOptionals...)
-
-	prefixedKeywordRequireds := make([]string, len(p.KeywordRequired))
-	counter = 0
-	for _, param := range p.KeywordRequired {
-		prefixedKeywordRequireds[counter] = dashPrefix(param)
-		counter++
-	}
-	sections = append(sections, prefixedKeywordRequireds...)
-
-	prefixedKeywordOptionals := make([]string, len(p.KeywordOptional))
-	counter = 0
-	for _, param := range p.KeywordOptional {
-		prefixedKeywordOptionals[counter] = dashPrefix(param)
-		counter++
-	}
-	sections = append(sections, prefixedKeywordOptionals...)
-
-	return strings.Join(sections, " ")
+func (l ParamList) String() string {
+	return strings.Trim(fmt.Sprint([]Parameter(l)), "[]")
 }
 
 func chevronWrap(v interface{}) string {

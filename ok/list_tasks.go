@@ -11,9 +11,14 @@ import (
 )
 
 func ListTasks(w io.Writer, tasks map[string]task.Task) error {
+	paramsPresent := false
 	filenames := make(set)
 	toolNames := make(set)
 	for _, task := range tasks {
+		if task.Params().String() != "" {
+			paramsPresent = true
+		}
+
 		filenames.insert(task.Filename())
 		toolNames.insert(task.ToolName())
 	}
@@ -24,7 +29,10 @@ func ListTasks(w io.Writer, tasks map[string]task.Task) error {
 	lines := make([]string, len(tasks))
 	counter := 0
 	for _, task := range tasks {
-		columns := []string{fmt.Sprintf("%s %s", task.Name(), task.Params())}
+		columns := []string{task.Name()}
+		if paramsPresent {
+			columns = append(columns, task.Params().String())
+		}
 
 		if includeFilenames {
 			columns = append(columns, task.Filename())
@@ -39,6 +47,10 @@ func ListTasks(w io.Writer, tasks map[string]task.Task) error {
 	}
 
 	headerSlice := []string{"TASK"}
+	if paramsPresent {
+		headerSlice = append(headerSlice, "ARGS")
+	}
+
 	if includeFilenames {
 		headerSlice = append(headerSlice, "FILE")
 	}

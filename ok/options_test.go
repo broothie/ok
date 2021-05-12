@@ -111,7 +111,7 @@ func TestParser_ParseOptions(t *testing.T) {
 
 		for arg, expectedStop := range argStops {
 			t.Run(fmt.Sprintf("%s stops execution", arg), func(t *testing.T) {
-				actual, err := parserWithArgs(append(tool.SplitWhitespace(arg), "taskName")...).ParseOptions()
+				actual, err := parserWithArgs(append(tool.SplitOnWhitespace(arg), "taskName")...).ParseOptions()
 				require.NoError(t, err)
 
 				assert.Equal(t, expectedStop, actual.Stop)

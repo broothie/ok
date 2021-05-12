@@ -17,4 +17,4 @@ generate: task/type_string.go
 
 clean:
 	go clean
-	rm -rf ok
+	rm -rf _ok dist

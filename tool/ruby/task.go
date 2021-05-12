@@ -32,15 +32,8 @@ func (t Task) Invoke(args task.Args) *os.Process {
 		counter++
 	}
 
-	builder := new(strings.Builder)
-	builder.WriteString(fmt.Sprintf("args = [%s]; ", strings.Join(positionalStrings, ", ")))
-	builder.WriteString(fmt.Sprintf("kwargs = {%s}; ", strings.Join(keywordEntries, ", ")))
-	builder.WriteString(fmt.Sprintf("%s(*args, **kwargs)", t.Name()))
-
-	return tool.Exec(ToolName,
-		"-r", fmt.Sprintf("./%s", t.Filename()),
-		"-e", builder.String(),
-	).Process
+	script := fmt.Sprintf("%s(%s)", t.Name(), strings.Join(append(positionalStrings, keywordEntries...), ", "))
+	return tool.Exec(ToolName, "-r", fmt.Sprintf("./%s", t.Filename()), "-e", script).Process
 }
 
 func processArg(arg string) string {
@@ -51,6 +44,6 @@ func processArg(arg string) string {
 	} else if _, err := strconv.ParseBool(arg); err == nil {
 		return arg
 	} else {
-		return fmt.Sprintf(`"%s"`, arg)
+		return strconv.Quote(arg)
 	}
 }
