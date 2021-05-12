@@ -17,4 +17,4 @@ jobs:
         uses: salsify/action-detect-and-tag-new-version@v2
         with:
           version-command: |
-            ok/version.go
+            cat ok/version.go
