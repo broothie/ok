@@ -31,7 +31,7 @@ def example(apple, banana = 'yellow', cherry:, durian: 'smelly')
 end
 ```
 
-Then, you can use `ok` to call methods directly from the command line:
+You can use `ok` to call methods directly from the command line:
 ```shell
 $ ok example 'granny smith' --durian stinky -c maraschino
 granny smith apple, yellow banana, maraschino cherry, stinky durian
