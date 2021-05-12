@@ -128,7 +128,6 @@ func runWatcher(task task.Task, args task.Args, watches []string) error {
 				}
 
 				ok.Logger.Println(err)
-				return
 
 			case <-watcher.Closed:
 				if process != nil {

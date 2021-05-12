@@ -8,7 +8,7 @@ Check out the [releases page](https://github.com/broothie/okay/releases)
 
 Or install with `go`:
 ```shell
-$ go install github.com/broothie/okay/cmd/ok
+$ go install github.com/broothie/ok/ok.go
 ```
 
 ## Usage

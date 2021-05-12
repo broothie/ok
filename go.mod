@@ -1,6 +1,6 @@
 module github.com/broothie/ok
 
-go 1.15
+go 1.16
 
 require (
 	github.com/bmatcuk/doublestar v1.3.4

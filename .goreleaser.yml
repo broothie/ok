@@ -30,3 +30,9 @@ changelog:
     exclude:
       - '^docs:'
       - '^test:'
+brews:
+  - homepage: https://github.com/broothie/ok
+    description: A task runner
+    github:
+      owner: broothie
+      name: homebrew-ok

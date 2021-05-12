@@ -14,6 +14,13 @@ def release(message, dry: true)
     end
 end
 
+def publish(message)
+    bump
+    version = get_version
+    tag version, message
+    push_tag version
+end
+
 def tag(version, message)
     puts `git tag -a #{version} -m "#{message}"`
 end
@@ -27,9 +34,7 @@ def bump
 end
 
 def get_version
-    tag = File.read('ok/version.go').match(/v\d+\.\d+\.\d+/)[0]
-    puts tag
-    tag
+    p File.read('ok/version.go').match(/v\d+\.\d+\.\d+/)[0]
 end
 
 def example(apple, banana = 'yellow', cherry:, durian: 'smelly')
