@@ -6,5 +6,5 @@ import (
 )
 
 func PrintVersion(version string) {
-	fmt.Printf("👌 ok %s\n", version)
+	fmt.Printf("👌 ok v%s\n", version)
 }
