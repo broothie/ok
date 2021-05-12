@@ -4,16 +4,25 @@ A task runner.
 
 ## Installation
 
-Check out the [releases page](https://github.com/broothie/okay/releases)
+### Brew
 
-Or install with `go`:
+```shell
+$ brew tap broothie/ok && brew install ok
+```
+
+### Releases
+
+Releases can be found on the [releases page](https://github.com/broothie/okay/releases).
+
+### Via Go
+
 ```shell
 $ go install github.com/broothie/ok/ok.go
 ```
 
 ## Usage
 
-Given an `Okfile` in any supported language:
+Given an `Okfile` written in any [supported language/tool](#currently-supported-languagestools):
 ```ruby
 # Okfile.rb
 
@@ -23,13 +32,13 @@ end
 ```
 
 Then, you can use `ok` to call methods directly from the command line:
-```bash
+```shell
 $ ok example 'granny smith' --durian stinky -c maraschino
 granny smith apple, yellow banana, maraschino cherry, stinky durian
 ```
 
 You can also run `ok` without a task name to list available tasks:
-```bash
+```shell
 $ ok
 build                                                     Makefile   make
 example <apple> <banana=yellow> --cherry --durian=smelly  Okfile.rb  ruby
@@ -40,7 +49,7 @@ list                                                      Okfile.go  go
 types                                                     Okfile.go  go
 ```
 
-## Current Supported Languages/Tools
+## Currently Supported Languages/Tools
 - Go
 - Make
 - Ruby
@@ -53,6 +62,7 @@ types                                                     Okfile.go  go
 - [ ] Improve tool interface
 - [ ] Scour error paths
 - [ ] Support .rc or something
+- [ ] Task comments
 - [ ] Task inspect
 - [ ] Specify file
 - [ ] Param validator (validates tool param output)
