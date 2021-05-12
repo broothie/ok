@@ -18,3 +18,5 @@ jobs:
         with:
           version-command: |
             cat VERSION
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
