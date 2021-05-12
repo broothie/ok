@@ -1,18 +1,7 @@
 require 'dotenv/load'
 require 'pry'
 
-def publish(message)
-    bump
-    puts `git add -A`
-    puts `git commit -m "#{message}"`
-    puts `git push`
-end
-
-def bump
-    puts `bump VERSION`
-end
-
-def fix_imports
+def ugly_imports
     filenames = Dir['**/*.go']
     filenames.each do |filename|
         source = File.read(filename)

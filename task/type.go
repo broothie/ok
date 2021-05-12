@@ -1,8 +1,6 @@
 package task
 
-import (
-	"strconv"
-)
+import "strconv"
 
 //go:generate stringer -type=Type
 type Type int
