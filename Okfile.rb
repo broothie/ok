@@ -17,16 +17,12 @@ end
 
 # Examples
 
-# Example thing!
-# More text
-def example(apple, banana = 'yellow', cherry:, durian: 'smelly')
-    puts "#{apple} apple, #{banana} banana, #{cherry} cherry, #{durian} durian"
-end
-
+# Repeat message `n` times
 def repeat(message, n = 3)
     n.times { puts message }
 end
 
-def greet(name = 'andrew')
-    binding.pry
+# Greet someone by name
+def greet(name = 'World')
+    puts "Hello, #{name}"
 end
