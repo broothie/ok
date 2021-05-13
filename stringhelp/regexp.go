@@ -8,6 +8,7 @@ var (
 	AllWhitespace = regexp.MustCompile(`^\s*$`).MatchString
 
 	DoubleSlashPrefixMatcher = regexp.MustCompile(`^\s*//`)
+	OctothorpePrefixMatcher  = regexp.MustCompile(`^\s*#`)
 )
 
 func SplitOnWhitespace(s string) []string {

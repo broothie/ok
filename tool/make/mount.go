@@ -5,13 +5,13 @@ import (
 	"os/exec"
 	"regexp"
 
+	"github.com/broothie/ok/stringhelp"
 	"github.com/broothie/ok/task"
 	"github.com/broothie/ok/toolhelp"
 )
 
 var (
-	ruleMatcher          = regexp.MustCompile(`(?m)^\s*(?P<taskName>.*?):`)
-	commentPrefixMatcher = regexp.MustCompile(`^\s*#`)
+	ruleMatcher = regexp.MustCompile(`(?m)^\s*(?P<taskName>.*?):`)
 )
 
 func (t Tool) Mount() ([]task.Task, error) {
@@ -32,7 +32,7 @@ func (t Tool) Mount() ([]task.Task, error) {
 		return nil, err
 	}
 
-	rawTasks := toolhelp.Scan(file, ruleMatcher, commentPrefixMatcher)
+	rawTasks := toolhelp.Scan(file, ruleMatcher, stringhelp.OctothorpePrefixMatcher)
 	tasks := make([]task.Task, len(rawTasks))
 	for i, rawTask := range rawTasks {
 		taskName := rawTask.MatchData["taskName"]

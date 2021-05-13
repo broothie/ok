@@ -9,6 +9,7 @@ import (
 	"github.com/broothie/ok/tool/golang"
 	maketool "github.com/broothie/ok/tool/make" // NOTE: Collides with `make` builtin
 	"github.com/broothie/ok/tool/node"
+	"github.com/broothie/ok/tool/python"
 	"github.com/broothie/ok/tool/ruby"
 	"github.com/broothie/ok/tool/yarn"
 )
@@ -20,6 +21,7 @@ var Registry = []Tool{
 	node.Tool{},
 	dockercompose.Tool{},
 	yarn.Tool{},
+	python.Python,
 }
 
 func Mount() map[string]task.Task {

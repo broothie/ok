@@ -12,8 +12,7 @@ import (
 )
 
 var (
-	methodFinder         = regexp.MustCompile(`(?m)^\s*def\s+(?P<taskName>\w+)\(?(?P<params>.*?)\)?$`)
-	commentPrefixMatcher = regexp.MustCompile(`^\s*#`)
+	methodFinder = regexp.MustCompile(`(?m)^def\s+(?P<taskName>\w+)\(?(?P<params>.*?)\)?$`)
 
 	positionalMatcher = regexp.MustCompile(`^(?P<paramName>\w+)(?:\s*=\s*(?P<default>.*))?$`)
 	keywordMatcher    = regexp.MustCompile(`^(?P<paramName>\w+):(?:\s*(?P<default>.*))?$`)
@@ -37,7 +36,7 @@ func (t Tool) Mount() ([]task.Task, error) {
 		return nil, err
 	}
 
-	rawTasks := toolhelp.Scan(file, methodFinder, commentPrefixMatcher)
+	rawTasks := toolhelp.Scan(file, methodFinder, stringhelp.OctothorpePrefixMatcher)
 	tasks := make([]task.Task, len(rawTasks))
 	for i, rawTask := range rawTasks {
 		taskName := rawTask.MatchData["taskName"]

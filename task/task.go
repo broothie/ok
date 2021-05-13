@@ -1,8 +1,6 @@
 package task
 
-import (
-	"os"
-)
+import "os"
 
 type Task interface {
 	Name() string
