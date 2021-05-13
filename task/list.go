@@ -58,7 +58,9 @@ func List(tasks map[string]Task) error {
 	}
 
 	sort.Strings(lines)
-	lines = append([]string{strings.Join(headerSlice, "\t") + "\n"}, lines...)
+	if len(headerSlice) > 1 {
+		lines = append([]string{strings.Join(headerSlice, "\t") + "\n"}, lines...)
+	}
 
 	table := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
 	for _, line := range lines {
