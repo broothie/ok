@@ -16,6 +16,10 @@ func SplitOnWhitespace(s string) []string {
 }
 
 func SplitOnCommas(s string) []string {
+	if s == "" {
+		return nil
+	}
+
 	return CommaSplitter.Split(s, -1)
 }
 

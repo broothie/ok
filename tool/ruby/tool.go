@@ -1,9 +1,11 @@
 package ruby
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/broothie/ok/toolhelp"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -18,8 +20,12 @@ func (Tool) Name() string {
 }
 
 func (Tool) Init() error {
-	_, err := os.Create(filename)
-	return err
+	_, err := os.OpenFile(filename, os.O_CREATE, 0)
+	if os.IsExist(err) {
+		return fmt.Errorf("file '%s' already exists", filename)
+	}
+
+	return errors.Wrapf(err, "could not create file '%s'", filename)
 }
 
 func (Tool) Check() error {

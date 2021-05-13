@@ -1,4 +1,4 @@
-package yarn
+package rake
 
 import (
 	"fmt"
@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	ToolName = "yarn"
-	filename = "package.json"
+	ToolName = "rake"
+	filename = "Rakefile"
 )
 
 type Tool struct{}

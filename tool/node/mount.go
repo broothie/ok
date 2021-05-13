@@ -47,21 +47,6 @@ func (t Tool) Mount() ([]task.Task, error) {
 		}
 	}
 
-	//fileBytes, err := ioutil.ReadFile(filename)
-	//if err != nil {
-	//	return nil, toolhelp.ReadToolFileError{Filename: filename, Err: err}
-	//}
-	//
-	//fileContents := string(fileBytes)
-	//results := stringhelp.NamedRegexpResults(fileContents, functionFinder)
-	//for _, result := range results {
-	//	tasks = append(tasks, Task{
-	//		Base:         task.NewBase(result["taskName"], filename, ToolName),
-	//		params:       paramListFromParamString(result["params"]),
-	//		fileContents: &fileContents,
-	//	})
-	//}
-
 	return tasks, nil
 }
 

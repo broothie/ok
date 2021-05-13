@@ -17,7 +17,7 @@ Releases can be found on the [releases page](https://github.com/broothie/okay/re
 ### Via Go
 
 ```shell
-$ go install github.com/broothie/ok/ok.go
+$ go install github.com/broothie/ok/ok.go@latest
 ```
 
 ## Usage
@@ -53,23 +53,20 @@ types                                                     Okfile.go  go
 - Go
 - Make
 - Ruby
+- Rake
+- Python
 - Node
+- zsh
+- bash
 - docker-compose
 - Yarn
 
 ## To do
 
-- [ ] Improve tool interface
 - [ ] Scour error paths
 - [ ] Support .rc or something
-- [ ] Task comments
 - [ ] Task inspect
 - [ ] Specify file
 - [ ] Param validator (validates tool param output)
-- [ ] Add more tools
-  - [ ] sh
-  - [ ] Python
-  - [ ] Rake
-  - [ ] npm
 - [ ] README
 - [ ] Tab completion

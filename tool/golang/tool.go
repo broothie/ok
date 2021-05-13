@@ -25,8 +25,12 @@ func (Tool) Name() string {
 }
 
 func (Tool) Init() error {
-	file, err := os.Create(filename)
+	file, err := os.OpenFile(filename, os.O_CREATE|os.O_RDWR, 0666)
 	if err != nil {
+		if os.IsExist(err) {
+			return fmt.Errorf("file '%s' already exists", filename)
+		}
+
 		return errors.Wrapf(err, "failed to create file '%s'", filename)
 	}
 

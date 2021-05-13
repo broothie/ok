@@ -10,14 +10,22 @@ func NewBase(name, filename, toolName string) Base {
 	return Base{name: name, filename: filename, toolName: toolName}
 }
 
-func (t Base) Name() string {
-	return t.name
+func (b Base) Name() string {
+	return b.name
 }
 
-func (t Base) Filename() string {
-	return t.filename
+func (b Base) Comment() string {
+	return ""
 }
 
-func (t Base) ToolName() string {
-	return t.toolName
+func (b Base) Filename() string {
+	return b.filename
+}
+
+func (b Base) ToolName() string {
+	return b.toolName
+}
+
+func (Base) Params() Parameters {
+	return Parameters{}
 }

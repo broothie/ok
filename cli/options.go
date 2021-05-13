@@ -55,7 +55,7 @@ var Options = []Option{
 		},
 	},
 	{
-		Name:        "list-tools",
+		Name:        "tools",
 		Short:       false,
 		Description: "List tools and their availability.",
 		Stop:        true,

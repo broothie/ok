@@ -43,22 +43,5 @@ func (t Tool) Mount() ([]task.Task, error) {
 		}
 	}
 
-	//fileBytes, err := ioutil.ReadFile(filename)
-	//if err != nil {
-	//	return nil, toolhelp.ReadToolFileError{Filename: filename, Err: err}
-	//}
-	//
-	//matches := ruleMatcher.FindAllStringSubmatch(string(fileBytes), -1)
-	//tasks := make([]task.Task, len(matches))
-	//counter := 0
-	//for _, match := range matches {
-	//	taskName := match[1]
-	//	tasks[counter] = Task{
-	//		Base: task.NewBase(taskName, filename, ToolName),
-	//	}
-	//
-	//	counter++
-	//}
-
 	return tasks, nil
 }

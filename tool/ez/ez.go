@@ -35,16 +35,20 @@ func (t Tool) Filename() string {
 }
 
 func (t Tool) Init() error {
-	file, err := os.Open(t.ToolFilename)
+	file, err := os.OpenFile(t.ToolFilename, os.O_CREATE|os.O_RDWR, 0666)
 	if err != nil {
-		return errors.Wrap(err, "")
+		if os.IsExist(err) {
+			return fmt.Errorf("file '%s' already exists", t.ToolFilename)
+		}
+
+		return errors.Wrapf(err, "failed to create file '%s'", t.ToolFilename)
 	}
 
 	if _, err := fmt.Fprint(file, t.ToolInitContent); err != nil {
-		return errors.Wrap(err, "")
+		return errors.Wrapf(err, "could not write to file '%s'", t.ToolFilename)
 	}
 
-	return errors.Wrap(file.Close(), "")
+	return errors.Wrapf(file.Close(), "could not close file '%s'", t.ToolFilename)
 }
 
 func (t Tool) Check() error {

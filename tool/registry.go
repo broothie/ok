@@ -5,23 +5,29 @@ import (
 
 	"github.com/broothie/ok/ok"
 	"github.com/broothie/ok/task"
+	"github.com/broothie/ok/tool/bash"
 	dockercompose "github.com/broothie/ok/tool/docker-compose"
 	"github.com/broothie/ok/tool/golang"
 	maketool "github.com/broothie/ok/tool/make" // NOTE: Collides with `make` builtin
 	"github.com/broothie/ok/tool/node"
 	"github.com/broothie/ok/tool/python"
+	"github.com/broothie/ok/tool/rake"
 	"github.com/broothie/ok/tool/ruby"
 	"github.com/broothie/ok/tool/yarn"
+	"github.com/broothie/ok/tool/zsh"
 )
 
 var Registry = []Tool{
-	ruby.Tool{},
+	bash.Bash,
+	dockercompose.Tool{},
 	golang.Tool{},
 	maketool.Tool{},
 	node.Tool{},
-	dockercompose.Tool{},
-	yarn.Tool{},
 	python.Python,
+	rake.Tool{},
+	ruby.Tool{},
+	yarn.Tool{},
+	zsh.Zsh,
 }
 
 func Mount() map[string]task.Task {

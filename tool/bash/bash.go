@@ -1,4 +1,4 @@
-package python
+package bash
 
 import (
 	"fmt"
@@ -13,36 +13,19 @@ import (
 	"github.com/broothie/ok/toolhelp"
 )
 
-var (
-	taskMatcher  = regexp.MustCompile(`^def\s+(?P<taskName>\w+)\s*\((?P<params>.*?)\)\s*:\s*$`)
-	paramMatcher = regexp.MustCompile(`^(?P<paramName>\w+)(?:\s*=\s*(?P<default>.*))?$`)
-)
+var taskMatcher = regexp.MustCompile(`^(?P<taskName>\w+)\s*\((?P<params>.*?)\)\s*{\s*$`)
 
-var Python = ez.Tool{
-	ToolName:             "python",
-	CommandName:          "python",
-	ToolFilename:         "Okfile.py",
+var Bash = ez.Tool{
+	ToolName:             "bash",
+	CommandName:          "bash",
+	ToolFilename:         "Okfile.bash",
 	TaskMatcher:          taskMatcher,
 	CommentPrefixMatcher: stringhelp.OctothorpePrefixMatcher,
 	ParamParser: func(paramString string) (task.Parameters, error) {
 		paramStrings := stringhelp.SplitOnCommas(paramString)
 		paramList := make(task.ParamList, len(paramStrings))
 		for i, paramString := range paramStrings {
-			result := stringhelp.NamedRegexpResult(paramString, paramMatcher)
-			paramName := result["paramName"]
-
-			var defaultValue interface{}
-			defaultString, defaultExists := result["default"]
-			if defaultExists && defaultString != "" {
-				defaultValue = defaultString
-			}
-
-			paramList[i] = task.Parameter{
-				Name:      paramName,
-				Type:      task.Untyped,
-				Default:   defaultValue,
-				IsKeyword: defaultString != "",
-			}
+			paramList[i] = task.Parameter{Name: paramString, Type: task.String}
 		}
 
 		return paramList.ToParameters(false), nil
@@ -53,11 +36,7 @@ var Python = ez.Tool{
 			argStrings = append(argStrings, processArg(arg.Value.(string)))
 		}
 
-		for name, arg := range args.Keyword {
-			argStrings = append(argStrings, fmt.Sprintf("%s=%s", name, processArg(arg.Value.(string))))
-		}
-
-		script := fmt.Sprintf("%s\n%s(%s)", *task.FileContents, task.Name(), strings.Join(argStrings, ", "))
+		script := fmt.Sprintf("%s\n%s %s", *task.FileContents, task.Name(), strings.Join(argStrings, "  "))
 		return toolhelp.Exec(task.ToolName(), "-c", script).Process
 	},
 }
@@ -69,9 +48,9 @@ func processArg(arg string) string {
 		return arg
 	} else if b, err := strconv.ParseBool(arg); err == nil {
 		if b {
-			return "True"
+			return "1"
 		} else {
-			return "False"
+			return "0"
 		}
 	} else {
 		return strconv.Quote(arg)
