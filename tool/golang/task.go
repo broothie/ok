@@ -30,7 +30,12 @@ type templateData struct {
 type Task struct {
 	task.Base
 	params       task.Parameters
+	comment      string
 	fileContents *string
+}
+
+func (t Task) Comment() string {
+	return t.comment
 }
 
 func (t Task) Params() task.Parameters {

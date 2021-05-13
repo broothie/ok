@@ -1,7 +1,6 @@
 package node
 
 import (
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"regexp"
@@ -13,14 +12,13 @@ import (
 )
 
 var (
-	functionFinder = regexp.MustCompile(`(?m)^\s*function\s+(?P<taskName>\w+)\s*\((?P<params>.*?)\)\s*{\s*$`)
-	paramSplitter  = regexp.MustCompile(`\s*,\s*`)
-
+	functionFinder    = regexp.MustCompile(`(?m)^\s*function\s+(?P<taskName>\w+)\s*\((?P<params>.*?)\)\s*{\s*$`)
 	positionalMatcher = regexp.MustCompile(`^(?P<paramName>\w+)(?:\s*=\s*(?P<default>.*))?$`)
 )
 
 func (t Tool) Mount() ([]task.Task, error) {
-	if _, err := os.Stat(filename); err != nil {
+	file, err := os.Open(filename)
+	if err != nil {
 		if os.IsNotExist(err) {
 			return nil, nil
 		}
@@ -36,21 +34,33 @@ func (t Tool) Mount() ([]task.Task, error) {
 		return nil, err
 	}
 
-	var tasks []task.Task
-	fileBytes, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return nil, toolhelp.ReadToolFileError{Filename: filename, Err: err}
+	rawTasks := toolhelp.Scan(file, functionFinder, stringhelp.DoubleSlashPrefixMatcher)
+	tasks := make([]task.Task, len(rawTasks))
+	for i, rawTask := range rawTasks {
+		taskName := rawTask.MatchData["taskName"]
+		params := rawTask.MatchData["params"]
+
+		tasks[i] = Task{
+			Base:    task.NewBase(taskName, filename, ToolName),
+			comment: rawTask.Comment,
+			params:  paramListFromParamString(params),
+		}
 	}
 
-	fileContents := string(fileBytes)
-	results := stringhelp.NamedRegexpResults(fileContents, functionFinder)
-	for _, result := range results {
-		tasks = append(tasks, Task{
-			Base:         task.NewBase(result["taskName"], filename, ToolName),
-			params:       paramListFromParamString(result["params"]),
-			fileContents: &fileContents,
-		})
-	}
+	//fileBytes, err := ioutil.ReadFile(filename)
+	//if err != nil {
+	//	return nil, toolhelp.ReadToolFileError{Filename: filename, Err: err}
+	//}
+	//
+	//fileContents := string(fileBytes)
+	//results := stringhelp.NamedRegexpResults(fileContents, functionFinder)
+	//for _, result := range results {
+	//	tasks = append(tasks, Task{
+	//		Base:         task.NewBase(result["taskName"], filename, ToolName),
+	//		params:       paramListFromParamString(result["params"]),
+	//		fileContents: &fileContents,
+	//	})
+	//}
 
 	return tasks, nil
 }

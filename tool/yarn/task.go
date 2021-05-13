@@ -11,6 +11,10 @@ type Task struct {
 	task.Base
 }
 
+func (t Task) Comment() string {
+	return ""
+}
+
 func (Task) Params() task.Parameters {
 	return task.Parameters{}
 }

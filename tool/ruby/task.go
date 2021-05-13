@@ -12,7 +12,12 @@ import (
 
 type Task struct {
 	task.Base
-	params task.Parameters
+	comment string
+	params  task.Parameters
+}
+
+func (t Task) Comment() string {
+	return t.comment
 }
 
 func (t Task) Params() task.Parameters {

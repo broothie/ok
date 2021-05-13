@@ -9,6 +9,7 @@ import (
 	"github.com/bmatcuk/doublestar"
 )
 
+// Try out doublestar
 func glob(pattern string) {
 	fmt.Println(doublestar.Glob(pattern))
 }

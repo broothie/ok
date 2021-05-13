@@ -1,6 +1,7 @@
 package golang
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -12,7 +13,7 @@ import (
 	"github.com/broothie/ok/toolhelp"
 )
 
-var funcFinder = regexp.MustCompile(`(?m)^\s*func\s+(\w+)\s*\((.*)\)`)
+var funcFinder = regexp.MustCompile(`(?m)^\s*func\s+(?P<taskName>\w+)\s*\((?P<params>.*?)\)`)
 
 func (t Tool) Mount() ([]task.Task, error) {
 	if _, err := os.Open(filename); err != nil {
@@ -33,24 +34,24 @@ func (t Tool) Mount() ([]task.Task, error) {
 	}
 
 	fileContents := string(fileBytes)
-
-	matches := funcFinder.FindAllStringSubmatch(fileContents, -1)
-	tasks := make([]task.Task, len(matches))
-	for i, match := range matches {
-		taskName, paramsString := match[1], match[2]
+	rawTasks := toolhelp.Scan(bytes.NewBuffer(fileBytes), funcFinder, stringhelp.DoubleSlashPrefixMatcher)
+	tasks := make([]task.Task, len(rawTasks))
+	for i, rawTask := range rawTasks {
+		taskName := rawTask.MatchData["taskName"]
+		paramsString := rawTask.MatchData["params"]
 
 		var paramEntries []string
 		if !stringhelp.AllWhitespace(paramsString) {
-			paramEntries = strings.Split(paramsString, ",")
+			paramEntries = stringhelp.SplitOnCommas(paramsString)
 		}
 
 		// Loop backwards with a `currentType` because of the whole `func(a, b string)` thing in Go
-		params := make([]task.Parameter, len(paramEntries))
+		params := make(task.ParamList, len(paramEntries))
 		currentType := ""
 		for i := len(paramEntries) - 1; i >= 0; i-- {
 			paramEntry := strings.TrimSpace(paramEntries[i])
 
-			chunks := stringhelp.WhitespaceSplitter.Split(paramEntry, 2)
+			chunks := stringhelp.Whitespace.Split(paramEntry, 2)
 			if len(chunks) > 1 {
 				currentType = chunks[1]
 			}
@@ -77,7 +78,8 @@ func (t Tool) Mount() ([]task.Task, error) {
 
 		tasks[i] = Task{
 			Base:         task.NewBase(taskName, filename, ToolName),
-			params:       task.Parameters{ParamList: params},
+			params:       params.ToParameters(false),
+			comment:      rawTask.Comment,
 			fileContents: &fileContents,
 		}
 	}

@@ -3,13 +3,15 @@ package stringhelp
 import "regexp"
 
 var (
-	WhitespaceSplitter = regexp.MustCompile(`\s+`)
-	CommaSplitter      = regexp.MustCompile(`\s*,\s*`)
-	AllWhitespace      = regexp.MustCompile(`^\s*$`).MatchString
+	Whitespace    = regexp.MustCompile(`\s+`)
+	CommaSplitter = regexp.MustCompile(`\s*,\s*`)
+	AllWhitespace = regexp.MustCompile(`^\s*$`).MatchString
+
+	DoubleSlashPrefixMatcher = regexp.MustCompile(`^\s*//`)
 )
 
 func SplitOnWhitespace(s string) []string {
-	return WhitespaceSplitter.Split(s, -1)
+	return Whitespace.Split(s, -1)
 }
 
 func SplitOnCommas(s string) []string {

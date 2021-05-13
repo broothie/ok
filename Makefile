@@ -1,4 +1,5 @@
 
+# Check all is okay
 check: test build clean
 
 build: generate

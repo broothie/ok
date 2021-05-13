@@ -10,19 +10,20 @@ import (
 
 func List(tasks map[string]Task) error {
 	paramsPresent := false
+	commentsPresent := false
 	filenames := make(set)
-	toolNames := make(set)
 	for _, task := range tasks {
 		if task.Params().String() != "" {
 			paramsPresent = true
 		}
 
 		filenames.insert(task.Filename())
-		toolNames.insert(task.ToolName())
+		if task.Comment() != "" {
+			commentsPresent = true
+		}
 	}
 
 	includeFilenames := len(filenames) > 1
-	includeToolNames := len(toolNames) > 1
 
 	lines := make([]string, len(tasks))
 	counter := 0
@@ -36,8 +37,8 @@ func List(tasks map[string]Task) error {
 			columns = append(columns, task.Filename())
 		}
 
-		if includeToolNames {
-			columns = append(columns, task.ToolName())
+		if commentsPresent {
+			columns = append(columns, task.Comment())
 		}
 
 		lines[counter] = fmt.Sprintf("%s\n", strings.Join(columns, "\t"))
@@ -53,8 +54,8 @@ func List(tasks map[string]Task) error {
 		headerSlice = append(headerSlice, "FILE")
 	}
 
-	if includeToolNames {
-		headerSlice = append(headerSlice, "TOOL")
+	if commentsPresent {
+		headerSlice = append(headerSlice, "DESCRIPTION")
 	}
 
 	sort.Strings(lines)

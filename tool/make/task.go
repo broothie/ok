@@ -9,6 +9,11 @@ import (
 
 type Task struct {
 	task.Base
+	comment string
+}
+
+func (t Task) Comment() string {
+	return t.comment
 }
 
 func (Task) Params() task.Parameters {

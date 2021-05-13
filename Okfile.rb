@@ -1,6 +1,7 @@
 require 'dotenv/load'
 require 'pry'
 
+# List files with more than one double newline
 def ugly_imports
     filenames = Dir['**/*.go']
     filenames.each do |filename|
@@ -16,6 +17,8 @@ end
 
 # Examples
 
+# Example thing!
+# More text
 def example(apple, banana = 'yellow', cherry:, durian: 'smelly')
     puts "#{apple} apple, #{banana} banana, #{cherry} cherry, #{durian} durian"
 end

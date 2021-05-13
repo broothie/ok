@@ -1,7 +1,6 @@
 package make
 
 import (
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"regexp"
@@ -10,10 +9,14 @@ import (
 	"github.com/broothie/ok/toolhelp"
 )
 
-var ruleMatcher = regexp.MustCompile(`(?m)^\s*(.*):`)
+var (
+	ruleMatcher          = regexp.MustCompile(`(?m)^\s*(?P<taskName>.*?):`)
+	commentPrefixMatcher = regexp.MustCompile(`^\s*#`)
+)
 
 func (t Tool) Mount() ([]task.Task, error) {
-	if _, err := os.Stat(filename); err != nil {
+	file, err := os.Open(filename)
+	if err != nil {
 		if os.IsNotExist(err) {
 			return nil, nil
 		}
@@ -29,22 +32,33 @@ func (t Tool) Mount() ([]task.Task, error) {
 		return nil, err
 	}
 
-	fileBytes, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return nil, toolhelp.ReadToolFileError{Filename: filename, Err: err}
-	}
+	rawTasks := toolhelp.Scan(file, ruleMatcher, commentPrefixMatcher)
+	tasks := make([]task.Task, len(rawTasks))
+	for i, rawTask := range rawTasks {
+		taskName := rawTask.MatchData["taskName"]
 
-	matches := ruleMatcher.FindAllStringSubmatch(string(fileBytes), -1)
-	tasks := make([]task.Task, len(matches))
-	counter := 0
-	for _, match := range matches {
-		taskName := match[1]
-		tasks[counter] = Task{
-			Base: task.NewBase(taskName, filename, ToolName),
+		tasks[i] = Task{
+			Base:    task.NewBase(taskName, filename, ToolName),
+			comment: rawTask.Comment,
 		}
-
-		counter++
 	}
+
+	//fileBytes, err := ioutil.ReadFile(filename)
+	//if err != nil {
+	//	return nil, toolhelp.ReadToolFileError{Filename: filename, Err: err}
+	//}
+	//
+	//matches := ruleMatcher.FindAllStringSubmatch(string(fileBytes), -1)
+	//tasks := make([]task.Task, len(matches))
+	//counter := 0
+	//for _, match := range matches {
+	//	taskName := match[1]
+	//	tasks[counter] = Task{
+	//		Base: task.NewBase(taskName, filename, ToolName),
+	//	}
+	//
+	//	counter++
+	//}
 
 	return tasks, nil
 }

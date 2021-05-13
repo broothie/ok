@@ -11,8 +11,8 @@ func (e CommandNotFoundError) Error() string {
 }
 
 type ReadToolFileError struct {
-	Err      error
 	Filename string
+	Err      error
 }
 
 func (e ReadToolFileError) Error() string {

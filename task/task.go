@@ -6,6 +6,7 @@ import (
 
 type Task interface {
 	Name() string
+	Comment() string
 	Filename() string
 	ToolName() string
 	Params() Parameters

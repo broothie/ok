@@ -11,6 +11,10 @@ type Task struct {
 	task.Base
 }
 
+func (Task) Comment() string {
+	return ""
+}
+
 func (Task) Params() task.Parameters {
 	return task.Parameters{Forward: true}
 }

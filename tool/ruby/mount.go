@@ -1,7 +1,6 @@
 package ruby
 
 import (
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"regexp"
@@ -13,15 +12,16 @@ import (
 )
 
 var (
-	methodFinder  = regexp.MustCompile(`(?m)^\s*def\s+(?P<taskName>\w+)\(?(?P<params>.*?)\)?$`)
-	paramSplitter = regexp.MustCompile(`\s*,\s*`)
+	methodFinder         = regexp.MustCompile(`(?m)^\s*def\s+(?P<taskName>\w+)\(?(?P<params>.*?)\)?$`)
+	commentPrefixMatcher = regexp.MustCompile(`^\s*#`)
 
 	positionalMatcher = regexp.MustCompile(`^(?P<paramName>\w+)(?:\s*=\s*(?P<default>.*))?$`)
 	keywordMatcher    = regexp.MustCompile(`^(?P<paramName>\w+):(?:\s*(?P<default>.*))?$`)
 )
 
 func (t Tool) Mount() ([]task.Task, error) {
-	if _, err := os.Stat(filename); err != nil {
+	file, err := os.Open(filename)
+	if err != nil {
 		if os.IsNotExist(err) {
 			return nil, nil
 		}
@@ -37,18 +37,17 @@ func (t Tool) Mount() ([]task.Task, error) {
 		return nil, err
 	}
 
-	var tasks []task.Task
-	fileBytes, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return nil, toolhelp.ReadToolFileError{Filename: filename, Err: err}
-	}
+	rawTasks := toolhelp.Scan(file, methodFinder, commentPrefixMatcher)
+	tasks := make([]task.Task, len(rawTasks))
+	for i, rawTask := range rawTasks {
+		taskName := rawTask.MatchData["taskName"]
+		params := rawTask.MatchData["params"]
 
-	results := stringhelp.NamedRegexpResults(string(fileBytes), methodFinder)
-	for _, result := range results {
-		tasks = append(tasks, Task{
-			Base:   task.NewBase(result["taskName"], filename, ToolName),
-			params: paramListFromParamString(result["params"]),
-		})
+		tasks[i] = Task{
+			Base:    task.NewBase(taskName, filename, ToolName),
+			comment: rawTask.Comment,
+			params:  paramListFromParamString(params),
+		}
 	}
 
 	return tasks, nil
