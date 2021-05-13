@@ -28,7 +28,7 @@ func TestSplitOnWhitespace(t *testing.T) {
 }
 
 func TestSplitOnCommas(t *testing.T) {
-	assert.Equal(t, []string{""}, SplitOnCommas(""))
+	assert.Equal(t, []string(nil), SplitOnCommas(""))
 	assert.Equal(t, []string{"", ""}, SplitOnCommas(","))
 	assert.Equal(t, []string{"", ""}, SplitOnCommas(", "))
 	assert.Equal(t, []string{"", ""}, SplitOnCommas(" , "))

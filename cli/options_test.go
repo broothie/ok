@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestParser_ParseOptions(t *testing.T) {
+func TestOptions(t *testing.T) {
 	taskName := "asdf"
 
 	t.Run("no options", func(t *testing.T) {
@@ -66,7 +66,7 @@ func TestParser_ParseOptions(t *testing.T) {
 
 	t.Run("list tools", func(t *testing.T) {
 		expected := ok.Options{Stop: true, ListTools: true}
-		actual, err := parserWithArgs("--list-tools").ParseOptions()
+		actual, err := parserWithArgs("--tools").ParseOptions()
 		assert.NoError(t, err)
 		assert.Equal(t, expected, actual)
 	})
@@ -95,7 +95,7 @@ func TestParser_ParseOptions(t *testing.T) {
 			"-h":              true,
 			"--help":          true,
 			"--version":       true,
-			"--list-tools":    true,
+			"--tools":         true,
 			"-w f":            false,
 			"--watch f":       false,
 			"-i toolName":     true,
