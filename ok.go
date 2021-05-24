@@ -12,7 +12,6 @@ import (
 	"github.com/broothie/ok/cli"
 	"github.com/broothie/ok/ok"
 	"github.com/broothie/ok/task"
-	"github.com/broothie/ok/tool"
 	"github.com/broothie/ok/tools"
 	"github.com/pkg/errors"
 	"github.com/radovskyb/watcher"
@@ -58,7 +57,7 @@ func main() {
 		tools.List()
 
 	case options.TaskName == "":
-		if err := task.List(tool.Mount()); err != nil {
+		if err := task.List(tools.Mount()); err != nil {
 			ok.Logger.Println(err)
 			os.Exit(1)
 			return
@@ -71,7 +70,7 @@ func main() {
 
 	// Get task
 	taskName := options.TaskName
-	tasks := tool.Mount()
+	tasks := tools.Mount()
 	task, taskExists := tasks[options.TaskName]
 	if !taskExists {
 		ok.Logger.Printf("no task called '%s'", taskName)

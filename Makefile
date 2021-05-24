@@ -20,6 +20,7 @@ generate: task/type_string.go
 clean:
 	go clean
 	rm -rf _ok dist
+	go mod tidy
 
 other things:
 	echo other things
