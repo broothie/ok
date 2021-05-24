@@ -2,15 +2,14 @@ package ruby
 
 import (
 	"fmt"
-	"os"
 	"regexp"
 	"strconv"
 	"strings"
 
 	"github.com/broothie/ok/stringhelp"
 	"github.com/broothie/ok/task"
-	"github.com/broothie/ok/tool/ez"
 	"github.com/broothie/ok/toolhelp"
+	"github.com/broothie/ok/tools/ez"
 )
 
 var (
@@ -29,7 +28,7 @@ var (
 		ParamParser: func(paramString string) (task.Parameters, error) {
 			return paramListFromParamString(paramString), nil
 		},
-		Invoke: func(task ez.Task, args task.Args) *os.Process {
+		Invoke: func(task ez.Task, args task.Args) task.RunningTask {
 			positionalStrings := make([]string, len(args.Positional))
 			for i, arg := range args.Positional {
 				positionalStrings[i] = processArg(arg.Value.(string))
@@ -43,8 +42,7 @@ var (
 			}
 
 			script := fmt.Sprintf("%s(%s)", task.Name(), strings.Join(append(positionalStrings, keywordEntries...), ", "))
-			return toolhelp.Exec(ToolName, "-r", fmt.Sprintf("./%s", task.Filename()), "-e", script).Process
-
+			return toolhelp.Exec(ToolName, "-r", fmt.Sprintf("./%s", task.Filename()), "-e", script)
 		},
 	}
 )

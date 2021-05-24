@@ -13,7 +13,7 @@ import (
 
 type ParamParser func(paramString string) (task.Parameters, error)
 
-type InvokeFunc func(task Task, args task.Args) *os.Process
+type InvokeFunc func(task Task, args task.Args) task.RunningTask
 
 type Tool struct {
 	ToolName             string
@@ -96,37 +96,4 @@ func (t Tool) Mount() ([]task.Task, error) {
 	}
 
 	return tasks, nil
-}
-
-type Task struct {
-	Tool         *Tool
-	TaskName     string
-	TaskComment  string
-	TaskFilename string
-	TaskParams   task.Parameters
-	FileContents *string
-}
-
-func (t Task) Name() string {
-	return t.TaskName
-}
-
-func (t Task) Comment() string {
-	return t.TaskComment
-}
-
-func (t Task) Filename() string {
-	return t.TaskFilename
-}
-
-func (t Task) ToolName() string {
-	return t.Tool.ToolName
-}
-
-func (t Task) Params() task.Parameters {
-	return t.TaskParams
-}
-
-func (t Task) Invoke(args task.Args) *os.Process {
-	return t.Tool.Invoke(t, args)
 }

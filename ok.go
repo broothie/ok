@@ -13,6 +13,7 @@ import (
 	"github.com/broothie/ok/ok"
 	"github.com/broothie/ok/task"
 	"github.com/broothie/ok/tool"
+	"github.com/broothie/ok/tools"
 	"github.com/pkg/errors"
 	"github.com/radovskyb/watcher"
 )
@@ -47,14 +48,14 @@ func main() {
 		cli.PrintVersion(Version())
 
 	case options.Init != "":
-		if err := tool.InitTool(options.Init); err != nil {
+		if err := tools.InitTool(options.Init); err != nil {
 			ok.Logger.Println(err)
 			os.Exit(1)
 			return
 		}
 
 	case options.ListTools:
-		tool.List()
+		tools.List()
 
 	case options.TaskName == "":
 		if err := task.List(tool.Mount()); err != nil {
@@ -93,7 +94,7 @@ func main() {
 			os.Exit(1)
 		}
 	} else {
-		if _, err := task.Invoke(args).Wait(); err != nil {
+		if err := task.Invoke(args).Wait(); err != nil {
 			if err.Error() == "wait: no child processes" {
 				return
 			}
@@ -104,7 +105,7 @@ func main() {
 	}
 }
 
-func runWatcher(task task.Task, args task.Args, watches []string) error {
+func runWatcher(t task.Task, args task.Args, watches []string) error {
 	var wg sync.WaitGroup
 	defer wg.Wait()
 	watcher := watcher.New()
@@ -126,7 +127,7 @@ func runWatcher(task task.Task, args task.Args, watches []string) error {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		var process *os.Process
+		var process task.RunningTask
 
 		for {
 			select {
@@ -135,7 +136,7 @@ func runWatcher(task task.Task, args task.Args, watches []string) error {
 					process.Kill()
 				}
 
-				process = task.Invoke(args)
+				process = t.Invoke(args)
 
 			case err := <-watcher.Error:
 				if process != nil {

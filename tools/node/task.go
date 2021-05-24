@@ -2,7 +2,6 @@ package node
 
 import (
 	"fmt"
-	"os"
 	"strconv"
 	"strings"
 
@@ -25,7 +24,7 @@ func (t Task) Params() task.Parameters {
 	return t.params
 }
 
-func (t Task) Invoke(args task.Args) *os.Process {
+func (t Task) Invoke(args task.Args) task.RunningTask {
 	positionalStrings := make([]string, len(args.Positional))
 	for i, arg := range args.Positional {
 		positionalStrings[i] = processArg(arg.Value.(string))
@@ -33,7 +32,7 @@ func (t Task) Invoke(args task.Args) *os.Process {
 
 	argString := strings.Join(positionalStrings, ", ")
 	script := fmt.Sprintf("%s; %s(%s)", *t.fileContents, t.Name(), argString)
-	return toolhelp.Exec(ToolName, "-e", script).Process
+	return toolhelp.Exec(ToolName, "-e", script)
 }
 
 func processArg(arg string) string {

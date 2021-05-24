@@ -2,15 +2,14 @@ package bash
 
 import (
 	"fmt"
-	"os"
 	"regexp"
 	"strconv"
 	"strings"
 
 	"github.com/broothie/ok/stringhelp"
 	"github.com/broothie/ok/task"
-	"github.com/broothie/ok/tool/ez"
 	"github.com/broothie/ok/toolhelp"
+	"github.com/broothie/ok/tools/ez"
 )
 
 var taskMatcher = regexp.MustCompile(`^(?P<taskName>\w+)\s*\((?P<params>.*?)\)\s*{\s*$`)
@@ -30,14 +29,14 @@ var Bash = ez.Tool{
 
 		return paramList.ToParameters(false), nil
 	},
-	Invoke: func(task ez.Task, args task.Args) *os.Process {
+	Invoke: func(task ez.Task, args task.Args) task.RunningTask {
 		var argStrings []string
 		for _, arg := range args.Positional {
 			argStrings = append(argStrings, processArg(arg.Value.(string)))
 		}
 
 		script := fmt.Sprintf("%s\n%s %s", *task.FileContents, task.Name(), strings.Join(argStrings, "  "))
-		return toolhelp.Exec(task.ToolName(), "-c", script).Process
+		return toolhelp.Exec(task.ToolName(), "-c", script)
 	},
 }
 

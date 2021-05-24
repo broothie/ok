@@ -1,9 +1,10 @@
-package tool
+package tools
 
 import (
 	"fmt"
 
 	"github.com/broothie/ok/ok"
+	"github.com/broothie/ok/tool"
 	"github.com/pkg/errors"
 )
 
@@ -21,8 +22,8 @@ func InitTool(toolName string) error {
 	return nil
 }
 
-func findTool(toolName string) (Tool, bool) {
-	for _, tool := range Registry {
+func findTool(toolName string) (tool.Tool, bool) {
+	for _, tool := range tool.Registry {
 		if tool.Name() == toolName {
 			return tool, true
 		}

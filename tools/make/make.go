@@ -1,13 +1,12 @@
 package make
 
 import (
-	"os"
 	"regexp"
 
 	"github.com/broothie/ok/stringhelp"
 	"github.com/broothie/ok/task"
-	"github.com/broothie/ok/tool/ez"
 	"github.com/broothie/ok/toolhelp"
+	"github.com/broothie/ok/tools/ez"
 )
 
 const ToolName = "make"
@@ -21,8 +20,8 @@ var (
 		ToolFilename:         "Makefile",
 		TaskMatcher:          ruleMatcher,
 		CommentPrefixMatcher: stringhelp.OctothorpePrefixMatcher,
-		Invoke: func(task ez.Task, args task.Args) *os.Process {
-			return toolhelp.Exec(ToolName, task.Name()).Process
+		Invoke: func(task ez.Task, args task.Args) task.RunningTask {
+			return toolhelp.Exec(ToolName, task.Name())
 		},
 	}
 )

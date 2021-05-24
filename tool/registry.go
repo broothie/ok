@@ -5,16 +5,16 @@ import (
 
 	"github.com/broothie/ok/ok"
 	"github.com/broothie/ok/task"
-	"github.com/broothie/ok/tool/bash"
-	dockercompose "github.com/broothie/ok/tool/docker-compose"
-	"github.com/broothie/ok/tool/golang"
-	maketool "github.com/broothie/ok/tool/make" // NOTE: Collides with `make` builtin
-	"github.com/broothie/ok/tool/node"
-	"github.com/broothie/ok/tool/python"
-	"github.com/broothie/ok/tool/rake"
-	"github.com/broothie/ok/tool/ruby"
-	"github.com/broothie/ok/tool/yarn"
-	"github.com/broothie/ok/tool/zsh"
+	"github.com/broothie/ok/tools/bash"
+	dockercompose "github.com/broothie/ok/tools/docker-compose"
+	"github.com/broothie/ok/tools/golang"
+	maketool "github.com/broothie/ok/tools/make" // NOTE: Collides with `make` builtin
+	"github.com/broothie/ok/tools/node"
+	"github.com/broothie/ok/tools/python"
+	"github.com/broothie/ok/tools/rake"
+	"github.com/broothie/ok/tools/ruby"
+	"github.com/broothie/ok/tools/yarn"
+	"github.com/broothie/ok/tools/zsh"
 )
 
 var Registry = []Tool{
@@ -36,7 +36,7 @@ func Mount() map[string]task.Task {
 	var wg sync.WaitGroup
 	defer wg.Wait()
 
-	for _, tool := range Registry {
+	for _, t := range Registry {
 		wg.Add(1)
 		go func(tool Tool) {
 			defer wg.Done()
@@ -54,7 +54,7 @@ func Mount() map[string]task.Task {
 				tasks[name] = toolTask
 				mutex.Unlock()
 			}
-		}(tool)
+		}(t)
 	}
 
 	return tasks
