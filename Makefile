@@ -8,6 +8,7 @@ build: generate
 test: generate
 	go test -cover ./...
 
+# Installs ok locally
 install: generate
 	go install ok.go
 
@@ -19,3 +20,6 @@ generate: task/type_string.go
 clean:
 	go clean
 	rm -rf _ok dist
+
+other things:
+	echo other things

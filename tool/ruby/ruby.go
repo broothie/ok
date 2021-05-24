@@ -1,56 +1,53 @@
 package ruby
 
 import (
+	"fmt"
 	"os"
-	"os/exec"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/broothie/ok/stringhelp"
 	"github.com/broothie/ok/task"
+	"github.com/broothie/ok/tool/ez"
 	"github.com/broothie/ok/toolhelp"
 )
 
 var (
-	methodFinder = regexp.MustCompile(`(?m)^def\s+(?P<taskName>\w+)\(?(?P<params>.*?)\)?$`)
+	ToolName = "ruby"
 
+	methodMatcher     = regexp.MustCompile(`(?m)^def\s+(?P<taskName>\w+)\(?(?P<params>.*?)\)?$`)
 	positionalMatcher = regexp.MustCompile(`^(?P<paramName>\w+)(?:\s*=\s*(?P<default>.*))?$`)
 	keywordMatcher    = regexp.MustCompile(`^(?P<paramName>\w+):(?:\s*(?P<default>.*))?$`)
+
+	Ruby = ez.Tool{
+		ToolName:             ToolName,
+		CommandName:          ToolName,
+		ToolFilename:         "Okfile.rb",
+		TaskMatcher:          methodMatcher,
+		CommentPrefixMatcher: stringhelp.OctothorpePrefixMatcher,
+		ParamParser: func(paramString string) (task.Parameters, error) {
+			return paramListFromParamString(paramString), nil
+		},
+		Invoke: func(task ez.Task, args task.Args) *os.Process {
+			positionalStrings := make([]string, len(args.Positional))
+			for i, arg := range args.Positional {
+				positionalStrings[i] = processArg(arg.Value.(string))
+			}
+
+			keywordEntries := make([]string, len(args.Keyword))
+			counter := 0
+			for name, arg := range args.Keyword {
+				keywordEntries[counter] = fmt.Sprintf("%s: %s", name, processArg(arg.Value.(string)))
+				counter++
+			}
+
+			script := fmt.Sprintf("%s(%s)", task.Name(), strings.Join(append(positionalStrings, keywordEntries...), ", "))
+			return toolhelp.Exec(ToolName, "-r", fmt.Sprintf("./%s", task.Filename()), "-e", script).Process
+
+		},
+	}
 )
-
-func (t Tool) Mount() ([]task.Task, error) {
-	file, err := os.Open(filename)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return nil, nil
-		}
-
-		return nil, toolhelp.ReadToolFileError{Err: err, Filename: filename}
-	}
-
-	if err := t.Check(); err != nil {
-		if err == exec.ErrNotFound {
-			return nil, toolhelp.CommandNotFoundError{CommandName: ToolName}
-		}
-
-		return nil, err
-	}
-
-	rawTasks := toolhelp.Scan(file, methodFinder, stringhelp.OctothorpePrefixMatcher)
-	tasks := make([]task.Task, len(rawTasks))
-	for i, rawTask := range rawTasks {
-		taskName := rawTask.MatchData["taskName"]
-		params := rawTask.MatchData["params"]
-
-		tasks[i] = Task{
-			Base:    task.NewBase(taskName, filename, ToolName),
-			comment: rawTask.Comment,
-			params:  paramListFromParamString(params),
-		}
-	}
-
-	return tasks, nil
-}
 
 func paramListFromParamString(paramsString string) task.Parameters {
 	paramStrings := stringhelp.SplitOnCommas(paramsString)
@@ -96,4 +93,16 @@ func paramListFromParamString(paramsString string) task.Parameters {
 	}
 
 	return params
+}
+
+func processArg(arg string) string {
+	if _, err := strconv.ParseFloat(arg, 64); err == nil {
+		return arg
+	} else if _, err := strconv.Atoi(arg); err == nil {
+		return arg
+	} else if _, err := strconv.ParseBool(arg); err == nil {
+		return arg
+	} else {
+		return strconv.Quote(arg)
+	}
 }

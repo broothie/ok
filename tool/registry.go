@@ -21,11 +21,11 @@ var Registry = []Tool{
 	bash.Bash,
 	dockercompose.Tool{},
 	golang.Tool{},
-	maketool.Tool{},
+	maketool.Make,
 	node.Tool{},
 	python.Python,
 	rake.Tool{},
-	ruby.Tool{},
+	ruby.Ruby,
 	yarn.Tool{},
 	zsh.Zsh,
 }

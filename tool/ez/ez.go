@@ -76,10 +76,13 @@ func (t Tool) Mount() ([]task.Task, error) {
 		taskName := rawTask.MatchData["taskName"]
 		paramString := rawTask.MatchData["params"]
 
-		params, err := t.ParamParser(paramString)
-		if err != nil {
-			toolhelp.Warn(t.ToolName, "")
-			continue
+		var params task.Parameters
+		if t.ParamParser != nil {
+			var err error
+			if params, err = t.ParamParser(paramString); err != nil {
+				toolhelp.Warn(t.ToolName, "")
+				continue
+			}
 		}
 
 		tasks[i] = Task{
