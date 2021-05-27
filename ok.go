@@ -46,6 +46,9 @@ func main() {
 
 	// Process options
 	switch {
+	case options.ZshAutocomplete:
+		cli.ZshAutocomplete()
+
 	case options.Help:
 		if err := cli.PrintHelp(Version()); err != nil {
 			logger.Ok.Println(err)

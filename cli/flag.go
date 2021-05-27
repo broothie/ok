@@ -65,4 +65,11 @@ var Flags = []Flag{
 		Halt:         false,
 		OptionSetter: func(options *Options, toolName string) { options.SkipTools = append(options.SkipTools, toolName) },
 	},
+	{
+		Name:         "zsh-autocomplete",
+		Description:  "Outputs zsh autocomplete script.",
+		Hidden:       true,
+		Halt:         true,
+		OptionSetter: func(options *Options, toolName string) { options.ZshAutocomplete = true },
+	},
 }

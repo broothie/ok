@@ -12,7 +12,6 @@ import (
 const configFileGlob = ".ok*.toml"
 
 type Options struct {
-	Debug        bool     `toml:"debug" envconfig:"debug"`
 	Help         bool     `toml:"-"`
 	Version      bool     `toml:"-"`
 	Init         string   `toml:"-"`
@@ -22,6 +21,10 @@ type Options struct {
 	SkipTools    []string `toml:"skip" envconfig:"skip"`
 	ToolPriority []string `toml:"tool_priority" envconfig:"tool_priority"`
 	TaskName     string   `toml:"-"`
+
+	// Hidden
+	Debug           bool `toml:"debug" envconfig:"debug"`
+	ZshAutocomplete bool `toml:"-"`
 }
 
 func ReadInNewConfig() Options {
