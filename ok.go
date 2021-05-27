@@ -13,6 +13,7 @@ import (
 	"github.com/broothie/ok/logger"
 	"github.com/broothie/ok/task"
 	"github.com/broothie/ok/tools"
+	_ "github.com/joho/godotenv/autoload"
 	"github.com/pkg/errors"
 	"github.com/radovskyb/watcher"
 )

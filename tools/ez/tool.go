@@ -66,7 +66,7 @@ func (t Tool) Mount() ([]task.Task, error) {
 	}
 
 	if err := t.Check(); err != nil {
-		return nil, toolhelp.CommandNotFoundError{CommandName: t.CommandName}
+		return nil, err
 	}
 
 	fileContents := string(fileBytes)

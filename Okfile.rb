@@ -1,4 +1,3 @@
-require 'dotenv/load'
 require 'pry'
 
 # List files with more than one double newline

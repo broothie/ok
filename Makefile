@@ -1,4 +1,6 @@
 
+.PHONY: build
+
 # Check all is okay
 check: test build clean
 
@@ -8,7 +10,7 @@ build: generate
 test: generate
 	go test -cover ./...
 
-# Installs ok locally
+# Install ok locally
 install: generate
 	go install ok.go
 
