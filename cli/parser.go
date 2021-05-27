@@ -14,8 +14,13 @@ type Parser struct {
 	options    ok.Options
 }
 
-func NewParser(args []string) *Parser {
-	return &Parser{Args: args}
+func NewParser(args []string) (*Parser, error) {
+	options, err := ok.NewOptionsFromEnvironment()
+	if err != nil {
+		return nil, err
+	}
+
+	return &Parser{Args: args, options: options}, nil
 }
 
 func (p *Parser) current() (string, bool) {

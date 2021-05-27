@@ -26,12 +26,22 @@ func Version() string {
 
 func main() {
 	// Parse options
-	parser := cli.NewParser(os.Args[1:])
+	parser, err := cli.NewParser(os.Args[1:])
+	if err != nil {
+		ok.Logger.Println(err)
+		os.Exit(1)
+		return
+	}
+
 	options, err := parser.ParseOptions()
 	if err != nil {
 		ok.Logger.Println(err)
 		os.Exit(1)
 		return
+	}
+
+	if options.Debug {
+		ok.DebugLogger.Printf("%+v\n", options)
 	}
 
 	// Process options
@@ -57,7 +67,7 @@ func main() {
 		tools.List()
 
 	case options.TaskName == "":
-		if err := task.List(tools.Mount()); err != nil {
+		if err := task.List(tools.Mount(options.ConfigurableOptions.SkipTools(), options.ConfigurableOptions.ToolSort())); err != nil {
 			ok.Logger.Println(err)
 			os.Exit(1)
 			return
@@ -70,7 +80,7 @@ func main() {
 
 	// Get task
 	taskName := options.TaskName
-	tasks := tools.Mount()
+	tasks := tools.Mount(options.ConfigurableOptions.SkipTools(), options.ConfigurableOptions.ToolSort())
 	task, taskExists := tasks[options.TaskName]
 	if !taskExists {
 		ok.Logger.Printf("no task called '%s'", taskName)

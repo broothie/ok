@@ -9,11 +9,23 @@ type Option struct {
 	Short        bool
 	Description  string
 	ArgName      string
+	Hidden       bool
 	Stop         bool
 	OptionSetter OptionSetter
 }
 
 var Options = []Option{
+	{
+		Name:        "debug",
+		Short:       false,
+		Description: "Show debug info",
+		Stop:        false,
+		OptionSetter: func(parser *Parser) error {
+			parser.options.Debug = true
+			parser.argCounter++
+			return nil
+		},
+	},
 	{
 		Name:        "help",
 		Short:       true,
@@ -79,6 +91,23 @@ var Options = []Option{
 			}
 
 			parser.options.Watches = append(parser.options.Watches, watchPattern)
+			parser.argCounter += 2
+			return nil
+		},
+	},
+	{
+		Name:        "skip",
+		Description: "Ignore a tool.",
+		ArgName:     "tool",
+		Stop:        false,
+		OptionSetter: func(parser *Parser) error {
+			toolName, ok := parser.peek(1)
+			if !ok {
+				current, _ := parser.current()
+				return fmt.Errorf("no tool provided to option '%s'", current)
+			}
+
+			parser.options.ConfigurableOptions.AddSkipTool(toolName)
 			parser.argCounter += 2
 			return nil
 		},

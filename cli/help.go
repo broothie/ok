@@ -16,6 +16,10 @@ func PrintHelp(version string) error {
 
 	t := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
 	for _, option := range Options {
+		if option.Hidden {
+			continue
+		}
+
 		var short string
 		if option.Short {
 			short = fmt.Sprintf("-%c", option.Name[0])
