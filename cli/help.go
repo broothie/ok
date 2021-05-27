@@ -15,7 +15,7 @@ func PrintHelp(version string) error {
 	fmt.Println("Options:")
 
 	t := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-	for _, option := range Options {
+	for _, option := range Flags {
 		if option.Hidden {
 			continue
 		}

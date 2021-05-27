@@ -1,115 +1,52 @@
 package cli
 
-import "fmt"
+import (
+	"os"
 
-type OptionSetter func(parser *Parser) error
+	"github.com/bmatcuk/doublestar"
+	"github.com/broothie/ok/logger"
+	"github.com/kelseyhightower/envconfig"
+	"github.com/pelletier/go-toml"
+)
 
-type Option struct {
-	Name         string
-	Short        bool
-	Description  string
-	ArgName      string
-	Hidden       bool
-	Stop         bool
-	OptionSetter OptionSetter
+const configFileGlob = ".ok*.toml"
+
+type Options struct {
+	Debug        bool     `toml:"debug" envconfig:"debug"`
+	Help         bool     `toml:"-"`
+	Version      bool     `toml:"-"`
+	Init         string   `toml:"-"`
+	ListTools    bool     `toml:"-"`
+	Watches      []string `toml:"-"`
+	Halt         bool     `toml:"-"`
+	SkipTools    []string `toml:"skip" envconfig:"skip"`
+	ToolPriority []string `toml:"tool_priority" envconfig:"tool_priority"`
+	TaskName     string   `toml:"-"`
 }
 
-var Options = []Option{
-	{
-		Name:        "debug",
-		Short:       false,
-		Description: "Show debug info",
-		Stop:        false,
-		OptionSetter: func(parser *Parser) error {
-			parser.options.Debug = true
-			parser.argCounter++
-			return nil
-		},
-	},
-	{
-		Name:        "help",
-		Short:       true,
-		Description: "Print this help text.",
-		Stop:        true,
-		OptionSetter: func(parser *Parser) error {
-			parser.options.Help = true
-			parser.argCounter++
-			return nil
-		},
-	},
-	{
-		Name:        "version",
-		Short:       false,
-		Description: "Print ok version.",
-		Stop:        true,
-		OptionSetter: func(parser *Parser) error {
-			parser.options.Version = true
-			parser.argCounter++
-			return nil
-		},
-	},
-	{
-		Name:        "init",
-		Short:       true,
-		Description: "Initialize a tool.",
-		ArgName:     "tool",
-		Stop:        true,
-		OptionSetter: func(parser *Parser) error {
-			toolName, ok := parser.peek(1)
-			if !ok {
-				current, _ := parser.current()
-				return fmt.Errorf("no tool provided to option '%s'", current)
-			}
+func ReadInNewConfig() Options {
+	filenames, err := doublestar.Glob(configFileGlob)
+	if err != nil {
+		logger.Ok.Printf("failed to glob for '%s'", configFileGlob)
+	}
 
-			parser.options.Init = toolName
-			parser.argCounter += 2
-			return nil
-		},
-	},
-	{
-		Name:        "tools",
-		Short:       false,
-		Description: "List tools and their availability.",
-		Stop:        true,
-		OptionSetter: func(parser *Parser) error {
-			parser.options.ListTools = true
-			parser.argCounter++
-			return nil
-		},
-	},
-	{
-		Name:        "watch",
-		Short:       true,
-		Description: "Provide files or glob pattern to have a task run on file change.",
-		ArgName:     "glob",
-		Stop:        false,
-		OptionSetter: func(parser *Parser) error {
-			watchPattern, ok := parser.peek(1)
-			if !ok {
-				current, _ := parser.current()
-				return fmt.Errorf("no watch pattern provided to option '%s'", current)
-			}
+	var config Options
+	if err := envconfig.Process("ok", &config); err != nil {
+		logger.Ok.Printf("failed to read config from env: %v", err)
+	}
 
-			parser.options.Watches = append(parser.options.Watches, watchPattern)
-			parser.argCounter += 2
-			return nil
-		},
-	},
-	{
-		Name:        "skip",
-		Description: "Ignore a tool.",
-		ArgName:     "tool",
-		Stop:        false,
-		OptionSetter: func(parser *Parser) error {
-			toolName, ok := parser.peek(1)
-			if !ok {
-				current, _ := parser.current()
-				return fmt.Errorf("no tool provided to option '%s'", current)
-			}
+	for _, filename := range filenames {
+		file, err := os.Open(filename)
+		if err != nil {
+			logger.Ok.Printf("failed to read config file '%s': %v", filename, err)
+			continue
+		}
 
-			parser.options.ConfigurableOptions.AddSkipTool(toolName)
-			parser.argCounter += 2
-			return nil
-		},
-	},
+		if err := toml.NewDecoder(file).Decode(&config); err != nil {
+			logger.Ok.Printf("failed to decode config file '%s': %v", filename, err)
+			continue
+		}
+	}
+
+	return config
 }

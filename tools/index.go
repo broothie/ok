@@ -3,11 +3,11 @@ package tools
 import (
 	"fmt"
 
-	tool2 "github.com/broothie/ok/tool"
+	"github.com/broothie/ok/tool"
 )
 
-func List() {
-	for _, tool := range tool2.Registry {
+func Index() {
+	for _, tool := range tool.Registry {
 		if err := tool.Check(); err != nil {
 			fmt.Printf("𝘹 %s %v\n", tool.Name(), err)
 		} else {

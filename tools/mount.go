@@ -4,15 +4,13 @@ import (
 	"sort"
 	"sync"
 
-	"github.com/broothie/ok/ok"
+	"github.com/broothie/ok/logger"
 	"github.com/broothie/ok/task"
 	"github.com/broothie/ok/tool"
 	"github.com/thoas/go-funk"
 )
 
-func Mount(skipTools, sortTools []string) map[string]task.Task {
-	ok.DebugLogger.Println(sortTools)
-
+func Mount(skipTools, sortTools []string) task.List {
 	tools := funk.Filter(tool.Registry, func(t tool.Tool) bool {
 		return !funk.ContainsString(skipTools, t.Name())
 	}).([]tool.Tool)
@@ -25,39 +23,32 @@ func Mount(skipTools, sortTools []string) map[string]task.Task {
 
 		jPriority := funk.IndexOfString(sortTools, tools[j].Name())
 		if jPriority == -1 {
-			return false
+			return true
 		}
 
 		return iPriority < jPriority
 	})
 
-	ok.DebugLogger.Println(funk.Map(tools, func(t tool.Tool) string { return t.Name() }).([]string))
-
-	tasks := make(map[string]task.Task)
-	var mutex sync.Mutex
+	tools = funk.Reverse(tools).([]tool.Tool)
+	tasks := make([][]task.Task, len(tools))
 	var wg sync.WaitGroup
-	defer wg.Wait()
-
-	for _, t := range tool.Registry {
+	for i, t := range tools {
 		wg.Add(1)
-		go func(tool tool.Tool) {
+		go func(tool tool.Tool, tasks *[]task.Task) {
 			defer wg.Done()
 
 			toolTasks, err := tool.Mount()
 			if err != nil {
-				ok.Logger.Printf("error mounting tool '%s': %v", tool.Name(), err)
+				logger.Ok.Printf("error mounting tool '%s': %v", tool.Name(), err)
 				return
 			}
 
 			for _, toolTask := range toolTasks {
-				name := toolTask.Name()
-
-				mutex.Lock()
-				tasks[name] = toolTask
-				mutex.Unlock()
+				*tasks = append(*tasks, toolTask)
 			}
-		}(t)
+		}(t, &tasks[i])
 	}
 
-	return tasks
+	wg.Wait()
+	return funk.Flatten(tasks).([]task.Task)
 }

@@ -3,47 +3,54 @@ package cli
 import (
 	"errors"
 	"fmt"
-
-	"github.com/broothie/ok/ok"
 )
 
-func (p *Parser) ParseOptions() (ok.Options, error) {
-	optionMap := make(map[string]Option)
-	for _, option := range Options {
-		optionMap[fmt.Sprintf("--%s", option.Name)] = option
-		if option.Short {
-			optionMap[fmt.Sprintf("-%c", option.Name[0])] = option
+func (p *Parser) ParseFlags() (Options, error) {
+	flagMap := make(map[string]Flag)
+	for _, flag := range Flags {
+		flagMap[fmt.Sprintf("--%s", flag.Name)] = flag
+		if flag.Short {
+			flagMap[fmt.Sprintf("-%c", flag.Name[0])] = flag
 		}
 	}
 
-	for p.argCounter < len(p.Args) && p.options.TaskName == "" {
+	for p.argCounter < len(p.Args) && p.config.TaskName == "" {
 		rawArg, _ := p.current()
 		if dashPrefix.MatchString(rawArg) {
-			option, optionFound := optionMap[rawArg]
-			if !optionFound {
-				return ok.Options{}, fmt.Errorf("invalid option: '%s'", rawArg)
+			flag, flagFound := flagMap[rawArg]
+			if !flagFound {
+				return Options{}, fmt.Errorf("invalid option: '%s'", rawArg)
 			}
 
-			if err := option.OptionSetter(p); err != nil {
-				return ok.Options{}, err
+			requiresNext := flag.ArgName != ""
+			next, ok := p.peek(1)
+			if requiresNext && !ok {
+				return Options{}, fmt.Errorf("no argument provided to option '%s'", rawArg)
 			}
 
-			if !p.options.Stop {
-				p.options.Stop = option.Stop
+			flag.OptionSetter(&p.config, next)
+			if !p.config.Halt {
+				p.config.Halt = flag.Halt
+			}
+
+			if requiresNext {
+				p.argCounter += 2
+			} else {
+				p.argCounter++
 			}
 		} else {
-			p.options.TaskName = rawArg
+			p.config.TaskName = rawArg
 			p.argCounter++
 		}
 	}
 
-	if len(p.options.Watches) > 0 && p.options.TaskName == "" {
-		return ok.Options{}, errors.New("watches provided without task")
+	if len(p.config.Watches) > 0 && p.config.TaskName == "" {
+		return Options{}, errors.New("watches provided without task")
 	}
 
-	if p.options.TaskName == "" {
-		p.options.Stop = true
+	if p.config.TaskName == "" {
+		p.config.Halt = true
 	}
 
-	return p.options, nil
+	return p.config, nil
 }

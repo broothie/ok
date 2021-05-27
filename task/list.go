@@ -6,13 +6,26 @@ import (
 	"sort"
 	"strings"
 	"text/tabwriter"
+
+	"github.com/thoas/go-funk"
 )
 
-func List(tasks map[string]Task) error {
+type List []Task
+
+func (l List) Get(taskName string) (Task, bool) {
+	task := funk.Find(l, func(task Task) bool { return task.Name() == taskName })
+	if task == nil {
+		return nil, false
+	}
+
+	return task.(Task), true
+}
+
+func (l List) List() error {
 	paramsPresent := false
 	commentsPresent := false
 	filenames := make(set)
-	for _, task := range tasks {
+	for _, task := range l {
 		if task.Params().String() != "" {
 			paramsPresent = true
 		}
@@ -25,9 +38,9 @@ func List(tasks map[string]Task) error {
 
 	includeFilenames := len(filenames) > 1
 
-	lines := make([]string, len(tasks))
+	lines := make([]string, len(l))
 	counter := 0
-	for _, task := range tasks {
+	for _, task := range l {
 		columns := []string{task.Name()}
 		if paramsPresent {
 			columns = append(columns, task.Params().String())

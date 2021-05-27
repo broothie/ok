@@ -10,7 +10,7 @@ import (
 
 	"github.com/bmatcuk/doublestar"
 	"github.com/broothie/ok/cli"
-	"github.com/broothie/ok/ok"
+	"github.com/broothie/ok/logger"
 	"github.com/broothie/ok/task"
 	"github.com/broothie/ok/tools"
 	"github.com/pkg/errors"
@@ -28,27 +28,27 @@ func main() {
 	// Parse options
 	parser, err := cli.NewParser(os.Args[1:])
 	if err != nil {
-		ok.Logger.Println(err)
+		logger.Ok.Println(err)
 		os.Exit(1)
 		return
 	}
 
-	options, err := parser.ParseOptions()
+	options, err := parser.ParseFlags()
 	if err != nil {
-		ok.Logger.Println(err)
+		logger.Ok.Println(err)
 		os.Exit(1)
 		return
 	}
 
 	if options.Debug {
-		ok.DebugLogger.Printf("%+v\n", options)
+		logger.Debug.Printf("%+v\n", options)
 	}
 
 	// Process options
 	switch {
 	case options.Help:
 		if err := cli.PrintHelp(Version()); err != nil {
-			ok.Logger.Println(err)
+			logger.Ok.Println(err)
 			os.Exit(1)
 			return
 		}
@@ -58,32 +58,32 @@ func main() {
 
 	case options.Init != "":
 		if err := tools.InitTool(options.Init); err != nil {
-			ok.Logger.Println(err)
+			logger.Ok.Println(err)
 			os.Exit(1)
 			return
 		}
 
 	case options.ListTools:
-		tools.List()
+		tools.Index()
 
 	case options.TaskName == "":
-		if err := task.List(tools.Mount(options.ConfigurableOptions.SkipTools(), options.ConfigurableOptions.ToolSort())); err != nil {
-			ok.Logger.Println(err)
+		if err := tools.Mount(options.SkipTools, options.ToolPriority).List(); err != nil {
+			logger.Ok.Println(err)
 			os.Exit(1)
 			return
 		}
 	}
 
-	if options.Stop {
+	if options.Halt {
 		return
 	}
 
 	// Get task
 	taskName := options.TaskName
-	tasks := tools.Mount(options.ConfigurableOptions.SkipTools(), options.ConfigurableOptions.ToolSort())
-	task, taskExists := tasks[options.TaskName]
+	tasks := tools.Mount(options.SkipTools, options.ToolPriority)
+	task, taskExists := tasks.Get(options.TaskName)
 	if !taskExists {
-		ok.Logger.Printf("no task called '%s'", taskName)
+		logger.Ok.Printf("no task called '%s'", taskName)
 		os.Exit(1)
 		return
 	}
@@ -91,7 +91,7 @@ func main() {
 	// Parse task args
 	args, err := parser.ParseArgs(task.Params())
 	if err != nil {
-		ok.Logger.Println(err)
+		logger.Ok.Println(err)
 		os.Exit(1)
 		return
 	}
@@ -99,7 +99,7 @@ func main() {
 	// Run task
 	if len(options.Watches) > 0 {
 		if err := runWatcher(task, args, options.Watches); err != nil {
-			ok.Logger.Println(err)
+			logger.Ok.Println(err)
 			os.Exit(1)
 		}
 	} else {
@@ -108,7 +108,7 @@ func main() {
 				return
 			}
 
-			ok.Logger.Println(err)
+			logger.Ok.Println(err)
 			os.Exit(1)
 		}
 	}
@@ -152,7 +152,7 @@ func runWatcher(t task.Task, args task.Args, watches []string) error {
 					process.Kill()
 				}
 
-				ok.Logger.Println(err)
+				logger.Ok.Println(err)
 
 			case <-watcher.Closed:
 				if process != nil {

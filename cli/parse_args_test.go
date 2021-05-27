@@ -3,7 +3,6 @@ package cli
 import (
 	"testing"
 
-	"github.com/broothie/ok/ok"
 	"github.com/broothie/ok/task"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -71,9 +70,9 @@ func TestParser_ParseArgs(t *testing.T) {
 	})
 }
 
-func parserWithArgsAndOptionsParsed(t *testing.T, args ...string) (*Parser, ok.Options) {
+func parserWithArgsAndOptionsParsed(t *testing.T, args ...string) (*Parser, Options) {
 	parser := parserWithArgs(args...)
-	options, err := parser.ParseOptions()
+	options, err := parser.ParseFlags()
 	require.NoError(t, err)
 
 	return parser, options

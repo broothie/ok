@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/broothie/ok/ok"
 	"github.com/broothie/ok/stringhelp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -14,22 +13,22 @@ func TestOptions(t *testing.T) {
 	taskName := "asdf"
 
 	t.Run("no options", func(t *testing.T) {
-		expected := ok.Options{Stop: true}
-		actual, err := parserWithArgs().ParseOptions()
+		expected := Options{Halt: true}
+		actual, err := parserWithArgs().ParseFlags()
 		assert.NoError(t, err)
 		assert.Equal(t, expected, actual)
 	})
 
 	t.Run("task provided", func(t *testing.T) {
-		expected := ok.Options{Stop: false, TaskName: taskName}
-		actual, err := parserWithArgs(taskName).ParseOptions()
+		expected := Options{Halt: false, TaskName: taskName}
+		actual, err := parserWithArgs(taskName).ParseFlags()
 		assert.NoError(t, err)
 		assert.Equal(t, expected, actual)
 	})
 
 	t.Run("task provided with help", func(t *testing.T) {
-		expected := ok.Options{Stop: true, TaskName: taskName, Help: true}
-		actual, err := parserWithArgs("-h", taskName).ParseOptions()
+		expected := Options{Halt: true, TaskName: taskName, Help: true}
+		actual, err := parserWithArgs("-h", taskName).ParseFlags()
 		assert.NoError(t, err)
 		assert.Equal(t, expected, actual)
 	})
@@ -37,8 +36,8 @@ func TestOptions(t *testing.T) {
 	t.Run("help", func(t *testing.T) {
 		for _, flag := range []string{"-h", "--help"} {
 			t.Run(flag, func(t *testing.T) {
-				expected := ok.Options{Stop: true, Help: true}
-				actual, err := parserWithArgs(flag).ParseOptions()
+				expected := Options{Halt: true, Help: true}
+				actual, err := parserWithArgs(flag).ParseFlags()
 				assert.NoError(t, err)
 				assert.Equal(t, expected, actual)
 			})
@@ -46,8 +45,8 @@ func TestOptions(t *testing.T) {
 	})
 
 	t.Run("version", func(t *testing.T) {
-		expected := ok.Options{Stop: true, Version: true}
-		actual, err := parserWithArgs("--version").ParseOptions()
+		expected := Options{Halt: true, Version: true}
+		actual, err := parserWithArgs("--version").ParseFlags()
 		assert.NoError(t, err)
 		assert.Equal(t, expected, actual)
 	})
@@ -56,8 +55,8 @@ func TestOptions(t *testing.T) {
 		toolName := "asdf"
 		for _, flag := range []string{"-i", "--init"} {
 			t.Run(flag, func(t *testing.T) {
-				expected := ok.Options{Stop: true, Init: toolName}
-				actual, err := parserWithArgs(flag, toolName).ParseOptions()
+				expected := Options{Halt: true, Init: toolName}
+				actual, err := parserWithArgs(flag, toolName).ParseFlags()
 				assert.NoError(t, err)
 				assert.Equal(t, expected, actual)
 			})
@@ -65,27 +64,27 @@ func TestOptions(t *testing.T) {
 	})
 
 	t.Run("list tools", func(t *testing.T) {
-		expected := ok.Options{Stop: true, ListTools: true}
-		actual, err := parserWithArgs("--tools").ParseOptions()
+		expected := Options{Halt: true, ListTools: true}
+		actual, err := parserWithArgs("--tools").ParseFlags()
 		assert.NoError(t, err)
 		assert.Equal(t, expected, actual)
 	})
 
 	t.Run("watches", func(t *testing.T) {
 		t.Run("task provided with watches", func(t *testing.T) {
-			expected := ok.Options{Stop: false, TaskName: taskName, Watches: []string{"a", "b"}}
-			actual, err := parserWithArgs("--watch", "a", "-w", "b", taskName).ParseOptions()
+			expected := Options{Halt: false, TaskName: taskName, Watches: []string{"a", "b"}}
+			actual, err := parserWithArgs("--watch", "a", "-w", "b", taskName).ParseFlags()
 			assert.NoError(t, err)
 			assert.Equal(t, expected, actual)
 		})
 
 		t.Run("watches without task", func(t *testing.T) {
-			_, err := parserWithArgs("--watch", "a", "-w", "b").ParseOptions()
+			_, err := parserWithArgs("--watch", "a", "-w", "b").ParseFlags()
 			assert.EqualError(t, err, "watches provided without task")
 		})
 
 		t.Run("watches without task", func(t *testing.T) {
-			_, err := parserWithArgs("--watch", "a", "-w", "b").ParseOptions()
+			_, err := parserWithArgs("--watch", "a", "-w", "b").ParseFlags()
 			assert.EqualError(t, err, "watches provided without task")
 		})
 	})
@@ -104,10 +103,10 @@ func TestOptions(t *testing.T) {
 
 		for arg, expectedStop := range argStops {
 			t.Run(fmt.Sprintf("%s stops execution", arg), func(t *testing.T) {
-				actual, err := parserWithArgs(append(stringhelp.SplitOnWhitespace(arg), taskName)...).ParseOptions()
+				actual, err := parserWithArgs(append(stringhelp.SplitOnWhitespace(arg), taskName)...).ParseFlags()
 				require.NoError(t, err)
 
-				assert.Equal(t, expectedStop, actual.Stop)
+				assert.Equal(t, expectedStop, actual.Halt)
 			})
 		}
 	})
