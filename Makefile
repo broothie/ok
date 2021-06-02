@@ -24,5 +24,8 @@ clean:
 	rm -rf _ok dist
 	go mod tidy
 
+dashed-things:
+	echo dashed-things
+
 other things:
 	echo other things
