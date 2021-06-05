@@ -4,7 +4,7 @@ before:
     - go generate ./...
 
 builds:
-  - main: ok.go
+  - main: cmd/ok/ok.go
     ignore:
       - goos: darwin
         goarch: 386

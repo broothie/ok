@@ -39,15 +39,15 @@ types                                                     Okfile.go  go
 $ brew tap broothie/ok && brew install ok
 ```
 
-### Releases
-
-Releases can be found on the [releases page](https://github.com/broothie/okay/releases).
-
 ### Via Go
 
 ```shell
-$ go install github.com/broothie/ok/ok.go@latest
+$ go install github.com/broothie/ok/cmd/ok/ok.go@latest
 ```
+
+### Releases
+
+Releases can be found on the [releases page](https://github.com/broothie/okay/releases).
 
 ## Currently Supported Languages/Tools
 - Go
