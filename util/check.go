@@ -1,4 +1,4 @@
-package toolhelp
+package util
 
 import "os/exec"
 

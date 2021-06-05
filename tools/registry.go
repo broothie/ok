@@ -1,6 +1,7 @@
-package tool
+package tools
 
 import (
+	"github.com/broothie/ok/tool"
 	"github.com/broothie/ok/tools/bash"
 	dockercompose "github.com/broothie/ok/tools/docker-compose"
 	"github.com/broothie/ok/tools/golang"
@@ -13,7 +14,7 @@ import (
 	"github.com/broothie/ok/tools/zsh"
 )
 
-var Registry = []Tool{
+var Registry = []tool.Tool{
 	bash.Bash,
 	dockercompose.Tool{},
 	golang.Tool{},

@@ -3,10 +3,9 @@ package make
 import (
 	"regexp"
 
-	"github.com/broothie/ok/stringhelp"
 	"github.com/broothie/ok/task"
-	"github.com/broothie/ok/toolhelp"
 	"github.com/broothie/ok/tools/ez"
+	"github.com/broothie/ok/util"
 )
 
 const ToolName = "make"
@@ -19,9 +18,9 @@ var (
 		CommandName:          ToolName,
 		ToolFilename:         "Makefile",
 		TaskMatcher:          ruleMatcher,
-		CommentPrefixMatcher: stringhelp.OctothorpePrefixMatcher,
+		CommentPrefixMatcher: util.OctothorpePrefixMatcher,
 		Invoke: func(task ez.Task, args task.Args) task.RunningTask {
-			return toolhelp.Exec(ToolName, task.Name())
+			return util.Exec(ToolName, task.Name())
 		},
 	}
 )

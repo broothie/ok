@@ -1,14 +1,13 @@
 package rake
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"regexp"
 
-	"github.com/broothie/ok/stringhelp"
 	"github.com/broothie/ok/task"
-	"github.com/broothie/ok/toolhelp"
-	"github.com/pkg/errors"
+	"github.com/broothie/ok/util"
 )
 
 var taskMatcher = regexp.MustCompile(`(?m)^rake (?P<taskName>\w+)(?:\[(?P<params>.*?)])?\s+# (?P<description>.*)?$`)
@@ -19,30 +18,30 @@ func (t Tool) Mount() ([]task.Task, error) {
 			return nil, nil
 		}
 
-		return nil, toolhelp.ReadToolFileError{Filename: filename, Err: err}
+		return nil, util.ReadToolFileError{Filename: filename, Err: err}
 	}
 
 	if err := t.Check(); err != nil {
 		if err == exec.ErrNotFound {
-			return nil, toolhelp.CommandNotFoundError{CommandName: ToolName}
+			return nil, util.CommandNotFoundError{CommandName: ToolName}
 		}
 
 		return nil, err
 	}
 
-	taskList, err := exec.Command(ToolName, "-AT").Output()
+	output, err := exec.Command(ToolName, "-AT").CombinedOutput()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get rake tasks")
+		return nil, fmt.Errorf("failed to get rake tasks: %v: %s", err, output)
 	}
 
-	results := stringhelp.NamedRegexpResults(string(taskList), taskMatcher)
+	results := util.NamedRegexpResults(string(output), taskMatcher)
 	tasks := make([]task.Task, len(results))
 	for i, result := range results {
 		taskName := result["taskName"]
 		paramsString := result["params"]
 		description := result["description"]
 
-		paramStrings := stringhelp.SplitOnCommas(paramsString)
+		paramStrings := util.SplitOnCommas(paramsString)
 		paramList := make(task.ParamList, len(paramStrings))
 		for i, paramString := range paramStrings {
 			paramList[i] = task.Parameter{Name: paramString, Type: task.String}

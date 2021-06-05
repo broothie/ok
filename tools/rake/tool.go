@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/broothie/ok/toolhelp"
+	"github.com/broothie/ok/util"
 	"github.com/pkg/errors"
 )
 
@@ -20,7 +20,7 @@ func (Tool) Name() string {
 }
 
 func (Tool) Init() error {
-	_, err := os.OpenFile(filename, os.O_CREATE, 0)
+	_, err := os.OpenFile(filename, os.O_CREATE, 0666)
 	if os.IsExist(err) {
 		return fmt.Errorf("file '%s' already exists", filename)
 	}
@@ -29,5 +29,5 @@ func (Tool) Init() error {
 }
 
 func (Tool) Check() error {
-	return toolhelp.Check(ToolName)
+	return util.Check(ToolName)
 }

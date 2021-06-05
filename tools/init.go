@@ -8,7 +8,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func InitTool(toolName string) error {
+func Init(toolName string) error {
 	tool, toolExists := findTool(toolName)
 	if !toolExists {
 		return fmt.Errorf("no tool called '%s'", toolName)
@@ -23,7 +23,7 @@ func InitTool(toolName string) error {
 }
 
 func findTool(toolName string) (tool.Tool, bool) {
-	for _, tool := range tool.Registry {
+	for _, tool := range Registry {
 		if tool.Name() == toolName {
 			return tool, true
 		}

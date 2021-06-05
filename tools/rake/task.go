@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/broothie/ok/task"
-	"github.com/broothie/ok/toolhelp"
+	"github.com/broothie/ok/util"
 )
 
 type Task struct {
@@ -28,5 +28,5 @@ func (t Task) Invoke(args task.Args) task.RunningTask {
 		argStrings[i] = arg.Value.(string)
 	}
 
-	return toolhelp.Exec(ToolName, fmt.Sprintf("%s[%s]", t.Name(), strings.Join(argStrings, ",")))
+	return util.Exec(ToolName, fmt.Sprintf("%s[%s]", t.Name(), strings.Join(argStrings, ",")))
 }

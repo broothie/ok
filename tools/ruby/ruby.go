@@ -6,10 +6,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/broothie/ok/stringhelp"
 	"github.com/broothie/ok/task"
-	"github.com/broothie/ok/toolhelp"
 	"github.com/broothie/ok/tools/ez"
+	"github.com/broothie/ok/util"
 )
 
 var (
@@ -24,7 +23,7 @@ var (
 		CommandName:          ToolName,
 		ToolFilename:         "Okfile.rb",
 		TaskMatcher:          methodMatcher,
-		CommentPrefixMatcher: stringhelp.OctothorpePrefixMatcher,
+		CommentPrefixMatcher: util.OctothorpePrefixMatcher,
 		ParamParser: func(paramString string) (task.Parameters, error) {
 			return paramListFromParamString(paramString), nil
 		},
@@ -42,14 +41,14 @@ var (
 			}
 
 			script := fmt.Sprintf("%s(%s)", task.Name(), strings.Join(append(positionalStrings, keywordEntries...), ", "))
-			return toolhelp.Exec(ToolName, "-r", fmt.Sprintf("./%s", task.Filename()), "-e", script)
+			return util.Exec(ToolName, "-r", fmt.Sprintf("./%s", task.Filename()), "-e", script)
 		},
 	}
 )
 
 func paramListFromParamString(paramsString string) task.Parameters {
-	paramStrings := stringhelp.SplitOnCommas(paramsString)
-	if len(paramStrings) == 1 && stringhelp.AllWhitespace(paramStrings[0]) {
+	paramStrings := util.SplitOnCommas(paramsString)
+	if len(paramStrings) == 1 && util.AllWhitespace(paramStrings[0]) {
 		return task.Parameters{}
 	}
 
@@ -65,11 +64,11 @@ func paramListFromParamString(paramsString string) task.Parameters {
 			re = keywordMatcher
 			isKeyword = true
 		} else {
-			toolhelp.Warn(ToolName, "error parsing param '%s'", paramString)
+			util.Warn(ToolName, "error parsing param '%s'", paramString)
 			continue
 		}
 
-		result := stringhelp.NamedRegexpResult(paramString, re)
+		result := util.NamedRegexpResult(paramString, re)
 
 		var defaultValue interface{}
 		defaultString, defaultPresent := result["default"]

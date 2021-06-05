@@ -2,7 +2,7 @@ package yarn
 
 import (
 	"github.com/broothie/ok/task"
-	"github.com/broothie/ok/toolhelp"
+	"github.com/broothie/ok/util"
 )
 
 type Task struct {
@@ -18,5 +18,5 @@ func (Task) Params() task.Parameters {
 }
 
 func (t Task) Invoke(args task.Args) task.RunningTask {
-	return toolhelp.Exec(ToolName, t.Name())
+	return util.Exec(ToolName, t.Name())
 }

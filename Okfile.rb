@@ -23,5 +23,5 @@ end
 
 # Greet someone by name
 def greet(name = 'World')
-    puts "Hello, #{name}"
+    puts "Hello, #{name}!"
 end

@@ -1,20 +1,32 @@
 package cli
 
 import (
+	"bufio"
 	"fmt"
-	"os"
+	"io"
 	"text/tabwriter"
+
+	"github.com/pkg/errors"
 )
 
-func PrintHelp(version string) error {
-	PrintVersion(version)
-	fmt.Println()
-	fmt.Println("Usage:")
-	fmt.Println("  $ ok [options] <task> [args]")
-	fmt.Println()
-	fmt.Println("Options:")
+const header = `
+Usage:
+  $ ok [options] <task> [args]
 
-	t := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
+Options:
+`
+
+func PrintHelp(w io.Writer, version string) error {
+	buf := bufio.NewWriter(w)
+	if err := PrintVersion(buf, version); err != nil {
+		return err
+	}
+
+	if _, err := fmt.Fprint(buf, header); err != nil {
+		return errors.Wrap(err, "failed to write help line")
+	}
+
+	table := tabwriter.NewWriter(buf, 0, 0, 2, ' ', 0)
 	for _, option := range Flags {
 		if option.Hidden {
 			continue
@@ -30,8 +42,14 @@ func PrintHelp(version string) error {
 			argName = fmt.Sprintf(" <%s>", option.ArgName)
 		}
 
-		fmt.Fprintf(t, "\t%s\t--%s%s\t%s\n", short, option.Name, argName, option.Description)
+		if _, err := fmt.Fprintf(table, "\t%s\t--%s%s\t%s\n", short, option.Name, argName, option.Description); err != nil {
+			return errors.Wrap(err, "failed to write help line")
+		}
 	}
 
-	return t.Flush()
+	if err := table.Flush(); err != nil {
+		return errors.Wrap(err, "failed to flush help table")
+	}
+
+	return errors.Wrap(buf.Flush(), "failed to print help")
 }

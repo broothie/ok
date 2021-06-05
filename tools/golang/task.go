@@ -7,7 +7,7 @@ import (
 	"text/template"
 
 	"github.com/broothie/ok/task"
-	"github.com/broothie/ok/toolhelp"
+	"github.com/broothie/ok/util"
 )
 
 var tmpl = template.Must(template.New("").Parse(`{{ .Source }}
@@ -45,7 +45,7 @@ func (t Task) Params() task.Parameters {
 func (t Task) Invoke(args task.Args) task.RunningTask {
 	file, err := ioutil.TempFile("", "Okfile-*.go")
 	if err != nil {
-		toolhelp.Warn(ToolName, "failed to write go tempfile: %v", err)
+		util.Warn(ToolName, "failed to write go tempfile: %v", err)
 		return nil
 	}
 
@@ -64,13 +64,13 @@ func (t Task) Invoke(args task.Args) task.RunningTask {
 		TaskName: t.Name(),
 		Args:     argStrings,
 	}); err != nil {
-		toolhelp.Warn(ToolName, "failed to write go template: %v", err)
+		util.Warn(ToolName, "failed to write go template: %v", err)
 		return nil
 	}
 
 	defer file.Close()
 
-	process := toolhelp.Exec(ToolName, "run", file.Name())
+	process := util.Exec(ToolName, "run", file.Name())
 	go func() {
 		process.Wait()
 		os.Remove(file.Name())

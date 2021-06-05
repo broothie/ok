@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-func (p *Parser) ParseFlags() (Options, error) {
+func (p *Parser) ParseOptions() (string, Options, error) {
 	flagMap := make(map[string]Flag)
 	for _, flag := range Flags {
 		flagMap[fmt.Sprintf("--%s", flag.Name)] = flag
@@ -14,43 +14,36 @@ func (p *Parser) ParseFlags() (Options, error) {
 		}
 	}
 
-	for p.argCounter < len(p.Args) && p.config.TaskName == "" {
+	taskName := ""
+	for p.argCounter < len(p.Args) && taskName == "" {
 		rawArg, _ := p.current()
 		if dashPrefix.MatchString(rawArg) {
 			flag, flagFound := flagMap[rawArg]
 			if !flagFound {
-				return Options{}, fmt.Errorf("invalid option: '%s'", rawArg)
+				return "", Options{}, fmt.Errorf("invalid option: '%s'", rawArg)
 			}
 
 			requiresNext := flag.ArgName != ""
 			next, ok := p.peek(1)
 			if requiresNext && !ok {
-				return Options{}, fmt.Errorf("no argument provided to option '%s'", rawArg)
+				return "", Options{}, fmt.Errorf("no argument provided to option '%s'", rawArg)
 			}
 
-			flag.OptionSetter(&p.config, next)
-			if !p.config.Halt {
-				p.config.Halt = flag.Halt
-			}
-
+			flag.OptionSetter(&p.options, next)
 			if requiresNext {
 				p.argCounter += 2
 			} else {
 				p.argCounter++
 			}
 		} else {
-			p.config.TaskName = rawArg
+			taskName = rawArg
 			p.argCounter++
 		}
 	}
 
-	if len(p.config.Watches) > 0 && p.config.TaskName == "" {
-		return Options{}, errors.New("watches provided without task")
+	if len(p.options.Watches) > 0 && taskName == "" {
+		return "", Options{}, errors.New("watches provided without task")
 	}
 
-	if p.config.TaskName == "" {
-		p.config.Halt = true
-	}
-
-	return p.config, nil
+	return taskName, p.options, nil
 }

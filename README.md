@@ -2,24 +2,6 @@
 
 A task runner.
 
-## Installation
-
-### Brew
-
-```shell
-$ brew tap broothie/ok && brew install ok
-```
-
-### Releases
-
-Releases can be found on the [releases page](https://github.com/broothie/okay/releases).
-
-### Via Go
-
-```shell
-$ go install github.com/broothie/ok/ok.go@latest
-```
-
 ## Usage
 
 Given an `Okfile` written in any [supported language/tool](#currently-supported-languagestools):
@@ -47,6 +29,24 @@ get <url>                                                 Okfile.go  go
 greet <name=World>                                        Okfile.rb  ruby
 list                                                      Okfile.go  go
 types                                                     Okfile.go  go
+```
+
+## Installation
+
+### Brew
+
+```shell
+$ brew tap broothie/ok && brew install ok
+```
+
+### Releases
+
+Releases can be found on the [releases page](https://github.com/broothie/okay/releases).
+
+### Via Go
+
+```shell
+$ go install github.com/broothie/ok/ok.go@latest
 ```
 
 ## Currently Supported Languages/Tools

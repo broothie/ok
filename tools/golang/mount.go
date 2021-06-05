@@ -8,9 +8,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/broothie/ok/stringhelp"
 	"github.com/broothie/ok/task"
-	"github.com/broothie/ok/toolhelp"
+	"github.com/broothie/ok/util"
 )
 
 var funcFinder = regexp.MustCompile(`(?m)^\s*func\s+(?P<taskName>\w+)\s*\((?P<params>.*?)\)`)
@@ -21,7 +20,7 @@ func (t Tool) Mount() ([]task.Task, error) {
 			return nil, nil
 		}
 
-		return nil, toolhelp.ReadToolFileError{Err: err, Filename: filename}
+		return nil, util.ReadToolFileError{Err: err, Filename: filename}
 	}
 
 	if err := t.Check(); err != nil {
@@ -30,19 +29,19 @@ func (t Tool) Mount() ([]task.Task, error) {
 
 	fileBytes, err := ioutil.ReadFile(filename)
 	if err != nil {
-		return nil, toolhelp.ReadToolFileError{Err: err, Filename: filename}
+		return nil, util.ReadToolFileError{Err: err, Filename: filename}
 	}
 
 	fileContents := string(fileBytes)
-	rawTasks := toolhelp.Scan(bytes.NewBuffer(fileBytes), funcFinder, stringhelp.DoubleSlashPrefixMatcher)
+	rawTasks := util.Scan(bytes.NewBuffer(fileBytes), funcFinder, util.DoubleSlashPrefixMatcher)
 	tasks := make([]task.Task, len(rawTasks))
 	for i, rawTask := range rawTasks {
 		taskName := rawTask.MatchData["taskName"]
 		paramsString := rawTask.MatchData["params"]
 
 		var paramEntries []string
-		if !stringhelp.AllWhitespace(paramsString) {
-			paramEntries = stringhelp.SplitOnCommas(paramsString)
+		if !util.AllWhitespace(paramsString) {
+			paramEntries = util.SplitOnCommas(paramsString)
 		}
 
 		// Loop backwards with a `currentType` because of the whole `func(a, b string)` thing in Go
@@ -51,7 +50,7 @@ func (t Tool) Mount() ([]task.Task, error) {
 		for i := len(paramEntries) - 1; i >= 0; i-- {
 			paramEntry := strings.TrimSpace(paramEntries[i])
 
-			chunks := stringhelp.Whitespace.Split(paramEntry, 2)
+			chunks := util.Whitespace.Split(paramEntry, 2)
 			if len(chunks) > 1 {
 				currentType = chunks[1]
 			}

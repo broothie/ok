@@ -3,8 +3,10 @@ package cli
 import (
 	_ "embed"
 	"fmt"
+	"io"
 )
 
-func PrintVersion(version string) {
-	fmt.Printf("👌 ok v%s\n", version)
+func PrintVersion(w io.Writer, version string) error {
+	_, err := fmt.Fprintf(w, "👌 ok v%s\n", version)
+	return err
 }

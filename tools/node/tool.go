@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/broothie/ok/toolhelp"
+	"github.com/broothie/ok/util"
 	"github.com/pkg/errors"
 )
 
@@ -29,5 +29,5 @@ func (Tool) Init() error {
 }
 
 func (Tool) Check() error {
-	return toolhelp.Check(ToolName)
+	return util.Check(ToolName)
 }

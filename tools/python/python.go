@@ -6,10 +6,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/broothie/ok/stringhelp"
 	"github.com/broothie/ok/task"
-	"github.com/broothie/ok/toolhelp"
 	"github.com/broothie/ok/tools/ez"
+	"github.com/broothie/ok/util"
 )
 
 var (
@@ -22,12 +21,12 @@ var Python = ez.Tool{
 	CommandName:          "python",
 	ToolFilename:         "Okfile.py",
 	TaskMatcher:          taskMatcher,
-	CommentPrefixMatcher: stringhelp.OctothorpePrefixMatcher,
+	CommentPrefixMatcher: util.OctothorpePrefixMatcher,
 	ParamParser: func(paramString string) (task.Parameters, error) {
-		paramStrings := stringhelp.SplitOnCommas(paramString)
+		paramStrings := util.SplitOnCommas(paramString)
 		paramList := make(task.ParamList, len(paramStrings))
 		for i, paramString := range paramStrings {
-			result := stringhelp.NamedRegexpResult(paramString, paramMatcher)
+			result := util.NamedRegexpResult(paramString, paramMatcher)
 			paramName := result["paramName"]
 
 			var defaultValue interface{}
@@ -57,7 +56,7 @@ var Python = ez.Tool{
 		}
 
 		script := fmt.Sprintf("%s\n%s(%s)", *task.FileContents, task.Name(), strings.Join(argStrings, ", "))
-		return toolhelp.Exec(task.ToolName(), "-c", script)
+		return util.Exec(task.ToolName(), "-c", script)
 	},
 }
 

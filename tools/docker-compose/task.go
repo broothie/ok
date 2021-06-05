@@ -2,7 +2,7 @@ package dockercompose
 
 import (
 	"github.com/broothie/ok/task"
-	"github.com/broothie/ok/toolhelp"
+	"github.com/broothie/ok/util"
 )
 
 type Task struct {
@@ -19,5 +19,5 @@ func (Task) Params() task.Parameters {
 
 func (t Task) Invoke(args task.Args) task.RunningTask {
 	argStrings := []string{"run", t.Name()}
-	return toolhelp.Exec(ToolName, append(argStrings, args.Forwards...)...)
+	return util.Exec(ToolName, append(argStrings, args.Forwards...)...)
 }

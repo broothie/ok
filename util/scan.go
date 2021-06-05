@@ -1,4 +1,4 @@
-package toolhelp
+package util
 
 import (
 	"bufio"
@@ -6,8 +6,6 @@ import (
 	"io"
 	"regexp"
 	"strings"
-
-	"github.com/broothie/ok/stringhelp"
 )
 
 type TaskMatcher func(s string) bool
@@ -28,8 +26,8 @@ func Scan(r io.Reader, taskMatcher, commentPrefixMatcher *regexp.Regexp) []RawTa
 		if taskMatcher.MatchString(scanner.Text()) {
 			rawTasks = append(rawTasks, RawTask{
 				Line:      lineCounter,
-				MatchData: stringhelp.NamedRegexpResult(line, taskMatcher),
-				Comment:   stringhelp.Whitespace.ReplaceAllString(strings.TrimSpace(comment.String()), " "),
+				MatchData: NamedRegexpResult(line, taskMatcher),
+				Comment:   Whitespace.ReplaceAllString(strings.TrimSpace(comment.String()), " "),
 			})
 		}
 

@@ -5,7 +5,7 @@ import (
 	"os/exec"
 
 	"github.com/broothie/ok/task"
-	"github.com/broothie/ok/toolhelp"
+	"github.com/broothie/ok/util"
 	"gopkg.in/yaml.v3"
 )
 
@@ -16,14 +16,14 @@ func (t Tool) Mount() ([]task.Task, error) {
 			return nil, nil
 		}
 
-		return nil, toolhelp.ReadToolFileError{Filename: filename, Err: err}
+		return nil, util.ReadToolFileError{Filename: filename, Err: err}
 	}
 
 	defer file.Close()
 
 	if err := t.Check(); err != nil {
 		if err == exec.ErrNotFound {
-			return nil, toolhelp.CommandNotFoundError{CommandName: ToolName}
+			return nil, util.CommandNotFoundError{CommandName: ToolName}
 		}
 
 		return nil, err
@@ -31,7 +31,7 @@ func (t Tool) Mount() ([]task.Task, error) {
 
 	var dockerComposeYML map[string]interface{}
 	if err := yaml.NewDecoder(file).Decode(&dockerComposeYML); err != nil {
-		return nil, toolhelp.ReadToolFileError{Filename: filename, Err: err}
+		return nil, util.ReadToolFileError{Filename: filename, Err: err}
 	}
 
 	untypedServices, servicesPresent := dockerComposeYML["services"]

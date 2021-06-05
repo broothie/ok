@@ -1,31 +1,33 @@
-
-.PHONY: build
+entrypoint=cmd/ok/ok.go
 
 # Check all is okay
 check: test build clean
 
+# Build locally into _ok
 build: generate
-	go build -o _ok ok.go
+	go build -o _ok $(entrypoint)
 
+# Run tests with coverage
 test: generate
 	go test -cover ./...
 
 # Install ok locally
 install: generate
-	go install ok.go
+	go install $(entrypoint)
 
+# Generate target
 task/type_string.go: task/type.go
 	go generate ./...
 
+# go generate
 generate: task/type_string.go
 
+# Cleans local dir
 clean:
 	go clean
 	rm -rf _ok dist
 	go mod tidy
 
-dashed-things:
-	echo dashed-things
-
-other things:
-	echo other things
+# Bumps VERSION file
+bump:
+	bump ok/VERSION

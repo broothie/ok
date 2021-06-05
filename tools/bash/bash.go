@@ -6,10 +6,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/broothie/ok/stringhelp"
 	"github.com/broothie/ok/task"
-	"github.com/broothie/ok/toolhelp"
 	"github.com/broothie/ok/tools/ez"
+	"github.com/broothie/ok/util"
 )
 
 var taskMatcher = regexp.MustCompile(`^(?P<taskName>\w+)\s*\((?P<params>.*?)\)\s*{\s*$`)
@@ -19,9 +18,9 @@ var Bash = ez.Tool{
 	CommandName:          "bash",
 	ToolFilename:         "Okfile.bash",
 	TaskMatcher:          taskMatcher,
-	CommentPrefixMatcher: stringhelp.OctothorpePrefixMatcher,
+	CommentPrefixMatcher: util.OctothorpePrefixMatcher,
 	ParamParser: func(paramString string) (task.Parameters, error) {
-		paramStrings := stringhelp.SplitOnCommas(paramString)
+		paramStrings := util.SplitOnCommas(paramString)
 		paramList := make(task.ParamList, len(paramStrings))
 		for i, paramString := range paramStrings {
 			paramList[i] = task.Parameter{Name: paramString, Type: task.String}
@@ -36,7 +35,7 @@ var Bash = ez.Tool{
 		}
 
 		script := fmt.Sprintf("%s\n%s %s", *task.FileContents, task.Name(), strings.Join(argStrings, "  "))
-		return toolhelp.Exec(task.ToolName(), "-c", script)
+		return util.Exec(task.ToolName(), "-c", script)
 	},
 }
 

@@ -9,11 +9,11 @@ var dashPrefix = regexp.MustCompile(`^-+`)
 type Parser struct {
 	Args       []string
 	argCounter int
-	config     Options
+	options    Options
 }
 
 func NewParser(args []string) (*Parser, error) {
-	return &Parser{Args: args, config: ReadInNewConfig()}, nil
+	return &Parser{Args: args, options: Options{Config: ReadInConfig()}}, nil
 }
 
 func (p *Parser) current() (string, bool) {

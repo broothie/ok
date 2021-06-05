@@ -72,7 +72,7 @@ func TestParser_ParseArgs(t *testing.T) {
 
 func parserWithArgsAndOptionsParsed(t *testing.T, args ...string) (*Parser, Options) {
 	parser := parserWithArgs(args...)
-	options, err := parser.ParseFlags()
+	_, options, err := parser.ParseOptions()
 	require.NoError(t, err)
 
 	return parser, options

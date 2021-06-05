@@ -1,4 +1,4 @@
-package stringhelp
+package util
 
 import "regexp"
 

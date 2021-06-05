@@ -7,7 +7,7 @@ import (
 	"regexp"
 
 	"github.com/broothie/ok/task"
-	"github.com/broothie/ok/toolhelp"
+	"github.com/broothie/ok/util"
 	"github.com/pkg/errors"
 )
 
@@ -52,7 +52,7 @@ func (t Tool) Init() error {
 }
 
 func (t Tool) Check() error {
-	return toolhelp.Check(t.CommandName)
+	return util.Check(t.CommandName)
 }
 
 func (t Tool) Mount() ([]task.Task, error) {
@@ -62,7 +62,7 @@ func (t Tool) Mount() ([]task.Task, error) {
 			return nil, nil
 		}
 
-		return nil, toolhelp.ReadToolFileError{Filename: t.ToolFilename, Err: err}
+		return nil, util.ReadToolFileError{Filename: t.ToolFilename, Err: err}
 	}
 
 	if err := t.Check(); err != nil {
@@ -70,7 +70,7 @@ func (t Tool) Mount() ([]task.Task, error) {
 	}
 
 	fileContents := string(fileBytes)
-	rawTasks := toolhelp.Scan(bytes.NewReader(fileBytes), t.TaskMatcher, t.CommentPrefixMatcher)
+	rawTasks := util.Scan(bytes.NewReader(fileBytes), t.TaskMatcher, t.CommentPrefixMatcher)
 	tasks := make([]task.Task, len(rawTasks))
 	for i, rawTask := range rawTasks {
 		taskName := rawTask.MatchData["taskName"]
@@ -80,7 +80,7 @@ func (t Tool) Mount() ([]task.Task, error) {
 		if t.ParamParser != nil {
 			var err error
 			if params, err = t.ParamParser(paramString); err != nil {
-				toolhelp.Warn(t.ToolName, "")
+				util.Warn(t.ToolName, "")
 				continue
 			}
 		}

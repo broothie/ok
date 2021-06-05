@@ -6,9 +6,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/broothie/ok/stringhelp"
 	"github.com/broothie/ok/task"
-	"github.com/broothie/ok/toolhelp"
+	"github.com/broothie/ok/util"
 )
 
 var (
@@ -23,18 +22,18 @@ func (t Tool) Mount() ([]task.Task, error) {
 			return nil, nil
 		}
 
-		return nil, toolhelp.ReadToolFileError{Err: err, Filename: filename}
+		return nil, util.ReadToolFileError{Err: err, Filename: filename}
 	}
 
 	if err := t.Check(); err != nil {
 		if err == exec.ErrNotFound {
-			return nil, toolhelp.CommandNotFoundError{CommandName: ToolName}
+			return nil, util.CommandNotFoundError{CommandName: ToolName}
 		}
 
 		return nil, err
 	}
 
-	rawTasks := toolhelp.Scan(file, functionFinder, stringhelp.DoubleSlashPrefixMatcher)
+	rawTasks := util.Scan(file, functionFinder, util.DoubleSlashPrefixMatcher)
 	tasks := make([]task.Task, len(rawTasks))
 	for i, rawTask := range rawTasks {
 		taskName := rawTask.MatchData["taskName"]
@@ -51,14 +50,14 @@ func (t Tool) Mount() ([]task.Task, error) {
 }
 
 func paramListFromParamString(paramsString string) task.Parameters {
-	paramStrings := stringhelp.SplitOnCommas(paramsString)
-	if len(paramStrings) == 1 && stringhelp.AllWhitespace(paramStrings[0]) {
+	paramStrings := util.SplitOnCommas(paramsString)
+	if len(paramStrings) == 1 && util.AllWhitespace(paramStrings[0]) {
 		return task.Parameters{}
 	}
 
 	var params task.Parameters
 	for _, paramString := range paramStrings {
-		result := stringhelp.NamedRegexpResult(paramString, positionalMatcher)
+		result := util.NamedRegexpResult(paramString, positionalMatcher)
 
 		var defaultValue interface{}
 		defaultString, defaultPresent := result["default"]
