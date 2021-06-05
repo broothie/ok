@@ -12,7 +12,7 @@ import (
 
 var taskMatcher = regexp.MustCompile(`(?m)^rake (?P<taskName>\w+)(?:\[(?P<params>.*?)])?\s+# (?P<description>.*)?$`)
 
-func (t Tool) Mount() ([]task.Task, error) {
+func (t *Tool) Mount() ([]task.Task, error) {
 	if _, err := os.Stat(filename); err != nil {
 		if os.IsNotExist(err) {
 			return nil, nil
@@ -29,7 +29,14 @@ func (t Tool) Mount() ([]task.Task, error) {
 		return nil, err
 	}
 
-	output, err := exec.Command(ToolName, "-AT").CombinedOutput()
+	command := "rake"
+	args := []string{"-AT"}
+	if t.ToolConfig.Bundle != nil && *t.ToolConfig.Bundle {
+		command = "bundle"
+		args = []string{"exec", "rake", "-AT"}
+	}
+
+	output, err := exec.Command(command, args...).CombinedOutput()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get rake tasks: %v: %s", err, output)
 	}
@@ -51,6 +58,7 @@ func (t Tool) Mount() ([]task.Task, error) {
 			Base:    task.NewBase(taskName, filename, ToolName),
 			params:  paramList.ToParameters(false),
 			comment: description,
+			tool:    t,
 		}
 	}
 

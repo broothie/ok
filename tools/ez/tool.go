@@ -24,6 +24,7 @@ type Tool struct {
 	CommentPrefixMatcher *regexp.Regexp
 	ParamParser          ParamParser
 	Invoke               InvokeFunc
+	ToolConfig           interface{}
 }
 
 func (t Tool) Name() string {
@@ -53,6 +54,14 @@ func (t Tool) Init() error {
 
 func (t Tool) Check() error {
 	return util.Check(t.CommandName)
+}
+
+func (t Tool) Config() interface{} {
+	if t.ToolConfig != nil {
+		return &t.ToolConfig
+	}
+
+	return nil
 }
 
 func (t Tool) Mount() ([]task.Task, error) {

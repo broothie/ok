@@ -56,7 +56,7 @@ var Python = ez.Tool{
 		}
 
 		script := fmt.Sprintf("%s\n%s(%s)", *task.FileContents, task.Name(), strings.Join(argStrings, ", "))
-		return util.Exec(task.ToolName(), "-c", script)
+		return util.Exec(task.Tool.Name(), "-c", script)
 	},
 }
 

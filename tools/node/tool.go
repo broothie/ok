@@ -31,3 +31,7 @@ func (Tool) Init() error {
 func (Tool) Check() error {
 	return util.Check(ToolName)
 }
+
+func (Tool) Config() interface{} {
+	return nil
+}

@@ -4,23 +4,29 @@ import (
 	"fmt"
 
 	"github.com/broothie/ok/cli"
+	"github.com/broothie/ok/config"
 	"github.com/pkg/errors"
 	"github.com/thoas/go-funk"
 )
 
 type Ok struct {
-	Parser   *cli.Parser
-	Options  cli.Options
-	TaskList []Task
+	Parser    *cli.Parser
+	Options   cli.Options
+	MapConfig map[string]interface{}
+	TaskList  []Task
 }
 
 func New(args []string) (*Ok, error) {
-	parser, err := cli.NewParser(args)
+	var cfg config.Config
+	config.ReadConfigAndEnv(&cfg)
+	parser, err := cli.NewParser(args, cfg)
 	if err != nil {
 		return nil, err
 	}
 
-	return &Ok{Parser: parser}, nil
+	var mapConfig map[string]interface{}
+	config.ReadInConfig(&mapConfig)
+	return &Ok{Parser: parser, MapConfig: mapConfig}, nil
 }
 
 func Run(args []string) error {

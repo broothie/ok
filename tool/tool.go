@@ -6,5 +6,6 @@ type Tool interface {
 	Name() string
 	Init() error
 	Check() error
+	Config() interface{}
 	Mount() ([]task.Task, error)
 }

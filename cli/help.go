@@ -27,7 +27,7 @@ func PrintHelp(w io.Writer, version string) error {
 	}
 
 	table := tabwriter.NewWriter(buf, 0, 0, 2, ' ', 0)
-	for _, option := range Flags {
+	for _, option := range options {
 		if option.Hidden {
 			continue
 		}

@@ -21,7 +21,7 @@ var Registry = []tool.Tool{
 	make.Make,
 	node.Tool{},
 	python.Python,
-	rake.Tool{},
+	new(rake.Tool),
 	ruby.Ruby,
 	yarn.Tool{},
 	zsh.Zsh,

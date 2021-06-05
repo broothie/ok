@@ -13,7 +13,13 @@ const (
 	filename = "Rakefile"
 )
 
-type Tool struct{}
+type Tool struct {
+	ToolConfig Config
+}
+
+type Config struct {
+	Bundle *bool `toml:"bundle"`
+}
 
 func (Tool) Name() string {
 	return ToolName
@@ -30,4 +36,8 @@ func (Tool) Init() error {
 
 func (Tool) Check() error {
 	return util.Check(ToolName)
+}
+
+func (t *Tool) Config() interface{} {
+	return &t.ToolConfig
 }

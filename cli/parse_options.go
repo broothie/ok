@@ -6,8 +6,8 @@ import (
 )
 
 func (p *Parser) ParseOptions() (string, Options, error) {
-	flagMap := make(map[string]Flag)
-	for _, flag := range Flags {
+	flagMap := make(map[string]Option)
+	for _, flag := range options {
 		flagMap[fmt.Sprintf("--%s", flag.Name)] = flag
 		if flag.Short {
 			flagMap[fmt.Sprintf("-%c", flag.Name[0])] = flag

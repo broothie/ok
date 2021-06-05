@@ -31,10 +31,10 @@ func TestOptions(t *testing.T) {
 	})
 
 	t.Run("help", func(t *testing.T) {
-		for _, flag := range []string{"-h", "--help"} {
-			t.Run(flag, func(t *testing.T) {
+		for _, option := range []string{"-h", "--help"} {
+			t.Run(option, func(t *testing.T) {
 				expected := Options{Help: true}
-				_, actual, err := parserWithArgs(flag).ParseOptions()
+				_, actual, err := parserWithArgs(option).ParseOptions()
 				assert.NoError(t, err)
 				assert.Equal(t, expected, actual)
 			})
@@ -50,10 +50,10 @@ func TestOptions(t *testing.T) {
 
 	t.Run("init", func(t *testing.T) {
 		toolName := "asdf"
-		for _, flag := range []string{"-i", "--init"} {
-			t.Run(flag, func(t *testing.T) {
+		for _, option := range []string{"-i", "--init"} {
+			t.Run(option, func(t *testing.T) {
 				expected := Options{Init: toolName}
-				_, actual, err := parserWithArgs(flag, toolName).ParseOptions()
+				_, actual, err := parserWithArgs(option, toolName).ParseOptions()
 				assert.NoError(t, err)
 				assert.Equal(t, expected, actual)
 			})

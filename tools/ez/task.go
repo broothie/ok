@@ -23,10 +23,6 @@ func (t Task) Filename() string {
 	return t.TaskFilename
 }
 
-func (t Task) ToolName() string {
-	return t.Tool.ToolName
-}
-
 func (t Task) Params() task.Parameters {
 	return t.TaskParams
 }

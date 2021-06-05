@@ -12,6 +12,7 @@ type Task struct {
 	task.Base
 	params  task.Parameters
 	comment string
+	tool    *Tool
 }
 
 func (t Task) Comment() string {
@@ -28,5 +29,13 @@ func (t Task) Invoke(args task.Args) task.RunningTask {
 		argStrings[i] = arg.Value.(string)
 	}
 
-	return util.Exec(ToolName, fmt.Sprintf("%s[%s]", t.Name(), strings.Join(argStrings, ",")))
+	command := "rake"
+	taskString := fmt.Sprintf("%s[%s]", t.Name(), strings.Join(argStrings, ","))
+	rest := []string{taskString}
+	if t.tool.ToolConfig.Bundle != nil && *t.tool.ToolConfig.Bundle {
+		command = "bundle"
+		rest = []string{"exec", "rake", taskString}
+	}
+
+	return util.Exec(command, rest...)
 }
