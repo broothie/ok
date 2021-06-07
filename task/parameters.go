@@ -22,6 +22,10 @@ func (p Parameter) IsRequired() bool {
 }
 
 func (p Parameter) String() string {
+	if p.Type == Bool {
+		return fmt.Sprintf("--[no-]-%s", p.Name)
+	}
+
 	inner := p.Name
 	if !p.IsRequired() {
 		inner = fmt.Sprintf("%s=%s", p.Name, p.Default)
