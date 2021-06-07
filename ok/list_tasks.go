@@ -8,7 +8,7 @@ import (
 	"text/tabwriter"
 )
 
-func (ok *Ok) List() error {
+func (ok *Ok) ListTasks() error {
 	paramsPresent := false
 	commentsPresent := false
 	filenames := make(set)

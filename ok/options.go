@@ -5,7 +5,6 @@ import (
 
 	"github.com/broothie/ok/cli"
 	"github.com/broothie/ok/logger"
-	"github.com/broothie/ok/tools"
 	"github.com/pkg/errors"
 )
 
@@ -21,10 +20,10 @@ func (ok *Ok) HandleOptions() (taskName string, halt bool, err error) {
 	} else if options.Version {
 		return "", true, cli.PrintVersion(os.Stdout, Version())
 	} else if options.ListTools {
-		tools.List()
+		ok.List()
 		return "", true, nil
 	} else if options.Init != "" {
-		return "", true, tools.Init(ok.Options.Init)
+		return "", true, ok.Init()
 	} else if taskName == "" {
 		if mountErrors := ok.Mount(); len(mountErrors) != 0 {
 			for toolName, err := range mountErrors {
@@ -32,7 +31,7 @@ func (ok *Ok) HandleOptions() (taskName string, halt bool, err error) {
 			}
 		}
 
-		return "", true, ok.List()
+		return "", true, ok.ListTasks()
 	}
 
 	return taskName, false, err
