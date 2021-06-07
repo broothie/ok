@@ -9,11 +9,11 @@ import (
 
 type Options struct {
 	config.Config
-	Help      bool     `toml:"-"`
-	Version   bool     `toml:"-"`
-	Init      string   `toml:"-"`
-	ListTools bool     `toml:"-"`
-	Watches   []string `toml:"-"`
+	Help      bool
+	Version   bool
+	Init      string
+	ListTools bool
+	Watches   []string
 }
 
 type OptionSetter func(options *Options, next string)
@@ -39,14 +39,14 @@ var options = []Option{
 		Name:         "help",
 		Short:        true,
 		Description:  "Print this help text.",
-		Hidden:       true,
+		Hidden:       false,
 		OptionSetter: func(options *Options, _ string) { options.Help = true },
 	},
 	{
 		Name:         "version",
 		Short:        false,
 		Description:  "Print ok version.",
-		Hidden:       true,
+		Hidden:       false,
 		OptionSetter: func(options *Options, _ string) { options.Version = true },
 	},
 	{
@@ -54,14 +54,14 @@ var options = []Option{
 		Short:        true,
 		Description:  "Initialize a tool.",
 		ArgName:      "tool",
-		Hidden:       true,
+		Hidden:       false,
 		OptionSetter: func(options *Options, toolName string) { options.Init = toolName },
 	},
 	{
 		Name:         "tools",
 		Short:        false,
 		Description:  "List tools and their availability.",
-		Hidden:       true,
+		Hidden:       false,
 		OptionSetter: func(options *Options, _ string) { options.ListTools = true },
 	},
 	{
@@ -69,7 +69,7 @@ var options = []Option{
 		Short:        true,
 		Description:  "Provide files or glob pattern to have a task run on file change.",
 		ArgName:      "glob",
-		Hidden:       true,
+		Hidden:       false,
 		OptionSetter: func(options *Options, watchPattern string) { options.Watches = append(options.Watches, watchPattern) },
 	},
 	{
@@ -77,7 +77,7 @@ var options = []Option{
 		Short:        false,
 		Description:  "Ignore a tool.",
 		ArgName:      "tool",
-		Hidden:       true,
+		Hidden:       false,
 		OptionSetter: func(options *Options, toolName string) { options.SkipTools = append(options.SkipTools, toolName) },
 	},
 	{
@@ -85,7 +85,7 @@ var options = []Option{
 		Short:       false,
 		Description: "Time to wait for each tool to mount, in milliseconds.",
 		ArgName:     "3s",
-		Hidden:      true,
+		Hidden:       false,
 		OptionSetter: func(options *Options, timeoutString string) {
 			timeout, err := time.ParseDuration(timeoutString)
 			if err != nil {
