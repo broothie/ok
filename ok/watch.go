@@ -44,7 +44,11 @@ func (ok *Ok) runWatcher(t task.Task, args task.Args) error {
 					process.Kill()
 				}
 
-				process = t.Invoke(args)
+				var err error
+				process, err = t.Invoke(args)
+				if err != nil {
+					logger.Ok.Printf("failed to start task process: %v", err)
+				}
 
 			case err := <-watcher.Error:
 				if process != nil {

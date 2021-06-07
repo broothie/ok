@@ -17,7 +17,7 @@ func (Task) Params() task.Parameters {
 	return task.Parameters{Forward: true}
 }
 
-func (t Task) Invoke(args task.Args) task.RunningTask {
+func (t Task) Invoke(args task.Args) (task.RunningTask, error) {
 	argStrings := []string{"run", t.Name()}
 	return util.Exec(ToolName, append(argStrings, args.Forwards...)...)
 }

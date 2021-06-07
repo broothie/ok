@@ -24,7 +24,7 @@ var (
 		ParamParser: func(paramString string) (task.Parameters, error) {
 			return paramListFromParamString(paramString), nil
 		},
-		Invoke: func(task ez.Task, args task.Args) task.RunningTask {
+		Invoke: func(task ez.Task, args task.Args) (task.RunningTask, error) {
 			positionalStrings := make([]string, len(args.Positional))
 			for i, arg := range args.Positional {
 				positionalStrings[i] = processArg(arg.Value.(string))

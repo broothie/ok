@@ -45,7 +45,7 @@ var Python = ez.Tool{
 
 		return paramList.ToParameters(false), nil
 	},
-	Invoke: func(task ez.Task, args task.Args) task.RunningTask {
+	Invoke: func(task ez.Task, args task.Args) (task.RunningTask, error) {
 		var argStrings []string
 		for _, arg := range args.Positional {
 			argStrings = append(argStrings, processArg(arg.Value.(string)))

@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/broothie/ok/logger"
 	"github.com/broothie/ok/task"
 	"github.com/broothie/ok/tools/ez"
 	"github.com/broothie/ok/util"
@@ -27,7 +28,7 @@ var (
 		ParamParser: func(paramString string) (task.Parameters, error) {
 			return paramListFromParamString(paramString), nil
 		},
-		Invoke: func(task ez.Task, args task.Args) task.RunningTask {
+		Invoke: func(task ez.Task, args task.Args) (task.RunningTask, error) {
 			positionalStrings := make([]string, len(args.Positional))
 			for i, arg := range args.Positional {
 				positionalStrings[i] = processArg(arg.Value.(string))
@@ -64,7 +65,7 @@ func paramListFromParamString(paramsString string) task.Parameters {
 			re = keywordMatcher
 			isKeyword = true
 		} else {
-			util.Warn(ToolName, "error parsing param '%s'", paramString)
+			logger.Tool("ruby").Printf("error parsing param '%s'", paramString)
 			continue
 		}
 

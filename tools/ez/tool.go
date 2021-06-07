@@ -13,7 +13,7 @@ import (
 
 type ParamParser func(paramString string) (task.Parameters, error)
 
-type InvokeFunc func(task Task, args task.Args) task.RunningTask
+type InvokeFunc func(task Task, args task.Args) (task.RunningTask, error)
 
 type Tool struct {
 	ToolName             string
@@ -78,6 +78,7 @@ func (t Tool) Mount() ([]task.Task, error) {
 		return nil, err
 	}
 
+	errs := new(util.ErrorGroup)
 	fileContents := string(fileBytes)
 	rawTasks := util.Scan(bytes.NewReader(fileBytes), t.TaskMatcher, t.CommentPrefixMatcher)
 	tasks := make([]task.Task, len(rawTasks))
@@ -89,7 +90,7 @@ func (t Tool) Mount() ([]task.Task, error) {
 		if t.ParamParser != nil {
 			var err error
 			if params, err = t.ParamParser(paramString); err != nil {
-				util.Warn(t.ToolName, "")
+				errs.Add(errors.Wrapf(err, "failed to parse params for task '%s' from tool '%s'", taskName, t.Name()))
 				continue
 			}
 		}
@@ -104,5 +105,5 @@ func (t Tool) Mount() ([]task.Task, error) {
 		}
 	}
 
-	return tasks, nil
+	return tasks, errs.NilIfEmpty()
 }

@@ -17,6 +17,6 @@ func (Task) Params() task.Parameters {
 	return task.Parameters{}
 }
 
-func (t Task) Invoke(args task.Args) task.RunningTask {
+func (t Task) Invoke(task.Args) (task.RunningTask, error) {
 	return util.Exec(ToolName, t.Name())
 }

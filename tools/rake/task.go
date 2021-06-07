@@ -23,7 +23,7 @@ func (t Task) Params() task.Parameters {
 	return t.params
 }
 
-func (t Task) Invoke(args task.Args) task.RunningTask {
+func (t Task) Invoke(args task.Args) (task.RunningTask, error) {
 	argStrings := make([]string, len(args.Positional))
 	for i, arg := range args.Positional {
 		argStrings[i] = arg.Value.(string)

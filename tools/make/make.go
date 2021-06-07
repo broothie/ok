@@ -19,7 +19,7 @@ var (
 		ToolFilename:         "Makefile",
 		TaskMatcher:          ruleMatcher,
 		CommentPrefixMatcher: util.OctothorpePrefixMatcher,
-		Invoke: func(task ez.Task, args task.Args) task.RunningTask {
+		Invoke: func(task ez.Task, args task.Args) (task.RunningTask, error) {
 			return util.Exec(ToolName, task.Name())
 		},
 	}

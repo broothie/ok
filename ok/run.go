@@ -66,5 +66,10 @@ func (ok *Ok) Run() error {
 		return ok.runWatcher(task, taskArgs)
 	}
 
-	return task.Invoke(taskArgs).Wait()
+	process, err := task.Invoke(taskArgs)
+	if err != nil {
+		return errors.Wrap(err, "failed to start task process")
+	}
+
+	return process.Wait()
 }

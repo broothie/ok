@@ -5,7 +5,7 @@ type Task interface {
 	Comment() string
 	Filename() string
 	Params() Parameters
-	Invoke(args Args) RunningTask
+	Invoke(args Args) (RunningTask, error)
 }
 
 type RunningTask interface {
