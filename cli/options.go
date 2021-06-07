@@ -83,7 +83,7 @@ var options = []Option{
 	{
 		Name:        "timeout",
 		Short:       false,
-		Description: "Time to wait for each tool to mount, in milliseconds.",
+		Description: "Time to wait for each tool to mount.",
 		ArgName:     "3s",
 		Hidden:       false,
 		OptionSetter: func(options *Options, timeoutString string) {
