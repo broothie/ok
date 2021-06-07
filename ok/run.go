@@ -24,7 +24,7 @@ func New(args []string) (*Ok, error) {
 		return nil, err
 	}
 
-	var mapConfig map[string]interface{}
+	mapConfig := make(map[string]interface{})
 	config.ReadInConfig(&mapConfig)
 	return &Ok{Parser: parser, MapConfig: mapConfig}, nil
 }

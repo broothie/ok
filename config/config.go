@@ -14,7 +14,7 @@ const configFileGlob = ".ok*.toml"
 
 type Config struct {
 	Debug        bool          `toml:"debug" envconfig:"debug"`
-	Timeout      time.Duration `toml:"timeout" envconfig:"timeout" default:"1ms"`
+	Timeout      time.Duration `toml:"timeout" envconfig:"timeout" default:"3s"`
 	SkipTools    []string      `toml:"skip" envconfig:"skip"`
 	ToolPriority []string      `toml:"tool_priority" envconfig:"tool_priority"`
 }

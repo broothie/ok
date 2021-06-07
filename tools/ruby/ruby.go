@@ -6,25 +6,31 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/alessio/shellescape"
+
 	"github.com/broothie/ok/logger"
 	"github.com/broothie/ok/task"
 	"github.com/broothie/ok/tools/ez"
 	"github.com/broothie/ok/util"
 )
 
-var (
-	ToolName = "ruby"
+type Config struct {
+	Bundler *bool `toml:"bundler"`
+	Rails   *bool `toml:"rails"`
+}
 
+var (
 	methodMatcher     = regexp.MustCompile(`(?m)^def\s+(?P<taskName>\w+)\(?(?P<params>.*?)\)?$`)
 	positionalMatcher = regexp.MustCompile(`^(?P<paramName>\w+)(?:\s*=\s*(?P<default>.*))?$`)
 	keywordMatcher    = regexp.MustCompile(`^(?P<paramName>\w+):(?:\s*(?P<default>.*))?$`)
 
 	Ruby = ez.Tool{
-		ToolName:             ToolName,
-		CommandName:          ToolName,
+		ToolName:             "ruby",
+		CommandName:          "ruby",
 		ToolFilename:         "Okfile.rb",
 		TaskMatcher:          methodMatcher,
 		CommentPrefixMatcher: util.OctothorpePrefixMatcher,
+		ToolConfig:           new(Config),
 		ParamParser: func(paramString string) (task.Parameters, error) {
 			return paramListFromParamString(paramString), nil
 		},
@@ -41,8 +47,20 @@ var (
 				counter++
 			}
 
-			script := fmt.Sprintf("%s(%s)", task.Name(), strings.Join(append(positionalStrings, keywordEntries...), ", "))
-			return util.Exec(ToolName, "-r", fmt.Sprintf("./%s", task.Filename()), "-e", script)
+			methodArgs := append(positionalStrings, keywordEntries...)
+			script := shellescape.Quote(fmt.Sprintf("%s; %s(%s)", *task.FileContents, task.Name(), strings.Join(methodArgs, ", ")))
+			execArgs := []string{"ruby", "-e", script}
+			config := task.Tool.ToolConfig.(*Config) // TODO: Type safe way to do this?
+			if config.Rails != nil && *config.Rails {
+				execArgs = []string{"rails", "runner", script}
+
+			}
+
+			if config.Bundler != nil && *config.Bundler {
+				execArgs = append([]string{"bin/bundle", "exec"}, execArgs...)
+			}
+
+			return util.Exec(execArgs[0], execArgs[1:]...)
 		},
 	}
 )

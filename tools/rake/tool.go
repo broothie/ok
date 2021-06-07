@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/broothie/ok/util"
+	"github.com/pelletier/go-toml"
 	"github.com/pkg/errors"
 )
 
@@ -14,11 +15,11 @@ const (
 )
 
 type Tool struct {
-	ToolConfig Config
+	Config Config
 }
 
 type Config struct {
-	Bundle *bool `toml:"bundle"`
+	Bundler *bool `toml:"bundler"`
 }
 
 func (Tool) Name() string {
@@ -38,6 +39,6 @@ func (Tool) Check() error {
 	return util.Check(ToolName)
 }
 
-func (t *Tool) Config() interface{} {
-	return &t.ToolConfig
+func (t *Tool) Configure(decoder *toml.Decoder) error {
+	return decoder.Decode(&t.Config)
 }

@@ -31,7 +31,7 @@ func (t *Tool) Mount() ([]task.Task, error) {
 
 	command := "rake"
 	args := []string{"-AT"}
-	if t.ToolConfig.Bundle != nil && *t.ToolConfig.Bundle {
+	if t.Config.Bundler != nil && *t.Config.Bundler {
 		command = "bundle"
 		args = []string{"exec", "rake", "-AT"}
 	}

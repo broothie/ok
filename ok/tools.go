@@ -12,8 +12,18 @@ import (
 )
 
 func (ok *Ok) Registry() []tool.Tool {
-	tools := funk.Filter(tools.Registry, func(t tool.Tool) bool {
-		return !funk.ContainsString(ok.Options.SkipTools, t.Name())
+	tools := funk.Filter(tools.Registry, func(tool tool.Tool) bool {
+		if funk.ContainsString(ok.Options.SkipTools, tool.Name()) {
+			return false
+		}
+
+		if toolConfig, toolConfigPresent := ok.MapConfig[tool.Name()]; toolConfigPresent {
+			if skip, skipPresent := toolConfig.(map[string]interface{})["skip"]; skipPresent && skip.(bool) {
+				return false
+			}
+		}
+
+		return true
 	}).([]tool.Tool)
 
 	sort.Slice(tools, func(i, j int) bool {

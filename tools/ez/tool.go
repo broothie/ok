@@ -8,6 +8,7 @@ import (
 
 	"github.com/broothie/ok/task"
 	"github.com/broothie/ok/util"
+	"github.com/pelletier/go-toml"
 	"github.com/pkg/errors"
 )
 
@@ -56,12 +57,12 @@ func (t Tool) Check() error {
 	return util.Check(t.CommandName)
 }
 
-func (t Tool) Config() interface{} {
-	if t.ToolConfig != nil {
-		return &t.ToolConfig
+func (t Tool) Configure(decoder *toml.Decoder) error {
+	if t.ToolConfig == nil {
+		return nil
 	}
 
-	return nil
+	return decoder.Decode(t.ToolConfig)
 }
 
 func (t Tool) Mount() ([]task.Task, error) {

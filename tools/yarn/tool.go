@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/broothie/ok/util"
+	"github.com/pelletier/go-toml"
 	"github.com/pkg/errors"
 )
 
@@ -32,6 +33,6 @@ func (Tool) Check() error {
 	return util.Check(ToolName)
 }
 
-func (Tool) Config() interface{} {
+func (Tool) Configure(*toml.Decoder) error {
 	return nil
 }

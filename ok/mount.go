@@ -19,12 +19,6 @@ type Task struct {
 	Tool tool.Tool
 }
 
-type mountContext struct {
-	waitGroup  *sync.WaitGroup
-	errors     map[string]error
-	errorsLock *sync.Mutex
-}
-
 func (ok *Ok) Mount() map[string]error {
 	mountCtx := mountContext{
 		waitGroup:  new(sync.WaitGroup),
@@ -47,6 +41,7 @@ func (ok *Ok) Mount() map[string]error {
 func (ok *Ok) mountTool(ctx mountContext, tool tool.Tool, tasks *[]Task) {
 	defer ctx.waitGroup.Done()
 
+	toolName := tool.Name()
 	done := make(chan struct{})
 	timer := time.NewTimer(ok.Options.Timeout)
 
@@ -56,25 +51,26 @@ func (ok *Ok) mountTool(ctx mountContext, tool tool.Tool, tasks *[]Task) {
 		start := time.Now()
 		defer func() {
 			if ok.Options.Debug {
-				logger.Debug.Printf("mounted '%s' in %v", tool.Name(), time.Since(start))
+				logger.Debug.Printf("mounted '%s' in %v", toolName, time.Since(start))
 			}
 		}()
 
-		toolConfig := tool.Config()
-		if toolConfig != nil && ok.MapConfig != nil && ok.MapConfig[tool.Name()] != nil {
-			if err := tomlEncodeDecode(ok.MapConfig[tool.Name()], toolConfig); err != nil {
-				ctx.errorsLock.Lock()
-				ctx.errors[tool.Name()] = err
-				ctx.errorsLock.Unlock()
-				return
+		if ok.MapConfig != nil && ok.MapConfig[toolName] != nil {
+			if ok.Options.Debug {
+				logger.Debug.Printf("%s config: %+v", toolName, ok.MapConfig[toolName])
+			}
+
+			decoder, err := tomlDecoder(ok.MapConfig[toolName])
+			if err != nil {
+				ctx.error(toolName, err)
+			} else if err := tool.Configure(decoder); err != nil {
+				ctx.error(toolName, errors.Wrapf(err, "failed to configure tool '%s'", toolName))
 			}
 		}
 
 		toolTasks, err := tool.Mount()
 		if err != nil {
-			ctx.errorsLock.Lock()
-			ctx.errors[tool.Name()] = err
-			ctx.errorsLock.Unlock()
+			ctx.error(toolName, errors.Wrapf(err, "failed to mount tool '%s'", toolName))
 			return
 		}
 
@@ -88,19 +84,29 @@ func (ok *Ok) mountTool(ctx mountContext, tool tool.Tool, tasks *[]Task) {
 		case <-done:
 			return
 		case <-timer.C:
-			ctx.errorsLock.Lock()
-			ctx.errors[tool.Name()] = fmt.Errorf("mounting '%s' took longer than %v", tool.Name(), ok.Options.Timeout)
-			ctx.errorsLock.Unlock()
+			ctx.error(toolName, fmt.Errorf("mounting '%s' took longer than %v", toolName, ok.Options.Timeout))
 			return
 		}
 	}
 }
 
-func tomlEncodeDecode(encode, decode interface{}) error {
+func tomlDecoder(encode interface{}) (*toml.Decoder, error) {
 	buf := new(bytes.Buffer)
 	if err := toml.NewEncoder(buf).Encode(encode); err != nil {
-		return errors.Wrap(err, "failed to temporarily encode toml")
+		return nil, errors.Wrap(err, "failed to temporarily encode toml")
 	}
 
-	return errors.Wrap(toml.NewDecoder(buf).Decode(decode), "failed to decode temporary toml")
+	return toml.NewDecoder(buf), nil
+}
+
+type mountContext struct {
+	waitGroup  *sync.WaitGroup
+	errors     map[string]error
+	errorsLock *sync.Mutex
+}
+
+func (mc *mountContext) error(toolName string, err error) {
+	mc.errorsLock.Lock()
+	mc.errors[toolName] = err
+	mc.errorsLock.Unlock()
 }

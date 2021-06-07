@@ -32,7 +32,7 @@ func (t Task) Invoke(args task.Args) (task.RunningTask, error) {
 	command := "rake"
 	taskString := fmt.Sprintf("%s[%s]", t.Name(), strings.Join(argStrings, ","))
 	rest := []string{taskString}
-	if t.tool.ToolConfig.Bundle != nil && *t.tool.ToolConfig.Bundle {
+	if t.tool.Config.Bundler != nil && *t.tool.Config.Bundler {
 		command = "bundle"
 		rest = []string{"exec", "rake", taskString}
 	}

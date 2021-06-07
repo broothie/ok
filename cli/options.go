@@ -84,7 +84,7 @@ var options = []Option{
 		Name:        "timeout",
 		Short:       false,
 		Description: "Time to wait for each tool to mount, in milliseconds.",
-		ArgName:     "1ms",
+		ArgName:     "3s",
 		Hidden:      true,
 		OptionSetter: func(options *Options, timeoutString string) {
 			timeout, err := time.ParseDuration(timeoutString)

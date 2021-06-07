@@ -1,11 +1,14 @@
 package tool
 
-import "github.com/broothie/ok/task"
+import (
+	"github.com/broothie/ok/task"
+	"github.com/pelletier/go-toml"
+)
 
 type Tool interface {
 	Name() string
 	Init() error
 	Check() error
-	Config() interface{}
+	Configure(*toml.Decoder) error
 	Mount() ([]task.Task, error)
 }

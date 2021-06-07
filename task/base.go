@@ -1,5 +1,7 @@
 package task
 
+import "github.com/pelletier/go-toml"
+
 type Base struct {
 	name     string
 	filename string
@@ -24,6 +26,10 @@ func (b Base) Filename() string {
 
 func (b Base) ToolName() string {
 	return b.toolName
+}
+
+func (b Base) Configure(*toml.Decoder) error {
+	return nil
 }
 
 func (Base) Params() Parameters {

@@ -34,7 +34,6 @@ var (
 			script := fmt.Sprintf("%s; %s(%s)", *task.FileContents, task.Name(), argString)
 			return util.Exec("node", "-e", script)
 		},
-		ToolConfig: nil,
 	}
 )
 

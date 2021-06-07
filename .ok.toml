@@ -1,3 +1,10 @@
 
-debug = true
-timeout = "500µs"
+#debug = true
+
+[ruby]
+#rails = true
+#bundler = true
+
+[rake]
+skip = true
+#bundler = true
