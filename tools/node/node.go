@@ -1,53 +1,42 @@
 package node
 
 import (
-	"os"
-	"os/exec"
+	"fmt"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/broothie/ok/task"
+	"github.com/broothie/ok/tools/ez"
 	"github.com/broothie/ok/util"
 )
 
 var (
 	functionFinder    = regexp.MustCompile(`(?m)^\s*function\s+(?P<taskName>\w+)\s*\((?P<params>.*?)\)\s*{\s*$`)
 	positionalMatcher = regexp.MustCompile(`^(?P<paramName>\w+)(?:\s*=\s*(?P<default>.*))?$`)
+
+	Node = ez.Tool{
+		ToolName:             "node",
+		CommandName:          "node",
+		ToolFilename:         "Okfile.js",
+		TaskMatcher:          functionFinder,
+		CommentPrefixMatcher: util.DoubleSlashPrefixMatcher,
+		ParamParser: func(paramString string) (task.Parameters, error) {
+			return paramListFromParamString(paramString), nil
+		},
+		Invoke: func(task ez.Task, args task.Args) task.RunningTask {
+			positionalStrings := make([]string, len(args.Positional))
+			for i, arg := range args.Positional {
+				positionalStrings[i] = processArg(arg.Value.(string))
+			}
+
+			argString := strings.Join(positionalStrings, ", ")
+			script := fmt.Sprintf("%s; %s(%s)", *task.FileContents, task.Name(), argString)
+			return util.Exec("node", "-e", script)
+		},
+		ToolConfig: nil,
+	}
 )
-
-func (t Tool) Mount() ([]task.Task, error) {
-	file, err := os.Open(filename)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return nil, nil
-		}
-
-		return nil, util.ReadToolFileError{Err: err, Filename: filename}
-	}
-
-	if err := t.Check(); err != nil {
-		if err == exec.ErrNotFound {
-			return nil, util.CommandNotFoundError{CommandName: ToolName}
-		}
-
-		return nil, err
-	}
-
-	rawTasks := util.Scan(file, functionFinder, util.DoubleSlashPrefixMatcher)
-	tasks := make([]task.Task, len(rawTasks))
-	for i, rawTask := range rawTasks {
-		taskName := rawTask.MatchData["taskName"]
-		params := rawTask.MatchData["params"]
-
-		tasks[i] = Task{
-			Base:    task.NewBase(taskName, filename, ToolName),
-			comment: rawTask.Comment,
-			params:  paramListFromParamString(params),
-		}
-	}
-
-	return tasks, nil
-}
 
 func paramListFromParamString(paramsString string) task.Parameters {
 	paramStrings := util.SplitOnCommas(paramsString)
@@ -77,4 +66,16 @@ func paramListFromParamString(paramsString string) task.Parameters {
 	}
 
 	return params
+}
+
+func processArg(arg string) string {
+	if _, err := strconv.ParseFloat(arg, 64); err == nil {
+		return arg
+	} else if _, err := strconv.Atoi(arg); err == nil {
+		return arg
+	} else if _, err := strconv.ParseBool(arg); err == nil {
+		return arg
+	} else {
+		return strconv.Quote(arg)
+	}
 }

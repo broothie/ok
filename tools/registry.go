@@ -19,7 +19,7 @@ var Registry = []tool.Tool{
 	dockercompose.Tool{},
 	golang.Tool{},
 	make.Make,
-	node.Tool{},
+	node.Node,
 	python.Python,
 	new(rake.Tool),
 	ruby.Ruby,
