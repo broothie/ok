@@ -14,6 +14,10 @@ func (ok *Ok) HandleOptions() (taskName string, halt bool, err error) {
 		return "", true, err
 	}
 
+	if options.Debug {
+		logger.Debug.Printf("options: %+v", options)
+	}
+
 	ok.Options = options
 	if options.Help {
 		return "", true, cli.PrintHelp(os.Stdout, Version())

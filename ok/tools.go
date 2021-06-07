@@ -5,10 +5,9 @@ import (
 	"sort"
 
 	"github.com/broothie/ok/logger"
-	"github.com/pkg/errors"
-
 	"github.com/broothie/ok/tool"
 	"github.com/broothie/ok/tools"
+	"github.com/pkg/errors"
 	"github.com/thoas/go-funk"
 )
 

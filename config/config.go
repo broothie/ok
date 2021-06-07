@@ -2,6 +2,7 @@ package config
 
 import (
 	"os"
+	"time"
 
 	"github.com/bmatcuk/doublestar"
 	"github.com/broothie/ok/logger"
@@ -12,9 +13,10 @@ import (
 const configFileGlob = ".ok*.toml"
 
 type Config struct {
-	Debug        bool     `toml:"debug" envconfig:"debug"`
-	SkipTools    []string `toml:"skip" envconfig:"skip"`
-	ToolPriority []string `toml:"tool_priority" envconfig:"tool_priority"`
+	Debug        bool          `toml:"debug" envconfig:"debug"`
+	Timeout      time.Duration `toml:"timeout" envconfig:"timeout" default:"1ms"`
+	SkipTools    []string      `toml:"skip" envconfig:"skip"`
+	ToolPriority []string      `toml:"tool_priority" envconfig:"tool_priority"`
 }
 
 func ReadConfigAndEnv(v interface{}) {
