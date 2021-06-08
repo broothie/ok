@@ -30,4 +30,4 @@ clean:
 
 # Bumps VERSION file
 bump:
-	bump ok/VERSION
+	bump VERSION
