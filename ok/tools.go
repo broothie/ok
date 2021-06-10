@@ -40,7 +40,7 @@ func (ok *Ok) Registry() []tool.Tool {
 		return iPriority < jPriority
 	})
 
-	return funk.Reverse(tools).([]tool.Tool)
+	return tools
 }
 
 func (ok *Ok) List() {

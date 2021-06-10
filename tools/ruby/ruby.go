@@ -6,8 +6,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/alessio/shellescape"
-
 	"github.com/broothie/ok/logger"
 	"github.com/broothie/ok/task"
 	"github.com/broothie/ok/tools/ez"
@@ -48,12 +46,11 @@ var (
 			}
 
 			methodArgs := append(positionalStrings, keywordEntries...)
-			script := shellescape.Quote(fmt.Sprintf("%s; %s(%s)", *task.FileContents, task.Name(), strings.Join(methodArgs, ", ")))
+			script := fmt.Sprintf("%s; %s(%s)", *task.FileContents, task.Name(), strings.Join(methodArgs, ", "))
 			execArgs := []string{"ruby", "-e", script}
 			config := task.Tool.ToolConfig.(*Config) // TODO: Type safe way to do this?
 			if config.Rails != nil && *config.Rails {
 				execArgs = []string{"rails", "runner", script}
-
 			}
 
 			if config.Bundler != nil && *config.Bundler {

@@ -10,3 +10,7 @@ func testSlice() {
 	fmt.Println("[0]", args[0])
 	fmt.Println("[0:]", args[1:])
 }
+
+func testOrder() {
+	fmt.Println("Okfile.go testOrder")
+}

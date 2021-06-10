@@ -26,7 +26,7 @@ func (ok *Ok) Mount() map[string]error {
 		errorsLock: new(sync.Mutex),
 	}
 
-	tools := ok.Registry()
+	tools := funk.Reverse(ok.Registry()).([]tool.Tool)
 	tasks := make([][]Task, len(tools))
 	for i, t := range tools {
 		mountCtx.waitGroup.Add(1)

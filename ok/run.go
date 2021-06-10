@@ -57,6 +57,10 @@ func (ok *Ok) Run() error {
 		return errors.Wrapf(err, "failed to mount tool '%s'", task.Tool.Name())
 	}
 
+	if ok.Options.Debug {
+		fmt.Printf("%+v", task)
+	}
+
 	taskArgs, err := ok.Parser.ParseArgs(task.Params())
 	if err != nil {
 		return err

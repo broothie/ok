@@ -3,7 +3,6 @@ module github.com/broothie/ok
 go 1.16
 
 require (
-	github.com/alessio/shellescape v1.4.1
 	github.com/bmatcuk/doublestar v1.3.4
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/joho/godotenv v1.3.0

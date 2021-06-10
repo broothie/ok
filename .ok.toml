@@ -1,6 +1,12 @@
 
 #debug = true
 
+tool_priority = [
+    "go",
+    "zsh",
+    "bash"
+]
+
 [ruby]
 #rails = true
 #bundler = true
