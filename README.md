@@ -42,7 +42,7 @@ This tool aims to do these things:
 
 I mostly work in Ruby, Go, and JS, and find that occasionally I just want to write a short method to try something out.
 Maybe hit an API endpoint, or just see the output of a function. Or even, like in this project, detect Go import groups
-with multiple double newlines (see `def ugly_imports` in `Okfile.rb`). Then again, I guess that's the whole point of a
+with multiple double newlines (see `ugly_imports` in `Okfile.rb`). Then again, I guess that's the whole point of a
 task runner in the first place, so maybe this is goal is redundant? ¯\_(ツ)_/¯
 
 ### Improved Task CLIs
@@ -52,6 +52,25 @@ arguments.
 
 Seriously though, why does Rake ask for square brackets to pass in arguments to tasks? Hugely inconvenient.
 ![Stack Overflow answers for passing args to Rake task](docs/rake_args_stack_overflow.png)
+
+To demonstrate, given Rake task:
+```ruby
+desc 'some task'
+task :things, [:arg_a, :arg_b] => :environment do |t, args|
+    arg_a, arg_b = args.values_at(:arg_a, :arg_b)
+    puts arg_a, arg_b
+end
+```
+
+invoking with rake looks like this:
+```shell
+$ rake 'things[aye,bee]'
+```
+
+now, with `ok`:
+```shell
+$ ok things aye bee
+```
 
 ### Aggregate tasks from several places
 
