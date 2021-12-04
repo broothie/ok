@@ -27,7 +27,7 @@ func New(version string, args []string) (*Ok, error) {
 
 	mapConfig := make(map[string]interface{})
 	config.ReadInConfig(&mapConfig)
-	return &Ok{Parser: parser, MapConfig: mapConfig}, nil
+	return &Ok{Version: version, Parser: parser, MapConfig: mapConfig}, nil
 }
 
 func Run(version string, args []string) error {
