@@ -1,4 +1,4 @@
-package ok
+package version
 
 import (
 	_ "embed"
@@ -8,6 +8,6 @@ import (
 //go:embed VERSION
 var version string
 
-func Version() string {
+func String() string {
 	return strings.TrimSpace(version)
 }

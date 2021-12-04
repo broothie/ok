@@ -5,6 +5,7 @@ import (
 
 	"github.com/broothie/ok/cli"
 	"github.com/broothie/ok/logger"
+	"github.com/broothie/ok/version"
 	"github.com/pkg/errors"
 )
 
@@ -20,9 +21,9 @@ func (ok *Ok) HandleOptions() (taskName string, halt bool, err error) {
 
 	ok.Options = options
 	if options.Help {
-		return "", true, cli.PrintHelp(os.Stdout, Version())
+		return "", true, cli.PrintHelp(os.Stdout, version.String())
 	} else if options.Version {
-		return "", true, cli.PrintVersion(os.Stdout, Version())
+		return "", true, cli.PrintVersion(os.Stdout, version.String())
 	} else if options.ListTools {
 		ok.List()
 		return "", true, nil
