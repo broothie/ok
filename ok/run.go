@@ -49,12 +49,12 @@ func (ok *Ok) Run() error {
 	mountErrors := ok.Mount()
 	foundTask := funk.Find(ok.TaskList, func(task Task) bool { return task.Name() == taskName })
 	if foundTask == nil {
-		return fmt.Errorf("no task found with name '%s'", taskName)
+		return fmt.Errorf("no task found with name %q", taskName)
 	}
 
 	task := foundTask.(Task)
 	if err, errPresent := mountErrors[task.Tool.Name()]; errPresent {
-		return errors.Wrapf(err, "failed to mount tool '%s'", task.Tool.Name())
+		return errors.Wrapf(err, "failed to mount tool %q", task.Tool.Name())
 	}
 
 	if ok.Options.Debug {

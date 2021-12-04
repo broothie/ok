@@ -45,16 +45,6 @@ func (l ParamList) ToParameters(forward bool) Parameters {
 	return Parameters{ParamList: l, Forward: forward}
 }
 
-func (l ParamList) Lookup(name string) (Parameter, bool) {
-	for _, param := range l {
-		if param.Name == name {
-			return param, true
-		}
-	}
-
-	return Parameter{}, false
-}
-
 func (l ParamList) Positional() ParamList {
 	positionalParams := make([]Parameter, 0, len(l))
 	for _, param := range l {

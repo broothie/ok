@@ -57,12 +57,12 @@ func (ok *Ok) Init() error {
 	toolName := ok.Options.Init
 	tool := ok.Tool(toolName)
 	if tool == nil {
-		return fmt.Errorf("no tool called '%s'", toolName)
+		return fmt.Errorf("no tool called %q", toolName)
 	}
 
 	logger.Ok.Printf("initializing %s...", toolName)
 	if err := tool.Init(); err != nil {
-		return errors.Wrapf(err, "failed to init tool '%s'", toolName)
+		return errors.Wrapf(err, "failed to init tool %q", toolName)
 	}
 
 	return nil

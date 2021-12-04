@@ -40,17 +40,17 @@ func (t Tool) Init() error {
 	file, err := os.OpenFile(t.ToolFilename, os.O_CREATE|os.O_RDWR, 0666)
 	if err != nil {
 		if os.IsExist(err) {
-			return fmt.Errorf("file '%s' already exists", t.ToolFilename)
+			return fmt.Errorf("file %q already exists", t.ToolFilename)
 		}
 
-		return errors.Wrapf(err, "failed to create file '%s'", t.ToolFilename)
+		return errors.Wrapf(err, "failed to create file %q", t.ToolFilename)
 	}
 
 	if _, err := fmt.Fprint(file, t.ToolInitContent); err != nil {
-		return errors.Wrapf(err, "could not write to file '%s'", t.ToolFilename)
+		return errors.Wrapf(err, "could not write to file %q", t.ToolFilename)
 	}
 
-	return errors.Wrapf(file.Close(), "could not close file '%s'", t.ToolFilename)
+	return errors.Wrapf(file.Close(), "could not close file %q", t.ToolFilename)
 }
 
 func (t Tool) Check() error {
@@ -91,7 +91,7 @@ func (t Tool) Mount() ([]task.Task, error) {
 		if t.ParamParser != nil {
 			var err error
 			if params, err = t.ParamParser(paramString); err != nil {
-				errs.Add(errors.Wrapf(err, "failed to parse params for task '%s' from tool '%s'", taskName, t.Name()))
+				errs.Add(errors.Wrapf(err, "failed to parse params for task %q from tool %q", taskName, t.Name()))
 				continue
 			}
 		}

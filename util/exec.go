@@ -3,30 +3,27 @@ package util
 import (
 	"os"
 	"os/exec"
-	"sync"
 	"syscall"
 
 	"github.com/pkg/errors"
 )
 
 type ExecProcess struct {
-	*exec.Cmd
-	killed    bool
-	waiter    *sync.WaitGroup
-	waitError error
+	Cmd           *exec.Cmd
+	killChan      chan struct{}
+	killErrorChan chan error
 }
 
-func (p ExecProcess) Kill() error {
-	p.killed = true
-	return syscall.Kill(-p.Process.Pid, syscall.SIGKILL)
+func (p *ExecProcess) Kill() error {
+	close(p.killChan)
+	return <-p.killErrorChan
 }
 
-func (p ExecProcess) Wait() error {
-	p.waiter.Wait()
-	return p.waitError
+func (p *ExecProcess) Wait() error {
+	return p.Cmd.Wait()
 }
 
-func Exec(name string, arg ...string) (ExecProcess, error) {
+func Exec(name string, arg ...string) (*ExecProcess, error) {
 	cmd := exec.Command(name, arg...)
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 	cmd.Stdin = os.Stdin
@@ -34,19 +31,18 @@ func Exec(name string, arg ...string) (ExecProcess, error) {
 	cmd.Stderr = os.Stderr
 
 	if err := cmd.Start(); err != nil {
-		return ExecProcess{}, errors.Wrap(err, "")
+		return nil, errors.Wrap(err, "failed to start command")
 	}
 
-	process := ExecProcess{Cmd: cmd, waiter: new(sync.WaitGroup)}
-	process.waiter.Add(1)
+	process := &ExecProcess{
+		Cmd:           cmd,
+		killChan:      make(chan struct{}),
+		killErrorChan: make(chan error),
+	}
+
 	go func() {
-		defer process.waiter.Done()
-
-		if process.killed || (process.ProcessState != nil && process.ProcessState.Exited()) {
-			return
-		}
-
-		process.waitError = cmd.Wait()
+		<-process.killChan
+		process.killErrorChan <- syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
 	}()
 
 	return process, nil

@@ -27,14 +27,14 @@ func (Tool) Name() string {
 func (Tool) Init() error {
 	file, err := os.Create(filename)
 	if err != nil {
-		return errors.Wrapf(err, "failed to create file '%s'", filename)
+		return errors.Wrapf(err, "failed to create file %q", filename)
 	}
 
 	if _, err := fmt.Fprint(file, initContents); err != nil {
-		return errors.Wrapf(err, "failed to init file '%s'", filename)
+		return errors.Wrapf(err, "failed to init file %q", filename)
 	}
 
-	return errors.Wrapf(file.Close(), "failed to close file '%s'", filename)
+	return errors.Wrapf(file.Close(), "failed to close file %q", filename)
 }
 
 func (Tool) Check() error {

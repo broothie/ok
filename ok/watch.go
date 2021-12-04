@@ -22,12 +22,12 @@ func (ok *Ok) runWatcher(t task.Task, args task.Args) error {
 	for _, watchPattern := range ok.Options.Watches {
 		filenames, err := doublestar.Glob(watchPattern)
 		if err != nil {
-			return errors.Wrapf(err, "failed to glob '%s'", watchPattern)
+			return errors.Wrapf(err, "failed to glob %q", watchPattern)
 		}
 
 		for _, filename := range filenames {
 			if err := watcher.Add(filename); err != nil {
-				return errors.Wrapf(err, "failed to add file '%s' to watches", filename)
+				return errors.Wrapf(err, "failed to add file %q to watches", filename)
 			}
 		}
 	}

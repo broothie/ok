@@ -33,18 +33,18 @@ func ReadInEnv(v interface{}) {
 func ReadInConfig(v interface{}) {
 	filenames, err := doublestar.Glob(configFileGlob)
 	if err != nil {
-		logger.Ok.Printf("failed to glob for '%s'", configFileGlob)
+		logger.Ok.Printf("failed to glob for %q", configFileGlob)
 	}
 
 	for _, filename := range filenames {
 		file, err := os.Open(filename)
 		if err != nil {
-			logger.Ok.Printf("failed to read config file '%s': %v", filename, err)
+			logger.Ok.Printf("failed to read config file %q: %v", filename, err)
 			continue
 		}
 
 		if err := toml.NewDecoder(file).Decode(v); err != nil {
-			logger.Ok.Printf("failed to decode config file '%s': %v", filename, err)
+			logger.Ok.Printf("failed to decode config file %q: %v", filename, err)
 			continue
 		}
 	}

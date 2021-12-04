@@ -29,17 +29,17 @@ func (Tool) Init() error {
 	file, err := os.OpenFile(filename, os.O_CREATE|os.O_RDWR, 0666)
 	if err != nil {
 		if os.IsExist(err) {
-			return fmt.Errorf("file '%s' already exists", filename)
+			return fmt.Errorf("file %q already exists", filename)
 		}
 
-		return errors.Wrapf(err, "failed to create file '%s'", filename)
+		return errors.Wrapf(err, "failed to create file %q", filename)
 	}
 
 	if _, err := fmt.Fprint(file, initContents); err != nil {
-		return errors.Wrapf(err, "failed to init file '%s'", filename)
+		return errors.Wrapf(err, "failed to init file %q", filename)
 	}
 
-	return errors.Wrapf(file.Close(), "failed to close file '%s'", filename)
+	return errors.Wrapf(file.Close(), "failed to close file %q", filename)
 }
 
 func (Tool) Check() error {

@@ -31,7 +31,7 @@ func (ok *Ok) HandleOptions() (taskName string, halt bool, err error) {
 	} else if taskName == "" {
 		if mountErrors := ok.Mount(); len(mountErrors) != 0 {
 			for toolName, err := range mountErrors {
-				logger.Tool(toolName).Print(errors.Wrapf(err, "failed to mount tool '%s'", toolName))
+				logger.Tool(toolName).Print(errors.Wrapf(err, "failed to mount tool %q", toolName))
 			}
 		}
 

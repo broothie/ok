@@ -85,11 +85,11 @@ var options = []Option{
 		Short:       false,
 		Description: "Time to wait for each tool to mount.",
 		ArgName:     "3s",
-		Hidden:       false,
+		Hidden:      false,
 		OptionSetter: func(options *Options, timeoutString string) {
 			timeout, err := time.ParseDuration(timeoutString)
 			if err != nil {
-				logger.Ok.Printf("failed to parse arg for --timeout: '%s'", timeoutString)
+				logger.Ok.Printf("failed to parse arg for --timeout: %q", timeoutString)
 				return
 			}
 

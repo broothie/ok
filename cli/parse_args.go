@@ -25,7 +25,7 @@ func (p *Parser) ParseArgs(params task.Parameters) (task.Args, error) {
 			argSansDash := dashPrefix.ReplaceAllString(rawArg, "")
 			param, paramFound := params.KeywordAt(argSansDash)
 			if !paramFound {
-				return task.Args{}, fmt.Errorf("invalid keyword arg '%s'", rawArg)
+				return task.Args{}, fmt.Errorf("invalid keyword arg %q", rawArg)
 			}
 
 			if param.Type == task.Bool {
@@ -43,7 +43,7 @@ func (p *Parser) ParseArgs(params task.Parameters) (task.Args, error) {
 
 			valueArg, valuePresent := p.peek(1)
 			if !valuePresent {
-				return task.Args{}, fmt.Errorf("no value provided to keyword arg '%s'", rawArg)
+				return task.Args{}, fmt.Errorf("no value provided to keyword arg %q", rawArg)
 			}
 
 			arg, err := processArgWithParam(valueArg, param)

@@ -20,13 +20,13 @@ func (p *Parser) ParseOptions() (string, Options, error) {
 		if dashPrefix.MatchString(rawArg) {
 			flag, flagFound := flagMap[rawArg]
 			if !flagFound {
-				return "", Options{}, fmt.Errorf("invalid option: '%s'", rawArg)
+				return "", Options{}, fmt.Errorf("invalid option: %q", rawArg)
 			}
 
 			requiresNext := flag.ArgName != ""
 			next, ok := p.peek(1)
 			if requiresNext && !ok {
-				return "", Options{}, fmt.Errorf("no argument provided to option '%s'", rawArg)
+				return "", Options{}, fmt.Errorf("no argument provided to option %q", rawArg)
 			}
 
 			flag.OptionSetter(&p.options, next)

@@ -69,7 +69,7 @@ func (t Tool) Mount() ([]task.Task, error) {
 			case "string":
 				paramType = task.String
 			default:
-				return nil, fmt.Errorf("invalid type '%s'", currentType)
+				return nil, fmt.Errorf("invalid type %q", currentType)
 			}
 
 			params[i] = task.Parameter{Name: paramName, Type: paramType}

@@ -80,7 +80,7 @@ func paramListFromParamString(paramsString string) task.Parameters {
 			re = keywordMatcher
 			isKeyword = true
 		} else {
-			logger.Tool("ruby").Printf("error parsing param '%s'", paramString)
+			logger.Tool("ruby").Printf("error parsing param %q", paramString)
 			continue
 		}
 

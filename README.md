@@ -47,7 +47,7 @@ task runner in the first place, so maybe this is goal is redundant? ¯\_(ツ)_/�
 
 ### Improved Task CLIs
 
-This is mostly a dig at Rake, but in general, a lot of task runners don't seem to offer a good way (if any) to pass in 
+This is mostly a dig at Rake, but in general, a lot of task runners don't seem to offer a good way (if any) to pass in
 arguments.
 
 Seriously though, why does Rake ask for square brackets to pass in arguments to tasks? Hugely inconvenient.
@@ -55,8 +55,10 @@ Seriously though, why does Rake ask for square brackets to pass in arguments to 
 
 To demonstrate, given Rake task:
 ```ruby
+# Rakefile
+
 desc 'some task'
-task :things, [:arg_a, :arg_b] => :environment do |t, args|
+task :things, [:arg_a, :arg_b] do |t, args|
     arg_a, arg_b = args.values_at(:arg_a, :arg_b)
     puts arg_a, arg_b
 end
@@ -68,6 +70,15 @@ $ rake 'things[aye,bee]'
 ```
 
 now, with `ok`:
+```ruby
+# Okfile.rb
+
+# some task
+def things(arg_a, arg_b)
+    puts arg_a, arg_b
+end
+```
+
 ```shell
 $ ok things aye bee
 ```

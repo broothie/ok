@@ -51,7 +51,7 @@ func (ok *Ok) mountTool(ctx mountContext, tool tool.Tool, tasks *[]Task) {
 		start := time.Now()
 		defer func() {
 			if ok.Options.Debug {
-				logger.Debug.Printf("mounted '%s' in %v", toolName, time.Since(start))
+				logger.Debug.Printf("mounted %q in %v", toolName, time.Since(start))
 			}
 		}()
 
@@ -64,13 +64,13 @@ func (ok *Ok) mountTool(ctx mountContext, tool tool.Tool, tasks *[]Task) {
 			if err != nil {
 				ctx.error(toolName, err)
 			} else if err := tool.Configure(decoder); err != nil {
-				ctx.error(toolName, errors.Wrapf(err, "failed to configure tool '%s'", toolName))
+				ctx.error(toolName, errors.Wrapf(err, "failed to configure tool %q", toolName))
 			}
 		}
 
 		toolTasks, err := tool.Mount()
 		if err != nil {
-			ctx.error(toolName, errors.Wrapf(err, "failed to mount tool '%s'", toolName))
+			ctx.error(toolName, errors.Wrapf(err, "failed to mount tool %q", toolName))
 			return
 		}
 
@@ -84,7 +84,7 @@ func (ok *Ok) mountTool(ctx mountContext, tool tool.Tool, tasks *[]Task) {
 		case <-done:
 			return
 		case <-timer.C:
-			ctx.error(toolName, fmt.Errorf("mounting '%s' took longer than %v", toolName, ok.Options.Timeout))
+			ctx.error(toolName, fmt.Errorf("mounting %q took longer than %v", toolName, ok.Options.Timeout))
 			return
 		}
 	}

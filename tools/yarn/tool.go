@@ -23,10 +23,10 @@ func (Tool) Name() string {
 func (Tool) Init() error {
 	_, err := os.OpenFile(filename, os.O_CREATE, 0)
 	if os.IsExist(err) {
-		return fmt.Errorf("file '%s' already exists", filename)
+		return fmt.Errorf("file %q already exists", filename)
 	}
 
-	return errors.Wrapf(err, "could not create file '%s'", filename)
+	return errors.Wrapf(err, "could not create file %q", filename)
 }
 
 func (Tool) Check() error {

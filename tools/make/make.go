@@ -11,7 +11,7 @@ import (
 const ToolName = "make"
 
 var (
-	ruleMatcher = regexp.MustCompile(`(?m)^(?P<taskName>[\w-]*?):[^=]?`)
+	ruleMatcher = regexp.MustCompile(`(?m)^(?P<taskName>[\w-.]*?):[^=]?`)
 
 	Make = ez.Tool{
 		ToolName:             ToolName,
