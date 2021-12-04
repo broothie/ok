@@ -42,7 +42,7 @@ func Exec(name string, arg ...string) (*ExecProcess, error) {
 
 	go func() {
 		<-process.killChan
-		process.killErrorChan <- syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
+		process.killErrorChan <- syscall.Kill(-cmd.Process.Pid, syscall.SIGTERM)
 	}()
 
 	return process, nil
