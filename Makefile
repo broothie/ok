@@ -1,4 +1,4 @@
-entrypoint=cmd/ok/ok.go
+entrypoint=main.go
 
 # Check all is okay
 check: test build clean
@@ -30,4 +30,4 @@ clean:
 
 # Bumps VERSION file
 bump:
-	bump version/VERSION
+	bump VERSION

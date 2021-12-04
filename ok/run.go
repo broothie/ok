@@ -10,13 +10,14 @@ import (
 )
 
 type Ok struct {
+	Version   string
 	Parser    *cli.Parser
 	Options   cli.Options
 	MapConfig map[string]interface{}
 	TaskList  []Task
 }
 
-func New(args []string) (*Ok, error) {
+func New(version string, args []string) (*Ok, error) {
 	var cfg config.Config
 	config.ReadConfigAndEnv(&cfg)
 	parser, err := cli.NewParser(args, cfg)
@@ -29,8 +30,8 @@ func New(args []string) (*Ok, error) {
 	return &Ok{Parser: parser, MapConfig: mapConfig}, nil
 }
 
-func Run(args []string) error {
-	ok, err := New(args)
+func Run(version string, args []string) error {
+	ok, err := New(version, args)
 	if err != nil {
 		return err
 	}
