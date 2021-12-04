@@ -1,10 +1,12 @@
 package util
 
 import (
+	"io"
 	"os"
 	"os/exec"
 	"syscall"
 
+	"github.com/broothie/ok/logger"
 	"github.com/pkg/errors"
 )
 
@@ -22,9 +24,19 @@ func (p *ExecProcess) Kill() error {
 func Exec(name string, arg ...string) (*ExecProcess, error) {
 	cmd := exec.Command(name, arg...)
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
-	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
+
+	stdin, err := cmd.StdinPipe()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get stdin pipe")
+	}
+
+	go func() {
+		if _, err := io.Copy(stdin, os.Stdin); err != nil {
+			logger.Ok.Printf("failed to pipe stdin: %v", err)
+		}
+	}()
 
 	if err := cmd.Start(); err != nil {
 		return nil, errors.Wrap(err, "failed to start command")
