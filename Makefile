@@ -1,11 +1,10 @@
-entrypoint=main.go
 
 # Check all is okay
 check: test build clean
 
 # Build locally into _ok
 build: generate
-	go build -o _ok $(entrypoint)
+	go build -o _ok main.go
 
 # Run tests with coverage
 test: generate
@@ -13,7 +12,7 @@ test: generate
 
 # Install ok locally
 install: generate
-	go install $(entrypoint)
+	go install .
 
 # Generate target
 task/type_string.go: task/type.go

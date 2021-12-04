@@ -3,7 +3,7 @@ package ok
 import (
 	"os"
 	"os/signal"
-	"sync"
+	"syscall"
 	"time"
 
 	"github.com/bmatcuk/doublestar"
@@ -14,8 +14,6 @@ import (
 )
 
 func (ok *Ok) runWatcher(t task.Task, args task.Args) error {
-	var wg sync.WaitGroup
-	defer wg.Wait()
 	watcher := watcher.New()
 	watcher.SetMaxEvents(1)
 
@@ -32,19 +30,21 @@ func (ok *Ok) runWatcher(t task.Task, args task.Args) error {
 		}
 	}
 
-	wg.Add(1)
 	go func() {
-		defer wg.Done()
-		var process task.RunningTask
+		process, err := t.Invoke(args)
+		if err != nil {
+			logger.Ok.Printf("failed to start task process: %v", err)
+		}
 
 		for {
 			select {
 			case <-watcher.Event:
 				if process != nil {
-					process.Kill()
+					if err := process.Kill(); err != nil {
+						logger.Ok.Printf("failed to kill process: %v", err)
+					}
 				}
 
-				var err error
 				process, err = t.Invoke(args)
 				if err != nil {
 					logger.Ok.Printf("failed to start task process: %v", err)
@@ -52,14 +52,18 @@ func (ok *Ok) runWatcher(t task.Task, args task.Args) error {
 
 			case err := <-watcher.Error:
 				if process != nil {
-					process.Kill()
+					if err := process.Kill(); err != nil {
+						logger.Ok.Printf("failed to kill process: %v", err)
+					}
 				}
 
-				logger.Ok.Println(err)
+				logger.Ok.Printf("watcher error: %v", err)
 
 			case <-watcher.Closed:
 				if process != nil {
-					process.Kill()
+					if err := process.Kill(); err != nil {
+						logger.Ok.Printf("failed to kill process: %v", err)
+					}
 				}
 
 				return
@@ -68,11 +72,9 @@ func (ok *Ok) runWatcher(t task.Task, args task.Args) error {
 	}()
 
 	kill := make(chan os.Signal)
-	signal.Notify(kill, os.Interrupt)
-	signal.Notify(kill, os.Kill)
-	wg.Add(1)
+	signal.Notify(kill, syscall.SIGINT)
+	signal.Notify(kill, syscall.SIGTERM)
 	go func() {
-		defer wg.Done()
 		<-kill
 		watcher.Close()
 	}()

@@ -2,9 +2,13 @@ package ok
 
 import (
 	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/broothie/ok/cli"
 	"github.com/broothie/ok/config"
+	"github.com/broothie/ok/logger"
 	"github.com/pkg/errors"
 	"github.com/thoas/go-funk"
 )
@@ -75,6 +79,16 @@ func (ok *Ok) Run() error {
 	if err != nil {
 		return errors.Wrap(err, "failed to start task process")
 	}
+
+	kill := make(chan os.Signal)
+	signal.Notify(kill, syscall.SIGINT)
+	signal.Notify(kill, syscall.SIGTERM)
+	go func() {
+		<-kill
+		if err := process.Kill(); err != nil {
+			logger.Ok.Printf("failed to kill process: %v", err)
+		}
+	}()
 
 	return process.Wait()
 }

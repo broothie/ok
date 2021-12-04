@@ -9,7 +9,7 @@ import (
 )
 
 type ExecProcess struct {
-	Cmd           *exec.Cmd
+	*exec.Cmd
 	killChan      chan struct{}
 	killErrorChan chan error
 }
@@ -17,10 +17,6 @@ type ExecProcess struct {
 func (p *ExecProcess) Kill() error {
 	close(p.killChan)
 	return <-p.killErrorChan
-}
-
-func (p *ExecProcess) Wait() error {
-	return p.Cmd.Wait()
 }
 
 func Exec(name string, arg ...string) (*ExecProcess, error) {
