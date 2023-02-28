@@ -5,6 +5,7 @@ import "fmt"
 type OkArgs struct {
 	Help      bool
 	ListTools bool
+	Watches   []string
 	TaskName  string
 }
 
@@ -19,6 +20,15 @@ func (p *Parser) ParseOkArgs() (OkArgs, error) {
 		case "--tools":
 			okArgs.ListTools = true
 			p.index += 1
+
+		case "-w", "--watch":
+			watch, present := p.peek(1)
+			if !present {
+				return OkArgs{}, fmt.Errorf("no value provided for %q", p.current())
+			}
+
+			okArgs.Watches = append(okArgs.Watches, watch)
+			p.index += 2
 
 		default:
 			if p.currentIsFlag() {

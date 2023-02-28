@@ -74,7 +74,7 @@ func (Tool) ProcessFile(path string) ([]tool.Task, error) {
 			}
 		}
 
-		return Task{name: name, parameters: params, rubyCode: &ruby}, true
+		return Task{name: name, parameters: params}, true
 	}), nil
 }
 

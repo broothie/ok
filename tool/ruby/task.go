@@ -15,7 +15,6 @@ import (
 type Task struct {
 	name       string
 	parameters parameter.Parameters
-	rubyCode   *string
 }
 
 func (t Task) Name() string {
@@ -60,5 +59,5 @@ func (t Task) generatedRubyCode(args argument.Arguments) string {
 	}
 
 	argString := strings.Join(argStrings, ", ")
-	return fmt.Sprintf("at_exit { %s(%s) };\n\n %s", t.name, argString, *t.rubyCode)
+	return fmt.Sprintf("at_exit { %s(%s) }\n\n require '%s'", t.name, argString, "./Okfile.rb")
 }

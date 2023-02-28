@@ -3,7 +3,9 @@ module github.com/broothie/ok
 go 1.18
 
 require (
+	github.com/bmatcuk/doublestar/v4 v4.6.0
 	github.com/pkg/errors v0.9.1
+	github.com/radovskyb/watcher v1.0.7
 	github.com/samber/lo v1.37.0
 	github.com/stretchr/testify v1.8.2
 )
