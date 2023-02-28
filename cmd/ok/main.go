@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"os/signal"
 	"strings"
 	"time"
 
@@ -56,11 +55,48 @@ func main() {
 		logger.Log.Fatalf("failed to parse task args: %v", err)
 	}
 
+	if len(okArgs.Watches) == 0 {
+		if err := task.Run(context.Background(), args); err != nil {
+			logger.Log.Printf("failed to run task %q: %v", task.Name(), err)
+		}
+
+		return
+	}
+
+	watcher := newWatcher(okArgs.Watches)
+	defer watcher.Close()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	go func() {
+		taskCtx, taskCancel := context.WithCancel(ctx)
+		go runTask(taskCtx, task, args)
+
+		for range watcher.Event {
+			taskCancel()
+			taskCtx, taskCancel = context.WithCancel(ctx)
+			go runTask(taskCtx, task, args)
+		}
+	}()
+
+	if err := watcher.Start(100 * time.Millisecond); err != nil {
+		logger.Log.Fatalf("failed to start watching files: %v", err)
+	}
+}
+
+func runTask(ctx context.Context, task tool.Task, args argument.Arguments) {
+	if err := task.Run(ctx, args); err != nil && !strings.HasSuffix(err.Error(), "signal: killed") {
+		logger.Log.Printf("failed to run task %q: %v", task.Name(), err)
+	}
+}
+
+func newWatcher(watches []string) *watcher.Watcher {
 	watcher := watcher.New()
 	watcher.SetMaxEvents(1)
 	defer watcher.Close()
 
-	for _, watch := range okArgs.Watches {
+	for _, watch := range watches {
 		matches, err := doublestar.FilepathGlob(watch)
 		if err != nil {
 			logger.Log.Fatalf("failed to glob pattern %q: %v", watch, err)
@@ -84,46 +120,5 @@ func main() {
 		}
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	interruptChan := make(chan os.Signal, 1)
-	signal.Notify(interruptChan, os.Interrupt)
-	go func() {
-		<-interruptChan
-		cancel()
-	}()
-
-	go func() {
-		taskCtx, taskCancel := context.WithCancel(ctx)
-		go runTask(taskCtx, task, args, cancel)
-
-		for {
-			select {
-			case <-ctx.Done():
-				watcher.Close()
-
-			case <-watcher.Event:
-				taskCancel()
-				taskCtx, taskCancel = context.WithCancel(ctx)
-				go runTask(taskCtx, task, args, cancel)
-			}
-		}
-	}()
-
-	if err := watcher.Start(100 * time.Millisecond); err != nil {
-		logger.Log.Fatalf("failed to start watching files: %v", err)
-	}
-}
-
-func runTask(ctx context.Context, task tool.Task, args argument.Arguments, done func()) {
-	if err := task.Run(ctx, args); err != nil {
-		if !strings.HasSuffix(err.Error(), "signal: killed") {
-			logger.Log.Printf("failed to run task %q: %v", task.Name(), err)
-		}
-
-		return
-	}
-
-	done()
+	return watcher
 }
