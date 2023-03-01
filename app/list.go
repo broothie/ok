@@ -1,4 +1,4 @@
-package ok
+package app
 
 import (
 	"fmt"
@@ -12,14 +12,15 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (ok *Ok) ListTasks() error {
-	rows := []string{strings.Join([]string{"TASK", "TOOL", "FILE"}, "\t")}
+func (ok *App) ListTasks() error {
+	var rows []string
 	for _, task := range ok.Tasks() {
-		row := []string{taskString(task), task.Tool.Name(), task.Filename}
+		row := []string{task.Name(), paramsString(task.Parameters()), task.Filename}
 		rows = append(rows, strings.Join(row, "\t"))
 	}
 
 	sort.Strings(rows)
+	rows = append([]string{strings.Join([]string{"TASK", "ARGS", "FILE"}, "\t")}, rows...)
 
 	table := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
 	if _, err := fmt.Fprintln(table, strings.Join(rows, "\n")); err != nil {
@@ -31,15 +32,6 @@ func (ok *Ok) ListTasks() error {
 	}
 
 	return nil
-}
-
-func taskString(task Task) string {
-	fields := []string{task.Name()}
-	if params := paramsString(task.Parameters()); params != "" {
-		fields = append(fields, params)
-	}
-
-	return strings.Join(fields, " ")
 }
 
 func paramsString(params parameter.Parameters) string {
@@ -55,8 +47,8 @@ func paramsString(params parameter.Parameters) string {
 	return strings.Join(fields, " ")
 }
 
-func (ok *Ok) ListTools() error {
-	rows := []string{strings.Join([]string{"NAME", "STATUS", "EXECUTABLE"}, "\t")}
+func (ok *App) ListTools() error {
+	var rows []string
 	for _, tool := range ok.Tools {
 		status := "ok"
 		executable, err := exec.LookPath(tool.CommandName())
@@ -69,6 +61,7 @@ func (ok *Ok) ListTools() error {
 	}
 
 	sort.Strings(rows)
+	rows = append([]string{strings.Join([]string{"NAME", "STATUS", "EXECUTABLE"}, "\t")}, rows...)
 
 	table := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
 	if _, err := fmt.Fprintln(table, strings.Join(rows, "\n")); err != nil {

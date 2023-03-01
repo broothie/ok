@@ -9,6 +9,7 @@ import (
 
 	"github.com/bmatcuk/doublestar/v4"
 	"github.com/broothie/ok"
+	"github.com/broothie/ok/app"
 	"github.com/broothie/ok/argument"
 	"github.com/broothie/ok/cli"
 	"github.com/broothie/ok/logger"
@@ -24,13 +25,21 @@ func main() {
 	}
 
 	if okArgs.Help {
-		fmt.Println("helping...")
+		if err := cli.Help(); err != nil {
+			logger.Log.Fatalf("failed to print help: %v", err)
+		}
+
 		return
 	}
 
-	ok := ok.NewAsConfigured()
+	if okArgs.Version {
+		fmt.Println(ok.Version())
+		return
+	}
+
+	app := app.NewAsConfigured()
 	if okArgs.ListTools {
-		if err := ok.ListTools(); err != nil {
+		if err := app.ListTools(); err != nil {
 			logger.Log.Fatalf("failed to list tools: %v", err)
 		}
 
@@ -38,14 +47,14 @@ func main() {
 	}
 
 	if okArgs.TaskName == "" {
-		if err := ok.ListTasks(); err != nil {
+		if err := app.ListTasks(); err != nil {
 			logger.Log.Fatalf("failed to list tasks: %v", err)
 		}
 
 		return
 	}
 
-	task, found := ok.Task(okArgs.TaskName)
+	task, found := app.Task(okArgs.TaskName)
 	if !found {
 		logger.Log.Fatalf("no task found with name %q", okArgs.TaskName)
 	}

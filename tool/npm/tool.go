@@ -1,13 +1,9 @@
 package npm
 
 import (
-	"context"
 	"encoding/json"
 	"os"
-	"os/exec"
 
-	"github.com/broothie/ok/argument"
-	"github.com/broothie/ok/parameter"
 	"github.com/broothie/ok/tool"
 	"github.com/pkg/errors"
 	"github.com/samber/lo"
@@ -20,7 +16,7 @@ type packageJSON struct {
 type Tool struct{}
 
 func (Tool) Name() string {
-	return "npm"
+	return "NPM"
 }
 
 func (Tool) CommandName() string {
@@ -47,32 +43,4 @@ func (Tool) ProcessFile(path string) ([]tool.Task, error) {
 	}
 
 	return lo.Map(lo.Keys(packageJSON.Scripts), func(name string, _ int) tool.Task { return Task{name: name} }), nil
-}
-
-type Task struct {
-	name string
-}
-
-func (r Task) Name() string {
-	return r.name
-}
-
-func (r Task) Parameters() parameter.Parameters {
-	return nil
-}
-
-func (r Task) Run(ctx context.Context, args argument.Arguments) error {
-	commandArgs := []string{"run", r.name}
-	commandArgs = append(commandArgs, lo.Map(args, func(arg argument.Argument, _ int) string { return arg.Value })...)
-
-	cmd := exec.CommandContext(ctx, "npm", commandArgs...)
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-
-	if err := cmd.Run(); err != nil {
-		return errors.Wrap(err, "failed to run npm script")
-	}
-
-	return nil
 }

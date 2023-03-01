@@ -6,6 +6,14 @@ type Parameter struct {
 	Default *string
 }
 
+func NewRequired(name string, t Type) Parameter {
+	return Parameter{Name: name, Type: t}
+}
+
+func NewOptional(name string, t Type, dfault string) Parameter {
+	return Parameter{Name: name, Type: t, Default: &dfault}
+}
+
 func (p Parameter) IsRequired() bool {
 	return p.Default == nil
 }

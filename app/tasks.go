@@ -1,4 +1,4 @@
-package ok
+package app
 
 import (
 	"fmt"
@@ -16,17 +16,17 @@ type Task struct {
 	Filename string
 }
 
-func (ok *Ok) Tasks() map[string]Task {
+func (ok *App) Tasks() map[string]Task {
 	ok.tasksOnce.Do(func() { ok.tasks = ok.collectTasks() })
 	return ok.tasks
 }
 
-func (ok *Ok) Task(name string) (Task, bool) {
+func (ok *App) Task(name string) (Task, bool) {
 	task, found := ok.Tasks()[name]
 	return task, found
 }
 
-func (ok *Ok) collectTasks() map[string]Task {
+func (ok *App) collectTasks() map[string]Task {
 	tasks := make(map[string]Task)
 	for _, tool := range ok.Tools {
 		paths := append(tool.Filenames(), lo.FlatMap(tool.Extensions(), func(extension string, _ int) []string {

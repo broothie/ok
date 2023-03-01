@@ -1,4 +1,4 @@
-package ok
+package app
 
 import (
 	"sync"
@@ -7,15 +7,15 @@ import (
 	"github.com/samber/lo"
 )
 
-type Ok struct {
+type App struct {
 	Tools map[string]tool.Tool
 
 	tasks     map[string]Task
 	tasksOnce *sync.Once
 }
 
-func New(tools []tool.Tool) *Ok {
-	return &Ok{
+func New(tools []tool.Tool) *App {
+	return &App{
 		Tools: lo.Associate(tools, func(tool tool.Tool) (string, tool.Tool) { return tool.Name(), tool }),
 
 		tasks:     make(map[string]Task),
@@ -23,6 +23,6 @@ func New(tools []tool.Tool) *Ok {
 	}
 }
 
-func NewAsConfigured() *Ok {
+func NewAsConfigured() *App {
 	return New(Tools())
 }

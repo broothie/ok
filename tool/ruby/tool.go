@@ -19,7 +19,7 @@ var definitionRegexp = regexp.MustCompile(`^def (?P<name>\w[a-zA-Z0-9_]*)(?:\(?(
 type Tool struct{}
 
 func (Tool) Name() string {
-	return "ruby"
+	return "Ruby"
 }
 
 func (Tool) CommandName() string {
@@ -41,7 +41,6 @@ func (Tool) ProcessFile(path string) ([]tool.Task, error) {
 	}
 
 	ruby := string(content)
-
 	return lo.FilterMap(strings.Split(ruby, "\n"), func(line string, _ int) (tool.Task, bool) {
 		captures := util.NamedCaptureGroups(definitionRegexp, line)
 		if len(captures) == 0 {
@@ -51,30 +50,23 @@ func (Tool) ProcessFile(path string) ([]tool.Task, error) {
 		name := captures["name"]
 		paramList := captures["paramList"]
 		var params parameter.Parameters
-		for _, arg := range util.SplitCommaParamList(paramList) {
-			fields := strings.Fields(arg)
+		for _, param := range util.SplitCommaParamList(paramList) {
+			fields := strings.Fields(param)
 			switch len(fields) {
 			case 1:
-				name := fields[0]
-				params = append(params, parameter.Parameter{
-					Name: name,
-					Type: parameter.TypeString,
-				})
+				paramName := fields[0]
+				params = append(params, parameter.NewRequired(paramName, parameter.TypeString))
 
 			case 2:
-				name, dflt := fields[0], fields[1]
-				params = append(params, parameter.Parameter{
-					Name:    strings.TrimSuffix(name, ":"),
-					Type:    parseType(dflt),
-					Default: &dflt,
-				})
+				paramName, paramDefault := fields[0], fields[1]
+				params = append(params, parameter.NewOptional(strings.TrimSuffix(paramName, ":"), parseType(paramDefault), paramDefault))
 
 			default:
-				logger.Log.Println("invalid parameter:", arg)
+				logger.Log.Printf("invalid parameter in %q: %s", name, param)
 			}
 		}
 
-		return Task{name: name, parameters: params}, true
+		return Task{name: name, parameters: params, filename: path}, true
 	}), nil
 }
 

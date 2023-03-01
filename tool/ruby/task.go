@@ -3,18 +3,18 @@ package ruby
 import (
 	"context"
 	"fmt"
-	"os"
-	"os/exec"
 	"strings"
 
 	"github.com/broothie/ok/argument"
 	"github.com/broothie/ok/parameter"
+	"github.com/broothie/ok/util"
 	"github.com/pkg/errors"
 )
 
 type Task struct {
 	name       string
 	parameters parameter.Parameters
+	filename   string
 }
 
 func (t Task) Name() string {
@@ -26,12 +26,7 @@ func (t Task) Parameters() parameter.Parameters {
 }
 
 func (t Task) Run(ctx context.Context, args argument.Arguments) error {
-	cmd := exec.CommandContext(ctx, "ruby", "-e", t.generatedRubyCode(args))
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-
-	if err := cmd.Run(); err != nil {
+	if err := util.CommandContext(ctx, "ruby", "-e", t.generatedRubyCode(args)).Run(); err != nil {
 		return errors.Wrap(err, "failed to run ruby command")
 	}
 
@@ -59,5 +54,5 @@ func (t Task) generatedRubyCode(args argument.Arguments) string {
 	}
 
 	argString := strings.Join(argStrings, ", ")
-	return fmt.Sprintf("at_exit { %s(%s) }\n\n require '%s'", t.name, argString, "./Okfile.rb")
+	return fmt.Sprintf("at_exit { %s(%s) }\n\nrequire './%s'", t.name, argString, t.filename)
 }
