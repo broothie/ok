@@ -25,7 +25,7 @@ func (Tool) Name() string {
 	return "Python"
 }
 
-func (t Tool) CommandName() string {
+func (t Tool) Executable() string {
 	return "python3"
 }
 

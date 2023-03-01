@@ -19,7 +19,7 @@ func (Tool) Name() string {
 	return "Make"
 }
 
-func (Tool) CommandName() string {
+func (Tool) Executable() string {
 	return "make"
 }
 

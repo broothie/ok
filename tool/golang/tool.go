@@ -21,7 +21,7 @@ func (Tool) Name() string {
 	return "Go"
 }
 
-func (Tool) CommandName() string {
+func (Tool) Executable() string {
 	return "go"
 }
 

@@ -22,7 +22,7 @@ func (Tool) Name() string {
 	return "Ruby"
 }
 
-func (Tool) CommandName() string {
+func (Tool) Executable() string {
 	return "ruby"
 }
 

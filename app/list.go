@@ -51,7 +51,7 @@ func (ok *App) ListTools() error {
 	var rows []string
 	for _, tool := range ok.Tools {
 		status := "ok"
-		executable, err := exec.LookPath(tool.CommandName())
+		executable, err := exec.LookPath(tool.Executable())
 		if err != nil {
 			status = err.Error()
 		}
