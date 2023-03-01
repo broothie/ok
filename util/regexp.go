@@ -4,8 +4,12 @@ import "regexp"
 
 var paramListCommaSplitter = regexp.MustCompile(`\s*,\s*`)
 
-func SplitCommaParamList(argList string) []string {
-	return paramListCommaSplitter.Split(argList, -1)
+func SplitCommaParamList(paramList string) []string {
+	if paramList == "" {
+		return nil
+	}
+
+	return paramListCommaSplitter.Split(paramList, -1)
 }
 
 // NamedCaptureGroups pulled from https://stackoverflow.com/questions/20750843/using-named-matches-from-go-regex
