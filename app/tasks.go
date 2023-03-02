@@ -16,19 +16,19 @@ type Task struct {
 	Filename string
 }
 
-func (ok *App) Tasks() map[string]Task {
-	ok.tasksOnce.Do(func() { ok.tasks = ok.collectTasks() })
-	return ok.tasks
+func (app *App) Tasks() map[string]Task {
+	app.tasksOnce.Do(func() { app.tasks = app.collectTasks() })
+	return app.tasks
 }
 
-func (ok *App) Task(name string) (Task, bool) {
-	task, found := ok.Tasks()[name]
+func (app *App) Task(name string) (Task, bool) {
+	task, found := app.Tasks()[name]
 	return task, found
 }
 
-func (ok *App) collectTasks() map[string]Task {
+func (app *App) collectTasks() map[string]Task {
 	tasks := make(map[string]Task)
-	for _, tool := range ok.Tools {
+	for _, tool := range app.Tools {
 		paths := append(tool.Filenames(), lo.FlatMap(tool.Extensions(), func(extension string, _ int) []string {
 			okfiles := []string{fmt.Sprintf("Okfile.%s", extension)}
 			subOkFiles, err := filepath.Glob(fmt.Sprintf("okfiles/*.%s", extension))

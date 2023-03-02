@@ -12,9 +12,9 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (ok *App) ListTasks() error {
+func (app *App) ListTasks() error {
 	var rows []string
-	for _, task := range ok.Tasks() {
+	for _, task := range app.Tasks() {
 		row := []string{task.Name(), paramsString(task.Parameters()), task.Filename}
 		rows = append(rows, strings.Join(row, "\t"))
 	}
@@ -47,9 +47,9 @@ func paramsString(params parameter.Parameters) string {
 	return strings.Join(fields, " ")
 }
 
-func (ok *App) ListTools() error {
+func (app *App) ListTools() error {
 	var rows []string
-	for _, tool := range ok.Tools {
+	for _, tool := range app.Tools {
 		status := "ok"
 		executable, err := exec.LookPath(tool.Executable())
 		if err != nil {
