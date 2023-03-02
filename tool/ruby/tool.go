@@ -7,8 +7,7 @@ import (
 	"strings"
 
 	"github.com/broothie/ok/logger"
-	"github.com/broothie/ok/parameter"
-	"github.com/broothie/ok/tool"
+	"github.com/broothie/ok/task"
 	"github.com/broothie/ok/util"
 	"github.com/pkg/errors"
 	"github.com/samber/lo"
@@ -34,14 +33,14 @@ func (Tool) Extensions() []string {
 	return []string{"rb"}
 }
 
-func (Tool) ProcessFile(path string) ([]tool.Task, error) {
+func (Tool) ProcessFile(path string) ([]task.Task, error) {
 	content, err := os.ReadFile(path)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to read ruby file")
 	}
 
 	ruby := string(content)
-	return lo.FilterMap(strings.Split(ruby, "\n"), func(line string, _ int) (tool.Task, bool) {
+	return lo.FilterMap(strings.Split(ruby, "\n"), func(line string, _ int) (task.Task, bool) {
 		captures := util.NamedCaptureGroups(definitionRegexp, line)
 		if len(captures) == 0 {
 			return nil, false
@@ -49,17 +48,17 @@ func (Tool) ProcessFile(path string) ([]tool.Task, error) {
 
 		name := captures["name"]
 		paramList := captures["paramList"]
-		var params parameter.Parameters
+		var params task.Parameters
 		for _, param := range util.SplitCommaParamList(paramList) {
 			fields := strings.Fields(param)
 			switch len(fields) {
 			case 1:
 				paramName := fields[0]
-				params = append(params, parameter.NewRequired(paramName, parameter.TypeString))
+				params = append(params, task.NewRequired(paramName, task.TypeString))
 
 			case 2:
 				paramName, paramDefault := fields[0], fields[1]
-				params = append(params, parameter.NewOptional(strings.TrimSuffix(paramName, ":"), parseType(paramDefault), paramDefault))
+				params = append(params, task.NewOptional(strings.TrimSuffix(paramName, ":"), parseType(paramDefault), paramDefault))
 
 			default:
 				logger.Log.Printf("invalid parameter in %q: %s", name, param)
@@ -70,15 +69,15 @@ func (Tool) ProcessFile(path string) ([]tool.Task, error) {
 	}), nil
 }
 
-func parseType(param string) parameter.Type {
+func parseType(param string) task.Type {
 	if param == "false" || param == "true" {
-		return parameter.TypeBool
+		return task.TypeBool
 	} else if lo.Every([]rune("1234567890_"), []rune(param)) {
-		return parameter.TypeInt
+		return task.TypeInt
 	} else if lo.Every([]rune("1234567890_."), []rune(param)) {
-		return parameter.TypeFloat
+		return task.TypeFloat
 	} else if (strings.HasPrefix(param, `"`) && strings.HasSuffix(param, `"`)) || (strings.HasPrefix(param, `'`) && strings.HasSuffix(param, `'`)) {
-		return parameter.TypeString
+		return task.TypeString
 	} else {
 		panic(fmt.Sprintf("invalid type %q", param))
 	}

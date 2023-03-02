@@ -8,7 +8,7 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	"github.com/broothie/ok/parameter"
+	"github.com/broothie/ok/task"
 	"github.com/pkg/errors"
 )
 
@@ -34,7 +34,7 @@ func (app *App) ListTasks() error {
 	return nil
 }
 
-func paramsString(params parameter.Parameters) string {
+func paramsString(params task.Parameters) string {
 	var fields []string
 	for _, param := range params {
 		if param.IsRequired() {

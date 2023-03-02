@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"os"
 
-	"github.com/broothie/ok/tool"
+	"github.com/broothie/ok/task"
 	"github.com/pkg/errors"
 	"github.com/samber/lo"
 )
@@ -31,7 +31,7 @@ func (Tool) Extensions() []string {
 	return nil
 }
 
-func (Tool) ProcessFile(path string) ([]tool.Task, error) {
+func (Tool) ProcessFile(path string) ([]task.Task, error) {
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to open file")
@@ -42,5 +42,5 @@ func (Tool) ProcessFile(path string) ([]tool.Task, error) {
 		return nil, errors.Wrap(err, "failed to parse file")
 	}
 
-	return lo.Map(lo.Keys(packageJSON.Scripts), func(name string, _ int) tool.Task { return Task{name: name} }), nil
+	return lo.Map(lo.Keys(packageJSON.Scripts), func(name string, _ int) task.Task { return Task{name: name} }), nil
 }

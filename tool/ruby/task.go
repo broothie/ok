@@ -5,15 +5,14 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/broothie/ok/argument"
-	"github.com/broothie/ok/parameter"
+	"github.com/broothie/ok/task"
 	"github.com/broothie/ok/util"
 	"github.com/pkg/errors"
 )
 
 type Task struct {
 	name       string
-	parameters parameter.Parameters
+	parameters task.Parameters
 	filename   string
 }
 
@@ -21,11 +20,11 @@ func (t Task) Name() string {
 	return t.name
 }
 
-func (t Task) Parameters() parameter.Parameters {
+func (t Task) Parameters() task.Parameters {
 	return t.parameters
 }
 
-func (t Task) Run(ctx context.Context, args argument.Arguments) error {
+func (t Task) Run(ctx context.Context, args task.Arguments) error {
 	if err := util.CommandContext(ctx, "ruby", "-e", t.generatedRubyCode(args)).Run(); err != nil {
 		return errors.Wrap(err, "failed to run ruby command")
 	}
@@ -33,22 +32,22 @@ func (t Task) Run(ctx context.Context, args argument.Arguments) error {
 	return nil
 }
 
-func (t Task) generatedRubyCode(args argument.Arguments) string {
+func (t Task) generatedRubyCode(args task.Arguments) string {
 	var argStrings []string
 	for _, arg := range args.Required() {
 		switch arg.Type {
-		case parameter.TypeBool, parameter.TypeInt, parameter.TypeFloat:
+		case task.TypeBool, task.TypeInt, task.TypeFloat:
 			argStrings = append(argStrings, arg.Value)
-		case parameter.TypeString:
+		case task.TypeString:
 			argStrings = append(argStrings, fmt.Sprintf("%q", arg.Value))
 		}
 	}
 
 	for _, arg := range args.Optional() {
 		switch arg.Type {
-		case parameter.TypeBool, parameter.TypeInt, parameter.TypeFloat:
+		case task.TypeBool, task.TypeInt, task.TypeFloat:
 			argStrings = append(argStrings, fmt.Sprintf("%s: %s", arg.Name, arg.Value))
-		case parameter.TypeString:
+		case task.TypeString:
 			argStrings = append(argStrings, fmt.Sprintf("%s: %q", arg.Name, arg.Value))
 		}
 	}

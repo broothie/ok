@@ -1,4 +1,4 @@
-package parameter
+package task
 
 type Parameter struct {
 	Name    string

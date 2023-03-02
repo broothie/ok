@@ -6,8 +6,7 @@ import (
 	"strings"
 
 	"github.com/broothie/ok/logger"
-	"github.com/broothie/ok/parameter"
-	"github.com/broothie/ok/tool"
+	"github.com/broothie/ok/task"
 	"github.com/broothie/ok/util"
 	"github.com/pkg/errors"
 	"github.com/samber/lo"
@@ -33,7 +32,7 @@ func (Tool) Extensions() []string {
 	return []string{"go"}
 }
 
-func (Tool) ProcessFile(path string) ([]tool.Task, error) {
+func (Tool) ProcessFile(path string) ([]task.Task, error) {
 	content, err := os.ReadFile(path)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to read ruby file")
@@ -41,7 +40,7 @@ func (Tool) ProcessFile(path string) ([]tool.Task, error) {
 
 	goCode := string(content)
 
-	return lo.FilterMap(strings.Split(goCode, "\n"), func(line string, _ int) (tool.Task, bool) {
+	return lo.FilterMap(strings.Split(goCode, "\n"), func(line string, _ int) (task.Task, bool) {
 		captures := util.NamedCaptureGroups(definitionRegexp, line)
 		if len(captures) == 0 {
 			return nil, false
@@ -49,28 +48,28 @@ func (Tool) ProcessFile(path string) ([]tool.Task, error) {
 
 		taskName := captures["name"]
 		paramList := captures["paramList"]
-		var params parameter.Parameters
+		var params task.Parameters
 		for _, param := range util.SplitCommaParamList(paramList) {
 			fields := strings.Fields(param)
 			paramName, paramType := fields[0], fields[1]
-			params = append(params, parameter.NewRequired(paramName, parseType(paramType)))
+			params = append(params, task.NewRequired(paramName, parseType(paramType)))
 		}
 
 		return Task{name: taskName, parameters: params, filename: path, goCode: &goCode}, true
 	}), nil
 }
 
-func parseType(paramType string) parameter.Type {
-	var typ parameter.Type
+func parseType(paramType string) task.Type {
+	var typ task.Type
 	switch paramType {
 	case "bool":
-		typ = parameter.TypeBool
+		typ = task.TypeBool
 	case "float32", "float64":
-		typ = parameter.TypeFloat
+		typ = task.TypeFloat
 	case "int", "int8", "int16", "int32", "int64":
-		typ = parameter.TypeInt
+		typ = task.TypeInt
 	case "string":
-		typ = parameter.TypeString
+		typ = task.TypeString
 	default:
 		logger.Log.Println("invalid type for: %s", paramType)
 	}

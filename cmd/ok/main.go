@@ -10,10 +10,9 @@ import (
 	"github.com/bmatcuk/doublestar/v4"
 	"github.com/broothie/ok"
 	"github.com/broothie/ok/app"
-	"github.com/broothie/ok/argument"
 	"github.com/broothie/ok/cli"
 	"github.com/broothie/ok/logger"
-	"github.com/broothie/ok/tool"
+	"github.com/broothie/ok/task"
 	"github.com/radovskyb/watcher"
 )
 
@@ -94,7 +93,7 @@ func main() {
 	}
 }
 
-func runTask(ctx context.Context, task tool.Task, args argument.Arguments) {
+func runTask(ctx context.Context, task task.Task, args task.Arguments) {
 	if err := task.Run(ctx, args); err != nil && !strings.HasSuffix(err.Error(), "signal: killed") {
 		logger.Log.Printf("failed to run task %q: %v", task.Name(), err)
 	}

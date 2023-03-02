@@ -6,12 +6,13 @@ import (
 	"path/filepath"
 
 	"github.com/broothie/ok/logger"
+	"github.com/broothie/ok/task"
 	"github.com/broothie/ok/tool"
 	"github.com/samber/lo"
 )
 
 type Task struct {
-	tool.Task
+	task.Task
 	Tool     tool.Tool
 	Filename string
 }
