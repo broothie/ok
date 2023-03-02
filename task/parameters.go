@@ -1,6 +1,11 @@
 package task
 
-import "github.com/samber/lo"
+import (
+	"fmt"
+	"strings"
+
+	"github.com/samber/lo"
+)
 
 type Type string
 
@@ -35,4 +40,17 @@ func (p Parameters) Optional() Parameters {
 
 func (p Parameters) Find(predicate func(Parameter) bool) (Parameter, bool) {
 	return lo.Find(p, predicate)
+}
+
+func (p Parameters) String() string {
+	var fields []string
+	for _, param := range p {
+		if param.IsRequired() {
+			fields = append(fields, fmt.Sprintf("<%s>", param.Name))
+		} else {
+			fields = append(fields, fmt.Sprintf("--%s=%s", param.Name, *param.Default))
+		}
+	}
+
+	return strings.Join(fields, " ")
 }

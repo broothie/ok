@@ -4,21 +4,18 @@ import (
 	"sync"
 
 	"github.com/broothie/ok/tool"
-	"github.com/samber/lo"
 )
 
 type App struct {
-	Tools map[string]tool.Tool
-
-	tasks     map[string]Task
+	Tools     tool.Tools
+	tasks     Tasks
 	tasksOnce *sync.Once
 }
 
 func New(tools []tool.Tool) *App {
 	return &App{
-		Tools: lo.Associate(tools, func(tool tool.Tool) (string, tool.Tool) { return tool.Name(), tool }),
-
-		tasks:     make(map[string]Task),
+		Tools:     tool.NewTools(tools),
+		tasks:     make(Tasks),
 		tasksOnce: new(sync.Once),
 	}
 }

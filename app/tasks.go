@@ -4,10 +4,14 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
+	"strings"
+	"text/tabwriter"
 
 	"github.com/broothie/ok/logger"
 	"github.com/broothie/ok/task"
 	"github.com/broothie/ok/tool"
+	"github.com/pkg/errors"
 	"github.com/samber/lo"
 )
 
@@ -17,17 +21,42 @@ type Task struct {
 	Filename string
 }
 
-func (app *App) Tasks() map[string]Task {
+type Tasks map[string]Task
+
+func (t Tasks) Task(name string) (Task, bool) {
+	task, found := t[name]
+	return task, found
+}
+
+func (t Tasks) Print() error {
+	var rows []string
+	for _, task := range t {
+		row := []string{task.Name(), task.Parameters().String(), task.Filename}
+		rows = append(rows, strings.Join(row, "\t"))
+	}
+
+	sort.Strings(rows)
+	header := strings.Join([]string{"TASK", "ARGS", "FILE"}, "\t")
+	rows = append([]string{header}, rows...)
+
+	table := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
+	if _, err := fmt.Fprintln(table, strings.Join(rows, "\n")); err != nil {
+		return errors.Wrap(err, "failed to write rows to table")
+	}
+
+	if err := table.Flush(); err != nil {
+		return errors.Wrap(err, "failed to write table")
+	}
+
+	return nil
+}
+
+func (app *App) Tasks() Tasks {
 	app.tasksOnce.Do(func() { app.tasks = app.collectTasks() })
 	return app.tasks
 }
 
-func (app *App) Task(name string) (Task, bool) {
-	task, found := app.Tasks()[name]
-	return task, found
-}
-
-func (app *App) collectTasks() map[string]Task {
+func (app *App) collectTasks() Tasks {
 	tasks := make(map[string]Task)
 	for _, tool := range app.Tools {
 		paths := append(tool.Filenames(), lo.FlatMap(tool.Extensions(), func(extension string, _ int) []string {

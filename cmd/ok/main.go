@@ -10,123 +10,123 @@ import (
 	"github.com/bmatcuk/doublestar/v4"
 	"github.com/broothie/ok"
 	"github.com/broothie/ok/app"
-	"github.com/broothie/ok/cli"
+	"github.com/broothie/ok/arg"
 	"github.com/broothie/ok/logger"
 	"github.com/broothie/ok/task"
+	"github.com/pkg/errors"
 	"github.com/radovskyb/watcher"
 )
 
 func main() {
-	parser := cli.NewFromArgs()
-	okArgs, err := parser.ParseOkArgs()
-	if err != nil {
-		logger.Log.Fatalf("failed to parse args: %v", err)
-	}
-
-	if okArgs.Help {
-		if err := cli.Help(); err != nil {
-			logger.Log.Fatalf("failed to print help: %v", err)
-		}
-
-		return
-	}
-
-	if okArgs.Version {
-		fmt.Println(ok.Version())
-		return
-	}
-
-	app := app.NewAsConfigured()
-	if okArgs.ListTools {
-		if err := app.ListTools(); err != nil {
-			logger.Log.Fatalf("failed to list tools: %v", err)
-		}
-
-		return
-	}
-
-	if okArgs.TaskName == "" {
-		if err := app.ListTasks(); err != nil {
-			logger.Log.Fatalf("failed to list tasks: %v", err)
-		}
-
-		return
-	}
-
-	task, found := app.Task(okArgs.TaskName)
-	if !found {
-		logger.Log.Fatalf("no task found with name %q", okArgs.TaskName)
-	}
-
-	args, err := parser.ParseTaskArgs(task.Parameters())
-	if err != nil {
-		logger.Log.Fatalf("failed to parse task args: %v", err)
-	}
-
-	if len(okArgs.Watches) == 0 {
-		if err := task.Run(context.Background(), args); err != nil {
-			logger.Log.Printf("failed to run task %q: %v", task.Name(), err)
-		}
-
-		return
-	}
-
-	watcher := newWatcher(okArgs.Watches)
-	defer watcher.Close()
-
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	go func() {
-		taskCtx, taskCancel := context.WithCancel(ctx)
-		go runTask(taskCtx, task, args)
-
-		for range watcher.Event {
-			taskCancel()
-			taskCtx, taskCancel = context.WithCancel(ctx)
-			go runTask(taskCtx, task, args)
-		}
-	}()
-
-	if err := watcher.Start(100 * time.Millisecond); err != nil {
-		logger.Log.Fatalf("failed to start watching files: %v", err)
+	if err := run(os.Args[1:]); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
 	}
 }
 
-func runTask(ctx context.Context, task task.Task, args task.Arguments) {
+func run(args []string) error {
+	app := app.New(app.Tools())
+	parser := arg.NewParser(args)
+
+	// Parse options
+	options, err := app.Options(parser)
+	if err != nil {
+		return err
+	}
+
+	// Handle early exits
+	if options.Help {
+		return app.PrintHelp()
+	} else if options.Version {
+		fmt.Println(ok.Version())
+		return nil
+	} else if options.ListTools {
+		return app.Tools.Print()
+	}
+
+	// List task when no task provided
+	if options.TaskName == "" {
+		return app.Tasks().Print()
+	}
+
+	task, found := app.Tasks().Task(options.TaskName)
+	if !found {
+		return fmt.Errorf("unknown task %q", options.TaskName)
+	}
+
+	// Parse task args
+	taskArgs, err := task.Parameters().Parse(parser)
+	if err != nil {
+		return err
+	}
+
+	// Run task in foreground if no watches provided
+	if len(options.Watches) == 0 {
+		return task.Run(context.Background(), taskArgs)
+	}
+
+	// Set up file watcher
+	fileWatcher, err := newWatcher(options.Watches)
+	if err != nil {
+		return err
+	}
+	defer fileWatcher.Close()
+
+	// Run task in background, killing/restarting on each watch event
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	go func() {
+		taskCtx, taskCancel := context.WithCancel(ctx)
+		go backgroundTask(taskCtx, task, taskArgs)
+
+		for range fileWatcher.Event {
+			taskCancel()
+			taskCtx, taskCancel = context.WithCancel(ctx)
+			go backgroundTask(taskCtx, task, taskArgs)
+		}
+	}()
+
+	// Block foreground on file watching
+	if err := fileWatcher.Start(100 * time.Millisecond); err != nil {
+		return errors.Wrap(err, "failed to start watching files")
+	}
+
+	return nil
+}
+
+func backgroundTask(ctx context.Context, task task.Task, args task.Arguments) {
 	if err := task.Run(ctx, args); err != nil && !strings.HasSuffix(err.Error(), "signal: killed") {
 		logger.Log.Printf("failed to run task %q: %v", task.Name(), err)
 	}
 }
 
-func newWatcher(watches []string) *watcher.Watcher {
+func newWatcher(watches []string) (*watcher.Watcher, error) {
 	watcher := watcher.New()
 	watcher.SetMaxEvents(1)
-	defer watcher.Close()
 
 	for _, watch := range watches {
 		matches, err := doublestar.FilepathGlob(watch)
 		if err != nil {
-			logger.Log.Fatalf("failed to glob pattern %q: %v", watch, err)
+			return nil, errors.Wrap(err, "failed to glob pattern")
 		}
 
 		for _, match := range matches {
 			stat, err := os.Stat(match)
 			if err != nil {
-				logger.Log.Fatalf("failed to stat file %q: %v", match, err)
+				return nil, errors.Wrap(err, "failed to state file")
 			}
 
 			if stat.IsDir() {
 				if err := watcher.AddRecursive(match); err != nil {
-					logger.Log.Fatalf("failed to add dir %q to watches: %v", match, err)
+					return nil, errors.Wrap(err, "failed to add dir to watches")
 				}
 			} else {
 				if err := watcher.Add(match); err != nil {
-					logger.Log.Fatalf("failed to add file %q to watches: %v", match, err)
+					return nil, errors.Wrap(err, "failed to add file to watches")
 				}
 			}
 		}
 	}
 
-	return watcher
+	return watcher, nil
 }
