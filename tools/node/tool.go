@@ -65,7 +65,7 @@ func (t Tool) ProcessFile(path string) ([]task.Task, error) {
 			switch len(fields) {
 			case 1:
 				paramName := strings.TrimSpace(fields[0])
-				params = append(params, task.NewRequired(paramName, task.TypeString))
+				params = append(params, task.NewPositional(paramName, task.TypeString))
 
 			case 2:
 				paramName, paramDefault := strings.TrimSpace(fields[0]), strings.TrimSpace(fields[1])
@@ -74,7 +74,7 @@ func (t Tool) ProcessFile(path string) ([]task.Task, error) {
 					return nil, err
 				}
 
-				params = append(params, task.NewOptional(paramName, typ, paramDefault))
+				params = append(params, task.NewKeyword(paramName, typ, paramDefault))
 
 			default:
 				return nil, fmt.Errorf("invalid parameter %q", param)

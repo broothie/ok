@@ -8,8 +8,8 @@ import (
 )
 
 func (cli *CLI) ParseParameters(params task.Parameters) (task.Arguments, error) {
-	positionalParams := lo.Filter(params, func(param task.Parameter, _ int) bool { return param.IsRequired() })
-	keywordParams := lo.Filter(params, func(param task.Parameter, _ int) bool { return param.IsOptional() })
+	positionalParams := lo.Filter(params, func(param task.Parameter, _ int) bool { return param.IsPositional() })
+	keywordParams := lo.Filter(params, func(param task.Parameter, _ int) bool { return param.IsKeyword() })
 
 	positionalIndex := 0
 	var args task.Arguments
@@ -33,22 +33,26 @@ func (cli *CLI) ParseParameters(params task.Parameters) (task.Arguments, error) 
 
 			cli.parser.advance(2)
 		} else {
-			if positionalIndex >= len(positionalParams) {
-				return nil, fmt.Errorf("")
-			}
-
 			param := positionalParams[positionalIndex]
 			args = append(args, task.Argument{
 				Parameter: param,
 				Value:     current.String(),
 			})
 
-			positionalIndex += 1
+			if !param.IsSplat() {
+				positionalIndex += 1
+			}
+
+			if positionalIndex >= len(positionalParams) {
+				return nil, fmt.Errorf("too many positional args (given %d, expected %d)", positionalIndex, len(positionalParams))
+			}
+
 			cli.parser.advance(1)
 		}
 	}
 
-	if positionalIndex < len(positionalParams) {
+	nonSplats := lo.CountBy(positionalParams, func(param task.Parameter) bool { return !param.IsSplat() })
+	if positionalIndex < nonSplats {
 		return nil, fmt.Errorf("missing required args (given %d, expected %d)", positionalIndex, len(positionalParams))
 	}
 

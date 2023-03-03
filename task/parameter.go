@@ -17,26 +17,34 @@ type Parameter struct {
 	Default *string
 }
 
-func NewRequired(name string, t Type) Parameter {
+func NewSplat(t Type) Parameter {
+	return NewPositional("...", t)
+}
+
+func NewPositional(name string, t Type) Parameter {
 	return Parameter{Name: name, Type: t}
 }
 
-func NewOptional(name string, t Type, dfault string) Parameter {
+func NewKeyword(name string, t Type, dfault string) Parameter {
 	return Parameter{Name: name, Type: t, Default: &dfault}
 }
 
 func (p Parameter) String() string {
-	if p.IsRequired() {
+	if p.IsPositional() {
 		return fmt.Sprintf("<%s>", p.Name)
 	} else {
 		return fmt.Sprintf("--%s %s", p.Name, *p.Default)
 	}
 }
 
-func (p Parameter) IsRequired() bool {
+func (p Parameter) IsSplat() bool {
+	return p.Name == "..."
+}
+
+func (p Parameter) IsPositional() bool {
 	return p.Default == nil
 }
 
-func (p Parameter) IsOptional() bool {
-	return !p.IsRequired()
+func (p Parameter) IsKeyword() bool {
+	return !p.IsPositional()
 }

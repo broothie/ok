@@ -5,11 +5,11 @@ import "github.com/samber/lo"
 type Arguments []Argument
 
 func (a Arguments) Required() Arguments {
-	return a.Filter(func(argument Argument, _ int) bool { return argument.IsRequired() })
+	return a.Filter(func(argument Argument, _ int) bool { return argument.IsPositional() })
 }
 
 func (a Arguments) Optional() Arguments {
-	return a.Filter(func(argument Argument, _ int) bool { return argument.IsOptional() })
+	return a.Filter(func(argument Argument, _ int) bool { return argument.IsKeyword() })
 }
 
 func (a Arguments) Filter(predicate func(Argument, int) bool) Arguments {

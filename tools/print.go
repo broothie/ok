@@ -26,7 +26,7 @@ func (t Tools) Print() error {
 	}
 
 	rows = append([]string{header}, rows...)
-	table := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
+	table := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', 0)
 	if _, err := fmt.Fprintln(table, strings.Join(rows, "\n")); err != nil {
 		return errors.Wrap(err, "failed to write rows to table")
 	}

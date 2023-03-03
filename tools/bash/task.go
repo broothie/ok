@@ -1,7 +1,9 @@
-package npm
+package bash
 
 import (
 	"context"
+	"fmt"
+	"strings"
 
 	"github.com/broothie/ok/task"
 	"github.com/broothie/ok/util"
@@ -11,8 +13,9 @@ import (
 
 type Task struct {
 	Tool
-	description string
 	name        string
+	description string
+	bashCode    *string
 }
 
 func (t Task) Name() string {
@@ -28,11 +31,14 @@ func (t Task) Parameters() task.Parameters {
 }
 
 func (t Task) Run(ctx context.Context, args task.Arguments) error {
-	commandArgs := []string{"run", t.name}
-	commandArgs = append(commandArgs, lo.Map(args, func(arg task.Argument, _ int) string { return arg.Value })...)
-	if err := util.CommandContext(ctx, t.Config().Executable(), commandArgs...).Run(); err != nil {
-		return errors.Wrap(err, "failed to run npm script")
+	if err := util.CommandContext(ctx, t.Config().Executable(), "-c", t.generatedBashCode(args)).Run(); err != nil {
+		return errors.Wrap(err, "failed to run bash command")
 	}
 
 	return nil
+}
+
+func (t Task) generatedBashCode(args task.Arguments) string {
+	argsString := strings.Join(lo.Map(args, func(arg task.Argument, _ int) string { return arg.Value }), " ")
+	return fmt.Sprintf("%s\n\n%s %s", *t.bashCode, t.name, argsString)
 }
