@@ -6,53 +6,54 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/broothie/ok/logger"
 	"github.com/broothie/ok/task"
+	"github.com/broothie/ok/tool"
 	"github.com/broothie/ok/util"
 	"github.com/pkg/errors"
 	"github.com/samber/lo"
 )
 
-var (
-	definitionRegexp  = regexp.MustCompile(`^def (?P<name>\w[a-zA-Z0-9_]*)\((?P<paramList>[^)]*)\):$`)
-	equalSignSplitter = regexp.MustCompile(`\s*=\s*`)
-)
+var definitionRegexp = regexp.MustCompile(`^def (?P<name>\w[a-zA-Z0-9_]*)\((?P<paramList>[^)]*)\):$`)
 
-type Tool struct{}
+type Tool struct {
+	config *tool.Config
+}
+
+func New() tool.Tool {
+	return Tool{
+		config: &tool.Config{
+			"extensions": "py",
+			"executable": "python",
+		},
+	}
+}
 
 func (Tool) Name() string {
-	return "Python"
+	return "python"
 }
 
-func (t Tool) Executable() string {
-	return "python3"
+func (t Tool) Config() *tool.Config {
+	return t.config
 }
 
-func (Tool) Filenames() []string {
-	return nil
-}
-
-func (Tool) Extensions() []string {
-	return []string{"py"}
-}
-
-func (Tool) ProcessFile(path string) ([]task.Task, error) {
+func (t Tool) ProcessFile(path string) ([]task.Task, error) {
 	content, err := os.ReadFile(path)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to read python file")
 	}
 
 	python := string(content)
-	return lo.FilterMap(strings.Split(python, "\n"), func(line string, _ int) (task.Task, bool) {
+	var tasks []task.Task
+	for _, line := range strings.Split(python, "\n") {
 		captures := util.NamedCaptureGroups(definitionRegexp, line)
 		if len(captures) == 0 {
-			return nil, false
+			continue
 		}
 
 		name := captures["name"]
 		paramList := captures["paramList"]
 		var params task.Parameters
-		for _, param := range util.SplitCommaParamList(paramList) {
+		for _, param := range util.SplitCommaList(paramList) {
 			fields := strings.SplitN(param, "=", 2)
 			switch len(fields) {
 			case 1:
@@ -64,12 +65,19 @@ func (Tool) ProcessFile(path string) ([]task.Task, error) {
 				params = append(params, task.NewOptional(paramName, parseType(paramDefault), paramDefault))
 
 			default:
-				logger.Log.Printf("invalid parameter in %q: %s", name, param)
+				return nil, fmt.Errorf("invalid parameter %q", param)
 			}
 		}
 
-		return Task{name: name, parameters: params, pythonCode: &python}, true
-	}), nil
+		tasks = append(tasks, Task{
+			Tool:       t,
+			name:       name,
+			parameters: params,
+			pythonCode: &python,
+		})
+	}
+
+	return tasks, nil
 }
 
 func parseType(param string) task.Type {

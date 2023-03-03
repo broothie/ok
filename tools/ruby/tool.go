@@ -6,8 +6,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/broothie/ok/logger"
 	"github.com/broothie/ok/task"
+	"github.com/broothie/ok/tool"
 	"github.com/broothie/ok/util"
 	"github.com/pkg/errors"
 	"github.com/samber/lo"
@@ -15,41 +15,45 @@ import (
 
 var definitionRegexp = regexp.MustCompile(`^def (?P<name>\w[a-zA-Z0-9_]*)(?:\(?(?P<paramList>[^)]*)\)?)?$`)
 
-type Tool struct{}
-
-func (Tool) Name() string {
-	return "Ruby"
+type Tool struct {
+	config *tool.Config
 }
 
-func (Tool) Executable() string {
+func New() tool.Tool {
+	return Tool{
+		config: &tool.Config{
+			"extensions": "rb",
+			"executable": "ruby",
+		},
+	}
+}
+
+func (Tool) Name() string {
 	return "ruby"
 }
 
-func (Tool) Filenames() []string {
-	return nil
+func (t Tool) Config() *tool.Config {
+	return t.config
 }
 
-func (Tool) Extensions() []string {
-	return []string{"rb"}
-}
-
-func (Tool) ProcessFile(path string) ([]task.Task, error) {
+func (t Tool) ProcessFile(path string) ([]task.Task, error) {
 	content, err := os.ReadFile(path)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to read ruby file")
 	}
 
 	ruby := string(content)
-	return lo.FilterMap(strings.Split(ruby, "\n"), func(line string, _ int) (task.Task, bool) {
+	var tasks []task.Task
+	for _, line := range strings.Split(ruby, "\n") {
 		captures := util.NamedCaptureGroups(definitionRegexp, line)
 		if len(captures) == 0 {
-			return nil, false
+			continue
 		}
 
 		name := captures["name"]
 		paramList := captures["paramList"]
 		var params task.Parameters
-		for _, param := range util.SplitCommaParamList(paramList) {
+		for _, param := range util.SplitCommaList(paramList) {
 			fields := strings.Fields(param)
 			switch len(fields) {
 			case 1:
@@ -61,12 +65,19 @@ func (Tool) ProcessFile(path string) ([]task.Task, error) {
 				params = append(params, task.NewOptional(strings.TrimSuffix(paramName, ":"), parseType(paramDefault), paramDefault))
 
 			default:
-				logger.Log.Printf("invalid parameter in %q: %s", name, param)
+				return nil, fmt.Errorf("ivnalid parameter %q", param)
 			}
 		}
 
-		return Task{name: name, parameters: params, filename: path}, true
-	}), nil
+		tasks = append(tasks, Task{
+			Tool:       t,
+			name:       name,
+			parameters: params,
+			filename:   path,
+		})
+	}
+
+	return tasks, nil
 }
 
 func parseType(param string) task.Type {

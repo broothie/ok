@@ -11,6 +11,7 @@ import (
 )
 
 type Task struct {
+	Tool
 	name       string
 	parameters task.Parameters
 	pythonCode *string
@@ -25,7 +26,7 @@ func (t Task) Parameters() task.Parameters {
 }
 
 func (t Task) Run(ctx context.Context, args task.Arguments) error {
-	if err := util.CommandContext(ctx, "python3", "-c", t.generatedPythonCode(args)).Run(); err != nil {
+	if err := util.CommandContext(ctx, t.Config().Executable(), "-c", t.generatedPythonCode(args)).Run(); err != nil {
 		return errors.Wrap(err, "failed to run python command")
 	}
 

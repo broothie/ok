@@ -1,5 +1,14 @@
 package task
 
+type Type string
+
+const (
+	TypeString Type = "string"
+	TypeBool   Type = "bool"
+	TypeInt    Type = "int"
+	TypeFloat  Type = "float"
+)
+
 type Parameter struct {
 	Name    string
 	Type    Type

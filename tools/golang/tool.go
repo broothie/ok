@@ -1,38 +1,41 @@
 package golang
 
 import (
+	"fmt"
 	"os"
 	"regexp"
 	"strings"
 
-	"github.com/broothie/ok/logger"
 	"github.com/broothie/ok/task"
+	"github.com/broothie/ok/tool"
 	"github.com/broothie/ok/util"
 	"github.com/pkg/errors"
-	"github.com/samber/lo"
 )
 
 var definitionRegexp = regexp.MustCompile(`^func (?P<name>\w[a-zA-Z0-9_]*)\((?P<paramList>[^)]*)\) \{$`)
 
-type Tool struct{}
-
-func (Tool) Name() string {
-	return "Go"
+type Tool struct {
+	config *tool.Config
 }
 
-func (Tool) Executable() string {
+func New() tool.Tool {
+	return Tool{
+		config: &tool.Config{
+			"extensions": "go",
+			"executable": "go",
+		},
+	}
+}
+
+func (Tool) Name() string {
 	return "go"
 }
 
-func (Tool) Filenames() []string {
-	return nil
+func (t Tool) Config() *tool.Config {
+	return t.config
 }
 
-func (Tool) Extensions() []string {
-	return []string{"go"}
-}
-
-func (Tool) ProcessFile(path string) ([]task.Task, error) {
+func (t Tool) ProcessFile(path string) ([]task.Task, error) {
 	content, err := os.ReadFile(path)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to read ruby file")
@@ -40,26 +43,40 @@ func (Tool) ProcessFile(path string) ([]task.Task, error) {
 
 	goCode := string(content)
 
-	return lo.FilterMap(strings.Split(goCode, "\n"), func(line string, _ int) (task.Task, bool) {
+	var tasks []task.Task
+	for _, line := range strings.Split(goCode, "\n") {
 		captures := util.NamedCaptureGroups(definitionRegexp, line)
 		if len(captures) == 0 {
-			return nil, false
+			continue
 		}
 
 		taskName := captures["name"]
 		paramList := captures["paramList"]
 		var params task.Parameters
-		for _, param := range util.SplitCommaParamList(paramList) {
+		for _, param := range util.SplitCommaList(paramList) {
 			fields := strings.Fields(param)
 			paramName, paramType := fields[0], fields[1]
-			params = append(params, task.NewRequired(paramName, parseType(paramType)))
+			typ, err := parseType(paramType)
+			if err != nil {
+				return nil, err
+			}
+
+			params = append(params, task.NewRequired(paramName, typ))
 		}
 
-		return Task{name: taskName, parameters: params, filename: path, goCode: &goCode}, true
-	}), nil
+		tasks = append(tasks, Task{
+			Tool:       t,
+			name:       taskName,
+			parameters: params,
+			filename:   path,
+			goCode:     &goCode,
+		})
+	}
+
+	return tasks, nil
 }
 
-func parseType(paramType string) task.Type {
+func parseType(paramType string) (task.Type, error) {
 	var typ task.Type
 	switch paramType {
 	case "bool":
@@ -71,8 +88,8 @@ func parseType(paramType string) task.Type {
 	case "string":
 		typ = task.TypeString
 	default:
-		logger.Log.Println("invalid type for: %s", paramType)
+		return "", fmt.Errorf("invalid type for: %s", paramType)
 	}
 
-	return typ
+	return typ, nil
 }

@@ -2,14 +2,14 @@ package util
 
 import "regexp"
 
-var paramListCommaSplitter = regexp.MustCompile(`\s*,\s*`)
+var commaListSplitter = regexp.MustCompile(`\s*,\s*`)
 
-func SplitCommaParamList(paramList string) []string {
-	if paramList == "" {
+func SplitCommaList(commaList string) []string {
+	if commaList == "" {
 		return nil
 	}
 
-	return paramListCommaSplitter.Split(paramList, -1)
+	return commaListSplitter.Split(commaList, -1)
 }
 
 // NamedCaptureGroups pulled from https://stackoverflow.com/questions/20750843/using-named-matches-from-go-regex

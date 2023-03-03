@@ -10,6 +10,7 @@ import (
 )
 
 type Task struct {
+	Tool
 	name string
 }
 
@@ -24,7 +25,7 @@ func (r Task) Parameters() task.Parameters {
 func (r Task) Run(ctx context.Context, args task.Arguments) error {
 	commandArgs := []string{"run", r.name}
 	commandArgs = append(commandArgs, lo.Map(args, func(arg task.Argument, _ int) string { return arg.Value })...)
-	if err := util.CommandContext(ctx, "npm", commandArgs...).Run(); err != nil {
+	if err := util.CommandContext(ctx, r.Config().Executable(), commandArgs...).Run(); err != nil {
 		return errors.Wrap(err, "failed to run npm script")
 	}
 

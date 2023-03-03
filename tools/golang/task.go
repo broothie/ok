@@ -2,22 +2,20 @@ package golang
 
 import (
 	"context"
-	"crypto/sha256"
-	"encoding/hex"
 	"fmt"
 	"os"
 	"regexp"
 	"strings"
 
-	"github.com/broothie/ok/logger"
 	"github.com/broothie/ok/task"
 	"github.com/broothie/ok/util"
 	"github.com/pkg/errors"
 )
 
-var packageReplacer = regexp.MustCompile(`package \w[a-zA-Z0-9]+`)
+var packageReplacer = regexp.MustCompile(`package \w+`)
 
 type Task struct {
+	Tool
 	name       string
 	parameters task.Parameters
 	filename   string
@@ -34,15 +32,14 @@ func (t Task) Parameters() task.Parameters {
 
 func (t Task) Run(ctx context.Context, args task.Arguments) error {
 	goCode := t.generatedGoCode(args)
-	sum := sha256.Sum256([]byte(goCode))
-	goFile, err := os.Create(fmt.Sprintf("Okfile.%s.go", hex.EncodeToString(sum[:])))
+	goFile, err := os.CreateTemp(".", "Okfile.*.go")
 	if err != nil {
 		return errors.Wrap(err, "failed to create temp file")
 	}
 
 	defer func() {
 		if err := os.Remove(goFile.Name()); err != nil {
-			logger.Log.Printf("failed to remove temp file: %v", err)
+			fmt.Println("failed to remove temp file", err)
 		}
 	}()
 
@@ -54,8 +51,8 @@ func (t Task) Run(ctx context.Context, args task.Arguments) error {
 		return errors.Wrap(err, "failed to close temp file")
 	}
 
-	if err := util.CommandContext(ctx, "go", "run", goFile.Name()).Run(); err != nil {
-		return errors.Wrap(err, "failed to run go task")
+	if err := util.CommandContext(ctx, t.Config().Executable(), "run", goFile.Name()).Run(); err != nil {
+		return errors.Wrap(err, "failed to run go command")
 	}
 
 	return nil
