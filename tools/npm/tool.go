@@ -46,10 +46,11 @@ func (t Tool) ProcessFile(path string) ([]task.Task, error) {
 		return nil, errors.Wrap(err, "failed to parse file")
 	}
 
-	return lo.Map(lo.Keys(packageJSON.Scripts), func(name string, _ int) task.Task {
+	return lo.Map(lo.Entries(packageJSON.Scripts), func(script lo.Entry[string, string], _ int) task.Task {
 		return Task{
-			Tool: t,
-			name: name,
+			Tool:        t,
+			name:        script.Key,
+			description: script.Value,
 		}
 	}), nil
 }

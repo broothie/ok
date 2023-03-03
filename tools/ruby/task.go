@@ -12,13 +12,18 @@ import (
 
 type Task struct {
 	Tool
-	name       string
-	parameters task.Parameters
-	filename   string
+	name        string
+	description string
+	parameters  task.Parameters
+	filename    string
 }
 
 func (t Task) Name() string {
 	return t.name
+}
+
+func (t Task) Description() string {
+	return t.description
 }
 
 func (t Task) Parameters() task.Parameters {
@@ -54,5 +59,5 @@ func (t Task) generatedRubyCode(args task.Arguments) string {
 	}
 
 	argString := strings.Join(argStrings, ", ")
-	return fmt.Sprintf("at_exit { %s(%s) }\n\nrequire './%s'", t.name, argString, t.filename)
+	return fmt.Sprintf("require './%s'\n%s(%s)", t.filename, t.name, argString)
 }

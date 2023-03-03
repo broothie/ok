@@ -43,8 +43,9 @@ func (t Tool) ProcessFile(path string) ([]task.Task, error) {
 	}
 
 	ruby := string(content)
+	lines := strings.Split(ruby, "\n")
 	var tasks []task.Task
-	for _, line := range strings.Split(ruby, "\n") {
+	for i, line := range lines {
 		captures := util.NamedCaptureGroups(definitionRegexp, line)
 		if len(captures) == 0 {
 			continue
@@ -65,15 +66,21 @@ func (t Tool) ProcessFile(path string) ([]task.Task, error) {
 				params = append(params, task.NewOptional(strings.TrimSuffix(paramName, ":"), parseType(paramDefault), paramDefault))
 
 			default:
-				return nil, fmt.Errorf("ivnalid parameter %q", param)
+				return nil, fmt.Errorf("invalid parameter %q", param)
 			}
 		}
 
+		description := ""
+		if i != 0 && strings.HasPrefix(lines[i-1], "#") {
+			description = lines[i-1]
+		}
+
 		tasks = append(tasks, Task{
-			Tool:       t,
-			name:       name,
-			parameters: params,
-			filename:   path,
+			Tool:        t,
+			name:        name,
+			description: description,
+			parameters:  params,
+			filename:    path,
 		})
 	}
 

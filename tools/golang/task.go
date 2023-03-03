@@ -16,14 +16,19 @@ var packageReplacer = regexp.MustCompile(`package \w+`)
 
 type Task struct {
 	Tool
-	name       string
-	parameters task.Parameters
-	filename   string
-	goCode     *string
+	name        string
+	description string
+	parameters  task.Parameters
+	filename    string
+	goCode      *string
 }
 
 func (t Task) Name() string {
 	return t.name
+}
+
+func (t Task) Description() string {
+	return t.description
 }
 
 func (t Task) Parameters() task.Parameters {

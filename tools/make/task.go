@@ -10,11 +10,16 @@ import (
 
 type Task struct {
 	Tool
-	name string
+	description string
+	name        string
 }
 
 func (t Task) Name() string {
 	return t.name
+}
+
+func (t Task) Description() string {
+	return t.description
 }
 
 func (t Task) Parameters() task.Parameters {

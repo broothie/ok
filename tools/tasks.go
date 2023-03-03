@@ -26,11 +26,11 @@ func (t Tasks) Task(name string) (Task, bool) {
 }
 
 func (t Tasks) Print() error {
-	header := strings.Join([]string{"TASK", "ARGS", "TOOL", "FILE"}, "\t")
+	header := strings.Join([]string{"TASK", "ARGS", "TOOL", "FILE", "DESCRIPTION"}, "\t")
 
 	var rows []string
 	for taskName, task := range t {
-		row := []string{taskName, task.Parameters().String(), task.Tool.Name(), task.Filename}
+		row := []string{taskName, task.Parameters().String(), task.Tool.Name(), task.Filename, task.Description()}
 		rows = append(rows, strings.Join(row, "\t"))
 	}
 

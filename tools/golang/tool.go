@@ -42,15 +42,15 @@ func (t Tool) ProcessFile(path string) ([]task.Task, error) {
 	}
 
 	goCode := string(content)
-
+	lines := strings.Split(goCode, "\n")
 	var tasks []task.Task
-	for _, line := range strings.Split(goCode, "\n") {
+	for i, line := range lines {
 		captures := util.NamedCaptureGroups(definitionRegexp, line)
 		if len(captures) == 0 {
 			continue
 		}
 
-		taskName := captures["name"]
+		name := captures["name"]
 		paramList := captures["paramList"]
 		var params task.Parameters
 		for _, param := range util.SplitCommaList(paramList) {
@@ -64,12 +64,18 @@ func (t Tool) ProcessFile(path string) ([]task.Task, error) {
 			params = append(params, task.NewRequired(paramName, typ))
 		}
 
+		description := ""
+		if i != 0 && strings.HasPrefix(lines[i-1], "//") {
+			description = lines[i-1]
+		}
+
 		tasks = append(tasks, Task{
-			Tool:       t,
-			name:       taskName,
-			parameters: params,
-			filename:   path,
-			goCode:     &goCode,
+			Tool:        t,
+			name:        name,
+			description: description,
+			parameters:  params,
+			filename:    path,
+			goCode:      &goCode,
 		})
 	}
 

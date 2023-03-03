@@ -12,13 +12,18 @@ import (
 
 type Task struct {
 	Tool
-	name       string
-	parameters task.Parameters
-	pythonCode *string
+	name        string
+	description string
+	parameters  task.Parameters
+	pythonCode  *string
 }
 
 func (t Task) Name() string {
 	return t.name
+}
+
+func (t Task) Description() string {
+	return t.description
 }
 
 func (t Task) Parameters() task.Parameters {
