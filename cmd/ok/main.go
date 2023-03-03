@@ -65,6 +65,13 @@ func run() error {
 		return nil
 	} else if options.ListTools {
 		return tools.Print()
+	} else if options.InitTool != "" {
+		tool, toolPresent := tools[options.InitTool]
+		if !toolPresent {
+			return fmt.Errorf("unknown tool %q", options.InitTool)
+		}
+
+		return tool.Init()
 	}
 
 	// Fetch tasks
@@ -78,7 +85,7 @@ func run() error {
 		return tasks.Print()
 	}
 
-	task, found := tasks.Task(options.TaskName)
+	task, found := tasks[options.TaskName]
 	if !found {
 		return fmt.Errorf("unknown task %q", options.TaskName)
 	}

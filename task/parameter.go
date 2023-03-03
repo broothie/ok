@@ -1,5 +1,7 @@
 package task
 
+import "fmt"
+
 type Type string
 
 const (
@@ -21,6 +23,14 @@ func NewRequired(name string, t Type) Parameter {
 
 func NewOptional(name string, t Type, dfault string) Parameter {
 	return Parameter{Name: name, Type: t, Default: &dfault}
+}
+
+func (p Parameter) String() string {
+	if p.IsRequired() {
+		return fmt.Sprintf("<%s>", p.Name)
+	} else {
+		return fmt.Sprintf("--%s %s", p.Name, *p.Default)
+	}
 }
 
 func (p Parameter) IsRequired() bool {

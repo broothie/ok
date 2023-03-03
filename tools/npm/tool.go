@@ -6,9 +6,14 @@ import (
 
 	"github.com/broothie/ok/task"
 	"github.com/broothie/ok/tool"
+	"github.com/broothie/ok/util"
 	"github.com/pkg/errors"
 	"github.com/samber/lo"
 )
+
+const initContents = `{
+	"scripts": {}
+}`
 
 type packageJSON struct {
 	Scripts map[string]string `json:"scripts"`
@@ -33,6 +38,10 @@ func (Tool) Name() string {
 
 func (t Tool) Config() *tool.Config {
 	return t.config
+}
+
+func (Tool) Init() error {
+	return util.InitFile("package.json", []byte(initContents))
 }
 
 func (t Tool) ProcessFile(path string) ([]task.Task, error) {

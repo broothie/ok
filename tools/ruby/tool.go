@@ -13,6 +13,8 @@ import (
 	"github.com/samber/lo"
 )
 
+const commentPrefix = "#"
+
 var definitionRegexp = regexp.MustCompile(`^def (?P<name>\w[a-zA-Z0-9_]*)(?:\(?(?P<paramList>[^)]*)\)?)?$`)
 
 type Tool struct {
@@ -34,6 +36,10 @@ func (Tool) Name() string {
 
 func (t Tool) Config() *tool.Config {
 	return t.config
+}
+
+func (Tool) Init() error {
+	return util.InitFile("Okfile.rb", nil)
 }
 
 func (t Tool) ProcessFile(path string) ([]task.Task, error) {
@@ -63,7 +69,12 @@ func (t Tool) ProcessFile(path string) ([]task.Task, error) {
 
 			case 2:
 				paramName, paramDefault := fields[0], fields[1]
-				params = append(params, task.NewOptional(strings.TrimSuffix(paramName, ":"), parseType(paramDefault), paramDefault))
+				typ, err := parseType(paramDefault)
+				if err != nil {
+					return nil, err
+				}
+
+				params = append(params, task.NewOptional(strings.TrimSuffix(paramName, ":"), typ, paramDefault))
 
 			default:
 				return nil, fmt.Errorf("invalid parameter %q", param)
@@ -72,7 +83,7 @@ func (t Tool) ProcessFile(path string) ([]task.Task, error) {
 
 		description := ""
 		if i != 0 {
-			description = util.ExtractComment(lines[i-1], "#")
+			description = util.ExtractComment(lines[i-1], commentPrefix)
 		}
 
 		tasks = append(tasks, Task{
@@ -87,16 +98,16 @@ func (t Tool) ProcessFile(path string) ([]task.Task, error) {
 	return tasks, nil
 }
 
-func parseType(param string) task.Type {
+func parseType(param string) (task.Type, error) {
 	if param == "false" || param == "true" {
-		return task.TypeBool
+		return task.TypeBool, nil
 	} else if lo.Every([]rune("1234567890_"), []rune(param)) {
-		return task.TypeInt
+		return task.TypeInt, nil
 	} else if lo.Every([]rune("1234567890_."), []rune(param)) {
-		return task.TypeFloat
+		return task.TypeFloat, nil
 	} else if (strings.HasPrefix(param, `"`) && strings.HasSuffix(param, `"`)) || (strings.HasPrefix(param, `'`) && strings.HasSuffix(param, `'`)) {
-		return task.TypeString
+		return task.TypeString, nil
 	} else {
-		panic(fmt.Sprintf("invalid type %q", param))
+		return "", fmt.Errorf("invalid type %q", param)
 	}
 }

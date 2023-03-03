@@ -5,6 +5,7 @@ type applyFunc func(*optionParser, *Options) error
 type flag struct {
 	long        string
 	short       rune
+	valueName   string
 	description string
 	apply       applyFunc
 }

@@ -11,6 +11,7 @@ type Options struct {
 	Help      bool
 	Version   bool
 	ListTools bool
+	InitTool  string
 	Watches   []string
 	TaskName  string
 }

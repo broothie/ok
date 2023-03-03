@@ -11,6 +11,8 @@ import (
 	"github.com/pkg/errors"
 )
 
+const commentPrefix = "#"
+
 var ruleRegexp = regexp.MustCompile(`^(?P<name>\w[a-zA-Z0-9]+):.*$`)
 
 type Tool struct {
@@ -34,6 +36,10 @@ func (t Tool) Config() *tool.Config {
 	return t.config
 }
 
+func (Tool) Init() error {
+	return util.InitFile("Makefile", nil)
+}
+
 func (t Tool) ProcessFile(path string) ([]task.Task, error) {
 	content, err := os.ReadFile(path)
 	if err != nil {
@@ -51,7 +57,7 @@ func (t Tool) ProcessFile(path string) ([]task.Task, error) {
 
 		description := ""
 		if i != 0 {
-			description = util.ExtractComment(lines[i-1], "#")
+			description = util.ExtractComment(lines[i-1], commentPrefix)
 		}
 
 		tasks = append(tasks, Task{

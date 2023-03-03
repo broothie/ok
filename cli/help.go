@@ -25,7 +25,12 @@ func (cli *CLI) PrintHelp() error {
 			short = fmt.Sprintf("-%c", flag.short)
 		}
 
-		row := []string{fmt.Sprintf("  %s", short), fmt.Sprintf("--%s", flag.long), flag.description}
+		long := fmt.Sprintf("--%s", flag.long)
+		if flag.valueName != "" {
+			long = fmt.Sprintf("%s %s", long, flag.valueName)
+		}
+
+		row := []string{fmt.Sprintf("  %s", short), long, flag.description}
 		rows = append(rows, strings.Join(row, "\t"))
 	}
 

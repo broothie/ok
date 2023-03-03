@@ -1,21 +1,13 @@
 package task
 
 import (
-	"fmt"
 	"strings"
+
+	"github.com/samber/lo"
 )
 
 type Parameters []Parameter
 
 func (p Parameters) String() string {
-	var fields []string
-	for _, param := range p {
-		if param.IsRequired() {
-			fields = append(fields, fmt.Sprintf("<%s>", param.Name))
-		} else {
-			fields = append(fields, fmt.Sprintf("--%s=%s", param.Name, *param.Default))
-		}
-	}
-
-	return strings.Join(fields, " ")
+	return strings.Join(lo.Map(p, func(param Parameter, _ int) string { return param.String() }), "  ")
 }

@@ -12,8 +12,3 @@ type Task struct {
 }
 
 type Tasks map[string]Task
-
-func (t Tasks) Task(name string) (Task, bool) {
-	task, found := t[name]
-	return task, found
-}

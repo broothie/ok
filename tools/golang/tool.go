@@ -13,6 +13,11 @@ import (
 )
 
 const commentPrefix = "//"
+const initContents = `
+//go:build ok
+
+package ok
+`
 
 var definitionRegexp = regexp.MustCompile(`^func (?P<name>\w[a-zA-Z0-9_]*)\((?P<paramList>[^)]*)\) \{$`)
 
@@ -35,6 +40,10 @@ func (Tool) Name() string {
 
 func (t Tool) Config() *tool.Config {
 	return t.config
+}
+
+func (Tool) Init() error {
+	return util.InitFile("Okfile.go", []byte(initContents))
 }
 
 func (t Tool) ProcessFile(path string) ([]task.Task, error) {
@@ -68,7 +77,7 @@ func (t Tool) ProcessFile(path string) ([]task.Task, error) {
 
 		description := ""
 		if i != 0 {
-			description = util.ExtractComment(lines[i-1], "//")
+			description = util.ExtractComment(lines[i-1], commentPrefix)
 		}
 
 		tasks = append(tasks, Task{

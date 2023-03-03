@@ -35,7 +35,8 @@ func flags() []flag {
 		},
 		{
 			long:        "tool",
-			description: "Configure a tool.",
+			description: "Configure a tool. Can be used multiple times.",
+			valueName:   "[TOOL]",
 			apply: func(parser *optionParser, options *Options) error {
 				next, _ := parser.next()
 				options.Tool = append(options.Tool, ParseToolOption(next))
@@ -44,8 +45,25 @@ func flags() []flag {
 			},
 		},
 		{
+			long:        "init",
+			description: "Initialize a tool.",
+			valueName:   "<TOOL>",
+			apply: func(parser *optionParser, options *Options) error {
+				current, _ := parser.current()
+				next, nextPresent := parser.next()
+				if !nextPresent {
+					return fmt.Errorf("no value provided for %q", current)
+				}
+
+				options.InitTool = next.String()
+				parser.advance(2)
+				return nil
+			},
+		},
+		{
 			long:        "watch",
 			short:       'w',
+			valueName:   "<GLOB>",
 			description: "Glob pattern of files to watch. Can be used multiple times.",
 			apply: func(parser *optionParser, options *Options) error {
 				watch, present := parser.next()

@@ -10,6 +10,7 @@ type NewFunc func() Tool
 type Tool interface {
 	Name() string
 	Config() *Config
+	Init() error
 	ProcessFile(path string) ([]task.Task, error)
 }
 
