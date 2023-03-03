@@ -1,5 +1,4 @@
 name: goreleaser
-description: Run goreleaser
 
 on:
   push:
