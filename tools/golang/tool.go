@@ -12,6 +12,8 @@ import (
 	"github.com/pkg/errors"
 )
 
+const commentPrefix = "//"
+
 var definitionRegexp = regexp.MustCompile(`^func (?P<name>\w[a-zA-Z0-9_]*)\((?P<paramList>[^)]*)\) \{$`)
 
 type Tool struct {
@@ -65,8 +67,8 @@ func (t Tool) ProcessFile(path string) ([]task.Task, error) {
 		}
 
 		description := ""
-		if i != 0 && strings.HasPrefix(lines[i-1], "//") {
-			description = lines[i-1]
+		if i != 0 {
+			description = util.ExtractComment(lines[i-1], "//")
 		}
 
 		tasks = append(tasks, Task{

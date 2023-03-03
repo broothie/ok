@@ -71,8 +71,8 @@ func (t Tool) ProcessFile(path string) ([]task.Task, error) {
 		}
 
 		description := ""
-		if i != 0 && strings.HasPrefix(lines[i-1], "#") {
-			description = lines[i-1]
+		if i != 0 {
+			description = util.ExtractComment(lines[i-1], "#")
 		}
 
 		tasks = append(tasks, Task{
