@@ -17,8 +17,8 @@ type Parameter struct {
 	Default *string
 }
 
-func NewSplat(t Type) Parameter {
-	return NewPositional("...", t)
+func NewSplatParameters(t Type) Parameters {
+	return Parameters{NewPositional("...", t)}
 }
 
 func NewPositional(name string, t Type) Parameter {

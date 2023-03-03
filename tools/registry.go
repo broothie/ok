@@ -3,6 +3,7 @@ package tools
 import (
 	"github.com/broothie/ok/tool"
 	"github.com/broothie/ok/tools/bash"
+	"github.com/broothie/ok/tools/dockercompose"
 	"github.com/broothie/ok/tools/golang"
 	"github.com/broothie/ok/tools/make"
 	"github.com/broothie/ok/tools/node"
@@ -14,6 +15,7 @@ import (
 func Registry() []tool.NewFunc {
 	return []tool.NewFunc{
 		bash.New,
+		dockercompose.New,
 		golang.New,
 		make.New,
 		node.New,

@@ -27,7 +27,7 @@ func (t Task) Description() string {
 }
 
 func (t Task) Parameters() task.Parameters {
-	return task.Parameters{task.NewSplat(task.TypeString)}
+	return task.NewSplatParameters(task.TypeString)
 }
 
 func (t Task) Run(ctx context.Context, args task.Arguments) error {

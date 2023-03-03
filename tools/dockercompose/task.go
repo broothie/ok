@@ -1,4 +1,4 @@
-package npm
+package dockercompose
 
 import (
 	"context"
@@ -28,10 +28,10 @@ func (t Task) Parameters() task.Parameters {
 }
 
 func (t Task) Run(ctx context.Context, args task.Arguments) error {
-	commandArgs := []string{"run", t.name}
+	commandArgs := []string{"compose", "run", "-d", t.name}
 	commandArgs = append(commandArgs, lo.Map(args, func(arg task.Argument, _ int) string { return arg.Value })...)
 	if err := util.CommandContext(ctx, t.Config().Executable(), commandArgs...).Run(); err != nil {
-		return errors.Wrap(err, "failed to run npm script")
+		return errors.Wrap(err, "failed to run docker compose")
 	}
 
 	return nil
