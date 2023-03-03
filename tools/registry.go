@@ -10,6 +10,7 @@ import (
 	"github.com/broothie/ok/tools/npm"
 	"github.com/broothie/ok/tools/python"
 	"github.com/broothie/ok/tools/ruby"
+	"github.com/broothie/ok/tools/zsh"
 )
 
 func Registry() []tool.NewFunc {
@@ -22,5 +23,6 @@ func Registry() []tool.NewFunc {
 		npm.New,
 		python.New,
 		ruby.New,
+		zsh.New,
 	}
 }
