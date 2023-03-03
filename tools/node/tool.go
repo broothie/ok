@@ -99,7 +99,7 @@ func (t Tool) ProcessFile(path string) ([]task.Task, error) {
 }
 
 func parseType(param string) (task.Type, error) {
-	if param == "False" || param == "True" {
+	if param == "false" || param == "true" {
 		return task.TypeBool, nil
 	} else if lo.Every([]rune("1234567890_"), []rune(param)) {
 		return task.TypeInt, nil
