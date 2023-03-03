@@ -8,6 +8,7 @@ require (
 	github.com/radovskyb/watcher v1.0.7
 	github.com/samber/lo v1.37.0
 	github.com/stretchr/testify v1.8.2
+	golang.org/x/sync v0.1.0
 )
 
 require (
