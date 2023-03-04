@@ -2,6 +2,7 @@ package ok
 
 import (
 	_ "embed"
+	"fmt"
 	"strings"
 )
 
@@ -9,5 +10,5 @@ import (
 var version string
 
 func Version() string {
-	return strings.TrimSpace(version)
+	return fmt.Sprintf("v%s", strings.TrimSpace(version))
 }
