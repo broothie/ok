@@ -30,7 +30,9 @@ func NewKeyword(name string, t Type, dfault string) Parameter {
 }
 
 func (p Parameter) String() string {
-	if p.IsPositional() {
+	if p.IsSplat() {
+		return p.Name
+	} else if p.IsPositional() {
 		return fmt.Sprintf("<%s>", p.Name)
 	} else {
 		return fmt.Sprintf("--%s %s", p.Name, *p.Default)
