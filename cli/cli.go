@@ -3,7 +3,7 @@ package cli
 import "sync"
 
 type CLI struct {
-	parser *optionParser
+	parser *parser
 	flags  []flag
 
 	optionsOnce *sync.Once
@@ -12,7 +12,7 @@ type CLI struct {
 
 func New(args []string) *CLI {
 	return &CLI{
-		parser:      newOptionParser(args),
+		parser:      newParser(args),
 		flags:       flags(),
 		optionsOnce: new(sync.Once),
 		options:     Options{},

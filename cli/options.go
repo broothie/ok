@@ -7,13 +7,13 @@ import (
 )
 
 type Options struct {
-	Tool      []ToolOptions
-	Help      bool
-	Version   bool
-	ListTools bool
-	InitTool  string
-	Watches   []string
-	TaskName  string
+	ToolOptions []ToolOptions
+	Help        bool
+	Version     bool
+	ListTools   bool
+	InitTool    string
+	Watches     []string
+	TaskName    string
 }
 
 // Options can only be called once.

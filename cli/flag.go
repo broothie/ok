@@ -1,6 +1,6 @@
 package cli
 
-type applyFunc func(*optionParser, *Options) error
+type applyFunc func(*parser, *Options) error
 
 type flag struct {
 	long        string

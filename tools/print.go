@@ -1,20 +1,15 @@
 package tools
 
 import (
-	"fmt"
-	"os"
+	"io"
 	"os/exec"
 	"sort"
-	"strings"
-	"text/tabwriter"
 
-	"github.com/pkg/errors"
+	"github.com/broothie/ok/util"
 )
 
-func (t Tools) Print() error {
-	header := strings.Join([]string{"NAME", "STATUS", "EXECUTABLE"}, "\t")
-
-	var rows []string
+func (t Tools) Print(out io.Writer) error {
+	table := [][]string{{"NAME", "STATUS", "EXECUTABLE"}}
 	for _, tool := range t {
 		status := "ok"
 		executable, err := exec.LookPath(tool.Config().Executable())
@@ -22,42 +17,18 @@ func (t Tools) Print() error {
 			status = err.Error()
 		}
 
-		rows = append(rows, strings.Join([]string{tool.Name(), status, executable}, "\t"))
+		table = append(table, []string{tool.Name(), status, executable})
 	}
 
-	rows = append([]string{header}, rows...)
-	table := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-	if _, err := fmt.Fprintln(table, strings.Join(rows, "\n")); err != nil {
-		return errors.Wrap(err, "failed to write rows to table")
-	}
-
-	if err := table.Flush(); err != nil {
-		return errors.Wrap(err, "failed to write table")
-	}
-
-	return nil
+	return util.PrintTable(out, table, 3)
 }
 
-func (t Tasks) Print() error {
-	header := strings.Join([]string{"TASK", "ARGS", "TOOL", "FILE", "DESCRIPTION"}, "\t")
-
-	var rows []string
+func (t Tasks) Print(out io.Writer) error {
+	table := [][]string{{"TASK", "ARGS", "TOOL", "FILE", "DESCRIPTION"}}
 	for taskName, task := range t {
-		row := []string{taskName, task.Parameters().String(), task.Tool.Name(), task.Filename, task.Description()}
-		rows = append(rows, strings.Join(row, "\t"))
+		table = append(table, []string{taskName, task.Parameters().String(), task.Tool.Name(), task.Filename, task.Description()})
 	}
 
-	sort.Strings(rows)
-	rows = append([]string{header}, rows...)
-
-	table := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', 0)
-	if _, err := fmt.Fprintln(table, strings.Join(rows, "\n")); err != nil {
-		return errors.Wrap(err, "failed to write rows to table")
-	}
-
-	if err := table.Flush(); err != nil {
-		return errors.Wrap(err, "failed to write table")
-	}
-
-	return nil
+	sort.Slice(table[1:], func(i, j int) bool { return table[i][0] < table[j][0] })
+	return util.PrintTable(out, table, 3)
 }

@@ -17,12 +17,25 @@ const (
 	ToolOptionsActionSet   ToolOptionsAction = "set"
 )
 
-var toolOptionParser = regexp.MustCompile(`(?P<tool>\w+)(?:\.(?P<key>\w+)(?:=(?P<value>\w+))?)?`)
+var toolOptionParser = regexp.MustCompile(`(?P<tool>\w+)(?:\.(?P<key>\w+)(?:=(?P<value>\S+))?)?`)
 
 type ToolOptions struct {
 	Name  string
 	Key   string
 	Value string
+}
+
+// ParseToolOption valid formats:
+//   python
+//	 python.executable
+//	 python.executable=python3
+func ParseToolOption(token token) ToolOptions {
+	captures := util.NamedCaptureGroups(toolOptionParser, token.String())
+	return ToolOptions{
+		Name:  captures["tool"],
+		Key:   captures["key"],
+		Value: captures["value"],
+	}
 }
 
 func (t ToolOptions) String() string {
@@ -39,18 +52,5 @@ func (t ToolOptions) Action() ToolOptionsAction {
 		return ToolOptionsActionKey
 	} else {
 		return ToolOptionsActionSet
-	}
-}
-
-// ParseToolOption valid formats:
-//   python
-//	 python.executable
-//	 python.executable=python3
-func ParseToolOption(token token) ToolOptions {
-	captures := util.NamedCaptureGroups(toolOptionParser, token.String())
-	return ToolOptions{
-		Name:  captures["tool"],
-		Key:   captures["key"],
-		Value: captures["value"],
 	}
 }

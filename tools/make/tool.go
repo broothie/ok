@@ -57,7 +57,7 @@ func (t Tool) ProcessFile(path string) ([]task.Task, error) {
 
 		description := ""
 		if i != 0 {
-			description = util.ExtractComment(lines[i-1], commentPrefix)
+			description = util.ExtractCommentIfPresent(lines[i-1], commentPrefix)
 		}
 
 		tasks = append(tasks, Task{

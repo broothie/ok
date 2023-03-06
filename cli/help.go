@@ -1,24 +1,27 @@
 package cli
 
 import (
+	"bytes"
 	"fmt"
-	"os"
+	"io"
 	"strings"
-	"text/tabwriter"
 
 	"github.com/broothie/ok"
+	"github.com/broothie/ok/util"
 	"github.com/pkg/errors"
 )
 
-func (cli *CLI) PrintHelp() error {
-	fmt.Printf("ok %s\n", ok.Version())
-	fmt.Printf("\n")
-	fmt.Printf("Usage:\n")
-	fmt.Printf("  ok [OPTIONS] <TASK> [TASK ARGS]\n")
-	fmt.Printf("\n")
-	fmt.Printf("Options:\n")
+func (cli *CLI) PrintHelp(out io.Writer) error {
+	strs := []string{
+		fmt.Sprintf("ok %s\n", ok.Version()),
+		"\n",
+		"Usage:\n",
+		"  ok [OPTIONS] <TASK> [TASK ARGS]\n",
+		"\n",
+		"Options:\n",
+	}
 
-	var rows []string
+	var table [][]string
 	for _, flag := range cli.flags {
 		short := ""
 		if flag.hasShort() {
@@ -30,17 +33,17 @@ func (cli *CLI) PrintHelp() error {
 			long = fmt.Sprintf("%s %s", long, flag.valueName)
 		}
 
-		row := []string{fmt.Sprintf("  %s", short), long, flag.description}
-		rows = append(rows, strings.Join(row, "\t"))
+		table = append(table, []string{fmt.Sprintf("  %s", short), long, flag.description})
 	}
 
-	table := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-	if _, err := fmt.Fprintln(table, strings.Join(rows, "\n")); err != nil {
-		return errors.Wrap(err, "failed to write rows to table")
-	}
-
-	if err := table.Flush(); err != nil {
+	var buf bytes.Buffer
+	if err := util.PrintTable(&buf, table, 2); err != nil {
 		return errors.Wrap(err, "failed to write table")
+	}
+
+	strs = append(strs, buf.String())
+	if _, err := fmt.Fprint(out, strings.Join(strs, "")); err != nil {
+		return errors.Wrap(err, "failed to print help")
 	}
 
 	return nil

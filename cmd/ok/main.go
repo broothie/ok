@@ -39,7 +39,7 @@ func run() error {
 	tools := tools.FromRegistry()
 
 	// Handle tool config
-	for _, options := range options.Tool {
+	for _, options := range options.ToolOptions {
 		if options.Action() == clipkg.ToolOptionsActionSet {
 			tool, toolPresent := tools[options.Name]
 			if !toolPresent {
@@ -59,12 +59,12 @@ func run() error {
 
 	// Handle early exits
 	if options.Help {
-		return cli.PrintHelp()
+		return cli.PrintHelp(os.Stdout)
 	} else if options.Version {
 		fmt.Println(ok.Version())
 		return nil
 	} else if options.ListTools {
-		return tools.Print()
+		return tools.Print(os.Stdout)
 	} else if options.InitTool != "" {
 		tool, toolPresent := tools[options.InitTool]
 		if !toolPresent {
@@ -82,7 +82,7 @@ func run() error {
 
 	// List task when no task provided
 	if options.TaskName == "" {
-		return tasks.Print()
+		return tasks.Print(os.Stdout)
 	}
 
 	task, found := tasks[options.TaskName]
@@ -144,7 +144,7 @@ func okrc() ([]string, error) {
 }
 
 func handleShowToolConfig(tools tools.Tools, options clipkg.Options) (bool, error) {
-	for _, toolOptions := range options.Tool {
+	for _, toolOptions := range options.ToolOptions {
 		switch toolOptions.Action() {
 		case clipkg.ToolOptionsActionTools:
 			for _, tool := range tools {
