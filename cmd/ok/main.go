@@ -9,7 +9,7 @@ import (
 
 	"github.com/bmatcuk/doublestar/v4"
 	"github.com/broothie/ok"
-	clipkg "github.com/broothie/ok/cli"
+	pkgcli "github.com/broothie/ok/cli"
 	"github.com/broothie/ok/task"
 	"github.com/broothie/ok/tools"
 	"github.com/pkg/errors"
@@ -30,7 +30,7 @@ func run() error {
 	}
 
 	// Parse options
-	cli := clipkg.New(append(okrcArgs, os.Args[1:]...))
+	cli := pkgcli.New(append(okrcArgs, os.Args[1:]...))
 	options, err := cli.Options()
 	if err != nil {
 		return err
@@ -40,7 +40,7 @@ func run() error {
 
 	// Handle tool config
 	for _, options := range options.ToolOptions {
-		if options.Action() == clipkg.ToolOptionsActionSet {
+		if options.Action() == pkgcli.ToolOptionsActionSet {
 			tool, toolPresent := tools[options.Name]
 			if !toolPresent {
 				return fmt.Errorf("unknown tool %q", options.Name)
@@ -143,10 +143,10 @@ func okrc() ([]string, error) {
 	return strings.Fields(string(contents)), nil
 }
 
-func handleShowToolConfig(tools tools.Tools, options clipkg.Options) (bool, error) {
+func handleShowToolConfig(tools tools.Tools, options pkgcli.Options) (bool, error) {
 	for _, toolOptions := range options.ToolOptions {
 		switch toolOptions.Action() {
-		case clipkg.ToolOptionsActionTools:
+		case pkgcli.ToolOptionsActionTools:
 			for _, tool := range tools {
 				for key, value := range tool.Config().Entries() {
 					fmt.Printf("--tool %s.%s=%s\n", tool.Name(), key, value)
@@ -155,7 +155,7 @@ func handleShowToolConfig(tools tools.Tools, options clipkg.Options) (bool, erro
 
 			return true, nil
 
-		case clipkg.ToolOptionsActionTool:
+		case pkgcli.ToolOptionsActionTool:
 			tool, toolPresent := tools[toolOptions.Name]
 			if !toolPresent {
 				return false, fmt.Errorf("unknown tool %q", toolOptions.Name)
@@ -167,7 +167,7 @@ func handleShowToolConfig(tools tools.Tools, options clipkg.Options) (bool, erro
 
 			return true, nil
 
-		case clipkg.ToolOptionsActionKey:
+		case pkgcli.ToolOptionsActionKey:
 			tool, toolPresent := tools[toolOptions.Name]
 			if !toolPresent {
 				return false, fmt.Errorf("unknown tool %q", toolOptions.Name)

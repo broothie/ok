@@ -115,7 +115,7 @@ func Test_flags(t *testing.T) {
 		assert.Equal(t, options.Watches, []string{"somefile"})
 	})
 
-	t.Run("-w somefile --watch otherfilefile", func(t *testing.T) {
+	t.Run("-w somefile --watch otherfile", func(t *testing.T) {
 		cli := newTestCLI("-w", "somefile", "--watch", "otherfile")
 		options, err := cli.Options()
 		require.NoError(t, err)
