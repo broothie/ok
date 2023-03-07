@@ -4,8 +4,16 @@ A task runner.
 
 ## Installation
 
+### Brew
+
 ```
-go install github.com/broothie/ok
+brew tap broothie/ok && brew install ok
+```
+
+### Go
+
+```
+go install github.com/broothie/ok/cmd/ok@latest
 ```
 
 ## Usage

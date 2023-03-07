@@ -17,7 +17,7 @@ const (
 	ToolOptionsActionSet   ToolOptionsAction = "set"
 )
 
-var toolOptionParser = regexp.MustCompile(`(?P<tool>\w+)(?:\.(?P<key>\w+)(?:=(?P<value>\S+))?)?`)
+var toolOptionParser = regexp.MustCompile(`(?P<tool>[^\s.]+)(?:\.(?P<key>\w+)(?:=(?P<value>\S+))?)?`)
 
 type ToolOptions struct {
 	Name  string
