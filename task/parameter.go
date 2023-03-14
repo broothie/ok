@@ -17,15 +17,19 @@ type Parameter struct {
 	Default *string
 }
 
-func NewSplatParameters(t Type) Parameters {
-	return Parameters{NewPositional("...", t)}
+func SplatParameters(t Type) Parameters {
+	return Parameters{SplatParameter(t)}
 }
 
-func NewPositional(name string, t Type) Parameter {
+func SplatParameter(t Type) Parameter {
+	return PositionalParameter("...", t)
+}
+
+func PositionalParameter(name string, t Type) Parameter {
 	return Parameter{Name: name, Type: t}
 }
 
-func NewKeyword(name string, t Type, dfault string) Parameter {
+func KeywordParameter(name string, t Type, dfault string) Parameter {
 	return Parameter{Name: name, Type: t, Default: &dfault}
 }
 

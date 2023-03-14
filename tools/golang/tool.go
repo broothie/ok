@@ -72,7 +72,7 @@ func (t Tool) ProcessFile(path string) ([]task.Task, error) {
 				return nil, err
 			}
 
-			params = append(params, task.NewPositional(paramName, typ))
+			params = append(params, task.PositionalParameter(paramName, typ))
 		}
 
 		description := ""

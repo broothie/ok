@@ -18,7 +18,7 @@ func newTestCLI(args ...string) *CLI {
 
 func Test_flags(t *testing.T) {
 	t.Run("-h", func(t *testing.T) {
-		cli := newTestCLI("-h")
+		cli := New([]string{"-h"})
 		options, err := cli.Options()
 		require.NoError(t, err)
 
@@ -26,7 +26,7 @@ func Test_flags(t *testing.T) {
 	})
 
 	t.Run("--help", func(t *testing.T) {
-		cli := newTestCLI("--help")
+		cli := New([]string{"--help"})
 		options, err := cli.Options()
 		require.NoError(t, err)
 
@@ -34,7 +34,7 @@ func Test_flags(t *testing.T) {
 	})
 
 	t.Run("-V", func(t *testing.T) {
-		cli := newTestCLI("-V")
+		cli := New([]string{"-V"})
 		options, err := cli.Options()
 		require.NoError(t, err)
 
@@ -42,7 +42,7 @@ func Test_flags(t *testing.T) {
 	})
 
 	t.Run("--version", func(t *testing.T) {
-		cli := newTestCLI("--version")
+		cli := New([]string{"--version"})
 		options, err := cli.Options()
 		require.NoError(t, err)
 
@@ -50,7 +50,7 @@ func Test_flags(t *testing.T) {
 	})
 
 	t.Run("--tools", func(t *testing.T) {
-		cli := newTestCLI("--tools")
+		cli := New([]string{"--tools"})
 		options, err := cli.Options()
 		require.NoError(t, err)
 
@@ -59,7 +59,7 @@ func Test_flags(t *testing.T) {
 
 	t.Run("--tool", func(t *testing.T) {
 		t.Run("", func(t *testing.T) {
-			cli := newTestCLI("--tool")
+			cli := New([]string{"--tool"})
 			options, err := cli.Options()
 			require.NoError(t, err)
 
@@ -67,7 +67,7 @@ func Test_flags(t *testing.T) {
 		})
 
 		t.Run("python", func(t *testing.T) {
-			cli := newTestCLI("--tool", "python")
+			cli := New([]string{"--tool", "python"})
 			options, err := cli.Options()
 			require.NoError(t, err)
 
@@ -75,7 +75,7 @@ func Test_flags(t *testing.T) {
 		})
 
 		t.Run("python.executable", func(t *testing.T) {
-			cli := newTestCLI("--tool", "python.executable")
+			cli := New([]string{"--tool", "python.executable"})
 			options, err := cli.Options()
 			require.NoError(t, err)
 
@@ -83,7 +83,7 @@ func Test_flags(t *testing.T) {
 		})
 
 		t.Run("python.executable=/path/to/python", func(t *testing.T) {
-			cli := newTestCLI("--tool", "python.executable=/path/to/python")
+			cli := New([]string{"--tool", "python.executable=/path/to/python"})
 			options, err := cli.Options()
 			require.NoError(t, err)
 
@@ -92,7 +92,7 @@ func Test_flags(t *testing.T) {
 	})
 
 	t.Run("--init", func(t *testing.T) {
-		cli := newTestCLI("--init", "python")
+		cli := New([]string{"--init", "python"})
 		options, err := cli.Options()
 		require.NoError(t, err)
 
@@ -100,7 +100,7 @@ func Test_flags(t *testing.T) {
 	})
 
 	t.Run("-w somefile", func(t *testing.T) {
-		cli := newTestCLI("-w", "somefile")
+		cli := New([]string{"-w", "somefile"})
 		options, err := cli.Options()
 		require.NoError(t, err)
 
@@ -108,7 +108,7 @@ func Test_flags(t *testing.T) {
 	})
 
 	t.Run("--watch somefile", func(t *testing.T) {
-		cli := newTestCLI("--watch", "somefile")
+		cli := New([]string{"--watch", "somefile"})
 		options, err := cli.Options()
 		require.NoError(t, err)
 
@@ -116,7 +116,7 @@ func Test_flags(t *testing.T) {
 	})
 
 	t.Run("-w somefile --watch otherfile", func(t *testing.T) {
-		cli := newTestCLI("-w", "somefile", "--watch", "otherfile")
+		cli := New([]string{"-w", "somefile", "--watch", "otherfile"})
 		options, err := cli.Options()
 		require.NoError(t, err)
 
