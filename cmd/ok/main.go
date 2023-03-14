@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"os/exec"
 	"strings"
 	"time"
 
@@ -98,7 +99,14 @@ func run() error {
 
 	// Run task in foreground if no watches provided
 	if len(options.Watches) == 0 {
-		return task.Run(context.Background(), args)
+		if err := task.Run(context.Background(), args); err != nil {
+			exitErr := new(exec.ExitError)
+			if errors.As(err, &exitErr) {
+				os.Exit(exitErr.ExitCode())
+			}
+		} else {
+			return nil
+		}
 	}
 
 	// Set up file watcher
@@ -127,6 +135,7 @@ func run() error {
 		return errors.Wrap(err, "failed to start watching files")
 	}
 
+	os.Exit(130)
 	return nil
 }
 
