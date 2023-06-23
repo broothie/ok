@@ -20,15 +20,19 @@ func (t Tools) Print(out io.Writer) error {
 		table = append(table, []string{tool.Name(), status, executable})
 	}
 
-	return util.PrintTable(out, table, 3)
+	return util.PrintTable(out, table, 2)
 }
 
 func (t Tasks) Print(out io.Writer) error {
-	table := [][]string{{"TASK", "ARGS", "TOOL", "FILE", "DESCRIPTION"}}
+	headers := []string{"TASK", "ARGS", "TOOL", "FILE", "DESCRIPTION"}
+
+	var table [][]string
 	for taskName, task := range t {
 		table = append(table, []string{taskName, task.Parameters().String(), task.Tool.Name(), task.Filename, task.Description()})
 	}
 
-	sort.Slice(table[1:], func(i, j int) bool { return table[i][0] < table[j][0] })
-	return util.PrintTable(out, table, 3)
+	sort.Slice(table, func(i, j int) bool { return table[i][0] < table[j][0] })
+
+	table = append([][]string{headers}, table...)
+	return util.PrintTable(out, table, 2)
 }

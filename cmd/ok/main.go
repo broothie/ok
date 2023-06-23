@@ -20,6 +20,11 @@ import (
 func main() {
 	if err := run(); err != nil {
 		fmt.Println(err)
+
+		if exitErr := new(exec.ExitError); errors.As(err, &exitErr) {
+			os.Exit(exitErr.ExitCode())
+		}
+
 		os.Exit(1)
 	}
 }
@@ -100,13 +105,10 @@ func run() error {
 	// Run task in foreground if no watches provided
 	if len(options.Watches) == 0 {
 		if err := task.Run(context.Background(), args); err != nil {
-			exitErr := new(exec.ExitError)
-			if errors.As(err, &exitErr) {
-				os.Exit(exitErr.ExitCode())
-			}
-		} else {
-			return nil
+			return err
 		}
+
+		return nil
 	}
 
 	// Set up file watcher
