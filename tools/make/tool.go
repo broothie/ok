@@ -13,7 +13,7 @@ import (
 
 const commentPrefix = "#"
 
-var ruleRegexp = regexp.MustCompile(`^(?P<name>[\w.][a-zA-Z0-9.]+):.*$`)
+var ruleRegexp = regexp.MustCompile(`^(?P<name>[\w.][a-zA-Z0-9.-]+):.*$`)
 
 type Tool struct {
 	config *tool.Config
