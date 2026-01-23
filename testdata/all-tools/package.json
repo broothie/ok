@@ -1,0 +1,5 @@
+{
+    "scripts": {
+        "npm-test": "echo 'from package.json'"
+    }
+}

@@ -1,0 +1,9 @@
+ok {{ .version }}
+
+Usage:
+    ok [OK_FLAGS] <taskName> [TASK_FLAGS]
+
+Options:
+{{- range $flag := .flags }}
+    {{ $flag.shorts }} {{ $flag.longs }}  {{ $flag.help }} 
+{{- end }}
