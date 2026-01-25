@@ -10,7 +10,6 @@ import (
 	"github.com/broothie/ok"
 	"github.com/broothie/ok/cli"
 	"github.com/broothie/ok/tool/tools"
-	"github.com/samber/lo"
 )
 
 const version = "v0.1.0"
@@ -88,13 +87,8 @@ func run() error {
 		return errors.Wrap(app.ListTasks(os.Stdout), "listing tasks")
 	}
 
-	tsk, found := lo.Find(app.Tasks, func(task ok.Task) bool { return task.Name == taskName })
-	if !found {
-		return errors.Errorf("no task found with name %q", taskName)
-	}
-
-	if err := tsk.Run(ctx, parser.RemainingArgs()); err != nil {
-		return errors.Wrapf(err, "running task %q", tsk.Name)
+	if err := app.RunTask(ctx, taskName, parser.RemainingArgs()); err != nil {
+		return errors.Wrapf(err, "running task %q", taskName)
 	}
 
 	return nil

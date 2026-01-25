@@ -1,7 +1,7 @@
 package tools
 
 import (
-	"github.com/broothie/ok/tool"
+	"github.com/broothie/ok"
 	"github.com/broothie/ok/tool/tools/just"
 	"github.com/broothie/ok/tool/tools/make"
 	"github.com/broothie/ok/tool/tools/npm"
@@ -9,8 +9,8 @@ import (
 	"github.com/broothie/ok/tool/tools/task"
 )
 
-func All() []tool.Tool {
-	return []tool.Tool{
+func All() []ok.Tool {
+	return []ok.Tool{
 		just.New(),
 		make.New(),
 		npm.New(),

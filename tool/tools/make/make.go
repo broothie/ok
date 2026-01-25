@@ -7,16 +7,16 @@ import (
 
 	"github.com/bobg/errors"
 	"github.com/broothie/cob"
-	"github.com/broothie/ok/tool"
+	"github.com/broothie/ok"
 	"github.com/broothie/option"
 )
 
-func New() tool.Tool {
-	return tool.Tool{
+func New() ok.Tool {
+	return ok.Tool{
 		Name:        "Make",
 		CommandName: "make",
 		FileGlobs:   []string{"GNUmakefile", "Makefile", "makefile"},
-		ProcessFile: func(ctx context.Context, filePath string) ([]tool.Task, error) {
+		ProcessFile: func(ctx context.Context, filePath string) ([]ok.Task, error) {
 			// https://stackoverflow.com/questions/4219255/how-do-you-get-the-list-of-targets-in-a-makefile
 			output, _, _, err := cob.Output(ctx, "make",
 				cob.AddArgs("--file", filePath),
@@ -30,7 +30,7 @@ func New() tool.Tool {
 				return nil, errors.Wrapf(err, "parsing make targets from %q", filePath)
 			}
 
-			var tasks []tool.Task
+			var tasks []ok.Task
 			for block := range strings.SplitSeq(output.String(), "\n\n") {
 				if !strings.Contains(block, "commands to execute") {
 					continue
@@ -38,7 +38,7 @@ func New() tool.Tool {
 
 				lines := strings.Split(block, "\n")
 				taskName := strings.TrimSuffix(lines[0], ":")
-				tasks = append(tasks, tool.Task{
+				tasks = append(tasks, ok.Task{
 					Name: taskName,
 					RunOptions: func(ctx context.Context, args []string) (option.Options[*exec.Cmd], error) {
 						return option.NewOptions(

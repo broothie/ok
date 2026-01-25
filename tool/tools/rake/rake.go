@@ -7,16 +7,16 @@ import (
 
 	"github.com/bobg/errors"
 	"github.com/broothie/cob"
-	"github.com/broothie/ok/tool"
+	"github.com/broothie/ok"
 	"github.com/broothie/option"
 )
 
-func New() tool.Tool {
-	return tool.Tool{
+func New() ok.Tool {
+	return ok.Tool{
 		Name:        "Rake",
 		CommandName: "rake",
 		FileGlobs:   []string{"Rakefile", "rakefile", "Rakefile.rb", "rakefile.rb"},
-		ProcessFile: func(ctx context.Context, filePath string) ([]tool.Task, error) {
+		ProcessFile: func(ctx context.Context, filePath string) ([]ok.Task, error) {
 			output, _, _, err := cob.Output(ctx, "rake",
 				cob.AddArgs("--rakefile", filePath),
 				cob.AddArgs("--tasks"),
@@ -26,7 +26,7 @@ func New() tool.Tool {
 				return nil, errors.Wrapf(err, "listing rake tasks from %q", filePath)
 			}
 
-			var tasks []tool.Task
+			var tasks []ok.Task
 			for line := range strings.SplitSeq(output.String(), "\n") {
 				line = strings.TrimSpace(line)
 				if !strings.HasPrefix(line, "rake ") {
@@ -38,7 +38,7 @@ func New() tool.Tool {
 				taskName, _, _ := strings.Cut(line, " ")
 				taskName, _, _ = strings.Cut(taskName, "[") // strip arg placeholders
 
-				tasks = append(tasks, tool.Task{
+				tasks = append(tasks, ok.Task{
 					Name: taskName,
 					RunOptions: func(ctx context.Context, args []string) (option.Options[*exec.Cmd], error) {
 						return option.NewOptions(

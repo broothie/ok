@@ -7,12 +7,12 @@ import (
 
 	"github.com/bobg/errors"
 	"github.com/broothie/cob"
-	"github.com/broothie/ok/tool"
+	"github.com/broothie/ok"
 	"github.com/broothie/option"
 )
 
-func New() tool.Tool {
-	return tool.Tool{
+func New() ok.Tool {
+	return ok.Tool{
 		Name:        "Task",
 		CommandName: "task",
 		FileGlobs: []string{
@@ -21,7 +21,7 @@ func New() tool.Tool {
 			"taskfile.yml",
 			"taskfile.yaml",
 		},
-		ProcessFile: func(ctx context.Context, filePath string) ([]tool.Task, error) {
+		ProcessFile: func(ctx context.Context, filePath string) ([]ok.Task, error) {
 			output, _, _, err := cob.Output(ctx, "task",
 				cob.AddArgs("--taskfile", filePath),
 				cob.AddArgs("--list-all"),
@@ -41,14 +41,14 @@ func New() tool.Tool {
 				return nil, errors.Wrapf(err, "parsing task task list from %q", filePath)
 			}
 
-			var tasks []tool.Task
+			var tasks []ok.Task
 			for _, task := range payload.Tasks {
 				taskName := task.Name
 				if taskName == "" {
 					taskName = task.Task
 				}
 
-				tasks = append(tasks, tool.Task{
+				tasks = append(tasks, ok.Task{
 					Name: taskName,
 					RunOptions: func(ctx context.Context, args []string) (option.Options[*exec.Cmd], error) {
 						opts := option.NewOptions(

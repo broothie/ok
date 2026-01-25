@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/bobg/errors"
-	"github.com/broothie/ok/tool"
 	"github.com/samber/lo"
 	"golang.org/x/sync/errgroup"
 )
@@ -25,15 +24,15 @@ func (o *Ok) DiscoverTasks(ctx context.Context) error {
 	return group.Wait()
 }
 
-func (o *Ok) processFile(ctx context.Context, tl Tool, filePath string) func() error {
+func (o *Ok) processFile(ctx context.Context, tl toolInfo, filePath string) func() error {
 	return func() error {
 		toolTasks, err := tl.ProcessFile(ctx, filePath)
 		if err != nil {
 			return errors.Wrapf(err, "parsing file %q for tool %q", filePath, tl.Name)
 		}
 
-		tasks := lo.Map(toolTasks, func(task tool.Task, _ int) Task {
-			return Task{
+		tasks := lo.Map(toolTasks, func(task Task, _ int) taskInfo {
+			return taskInfo{
 				Task:     task,
 				Tool:     &tl,
 				FilePath: filePath,
