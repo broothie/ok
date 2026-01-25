@@ -9,7 +9,7 @@ import (
 	"github.com/bobg/errors"
 	"github.com/broothie/ok"
 	"github.com/broothie/ok/cli"
-	"github.com/broothie/ok/tool/tools"
+	"github.com/broothie/ok/tools"
 )
 
 const version = "v0.1.0"
