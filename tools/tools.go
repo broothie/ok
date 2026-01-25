@@ -6,6 +6,7 @@ import (
 	"github.com/broothie/ok/tools/make"
 	"github.com/broothie/ok/tools/packagejson"
 	"github.com/broothie/ok/tools/rake"
+	"github.com/broothie/ok/tools/shell"
 	"github.com/broothie/ok/tools/task"
 )
 
@@ -16,6 +17,7 @@ func All() []ok.Tool {
 		packagejson.NewNPM(),
 		packagejson.NewYarn(),
 		rake.New(),
+		shell.New(),
 		task.New(),
 	}
 }
