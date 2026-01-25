@@ -8,7 +8,7 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-func (o *Ok) DiscoverTasks(ctx context.Context) error {
+func (o *Ok) SetUpTasks(ctx context.Context) error {
 	group, ctx := errgroup.WithContext(ctx)
 	for _, tl := range o.tools {
 		for _, filePath := range tl.FilePaths {

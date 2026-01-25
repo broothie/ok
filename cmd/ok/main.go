@@ -78,7 +78,7 @@ func run() error {
 		return errors.Wrap(app.PrintTools(os.Stdout), "listing tools")
 	}
 
-	if err := app.DiscoverTasks(ctx); err != nil {
+	if err := app.SetUpTasks(ctx); err != nil {
 		return errors.Wrap(err, "discovering tasks")
 	}
 
