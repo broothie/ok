@@ -11,7 +11,7 @@ import (
 	"github.com/broothie/ok/tool"
 )
 
-func NewMake() tool.Tool {
+func New() tool.Tool {
 	return tool.Tool{
 		Name:        "Make",
 		CommandName: "make",

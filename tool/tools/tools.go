@@ -9,8 +9,8 @@ import (
 
 func All() []tool.Tool {
 	return []tool.Tool{
-		make.NewMake(),
-		npm.NewNPM(),
-		rake.NewRake(),
+		make.New(),
+		npm.New(),
+		rake.New(),
 	}
 }

@@ -10,7 +10,7 @@ import (
 	"github.com/broothie/ok/tool"
 )
 
-func NewNPM() tool.Tool {
+func New() tool.Tool {
 	return tool.Tool{
 		Name:        "NPM",
 		CommandName: "npm",

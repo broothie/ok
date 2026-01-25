@@ -10,7 +10,7 @@ import (
 	"github.com/broothie/ok/tool"
 )
 
-func NewRake() tool.Tool {
+func New() tool.Tool {
 	return tool.Tool{
 		Name:        "Rake",
 		CommandName: "rake",
