@@ -1,6 +1,11 @@
 package tool
 
-import "context"
+import (
+	"context"
+	"os/exec"
+
+	"github.com/broothie/option"
+)
 
 type Tool struct {
 	Name        string
@@ -10,6 +15,6 @@ type Tool struct {
 }
 
 type Task struct {
-	Name string
-	Run  func(ctx context.Context, args []string) error
+	Name       string
+	RunOptions func(ctx context.Context, args []string) (option.Options[*exec.Cmd], error)
 }

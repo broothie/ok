@@ -2,12 +2,13 @@ package rake
 
 import (
 	"context"
-	"os"
+	"os/exec"
 	"strings"
 
 	"github.com/bobg/errors"
 	"github.com/broothie/cob"
 	"github.com/broothie/ok/tool"
+	"github.com/broothie/option"
 )
 
 func New() tool.Tool {
@@ -39,17 +40,12 @@ func New() tool.Tool {
 
 				tasks = append(tasks, tool.Task{
 					Name: taskName,
-					Run: func(ctx context.Context, args []string) error {
-						_, err := cob.Run(ctx, "rake",
+					RunOptions: func(ctx context.Context, args []string) (option.Options[*exec.Cmd], error) {
+						return option.NewOptions(
 							cob.AddArgs("--rakefile", filePath),
 							cob.AddArgs(taskName),
 							cob.AddArgs(args...),
-							cob.SetStdin(os.Stdin),
-							cob.SetStdout(os.Stdout),
-							cob.SetStderr(os.Stderr),
-						)
-
-						return errors.Wrapf(err, "running rake task %q", taskName)
+						), nil
 					},
 				})
 			}

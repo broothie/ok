@@ -4,10 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"os"
+	"os/exec"
 
 	"github.com/bobg/errors"
 	"github.com/broothie/cob"
 	"github.com/broothie/ok/tool"
+	"github.com/broothie/option"
 )
 
 func New() tool.Tool {
@@ -34,16 +36,11 @@ func New() tool.Tool {
 			for taskName := range packageJSONSchema.Scripts {
 				tasks = append(tasks, tool.Task{
 					Name: taskName,
-					Run: func(ctx context.Context, args []string) error {
-						_, err := cob.Run(ctx, "npm",
+					RunOptions: func(ctx context.Context, args []string) (option.Options[*exec.Cmd], error) {
+						return option.NewOptions(
 							cob.AddArgs("run", taskName),
 							cob.AddArgs(args...),
-							cob.SetStdin(os.Stdin),
-							cob.SetStdout(os.Stdout),
-							cob.SetStderr(os.Stderr),
-						)
-
-						return errors.Wrapf(err, "running npm script %q", taskName)
+						), nil
 					},
 				})
 			}

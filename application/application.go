@@ -6,12 +6,6 @@ import (
 	"github.com/broothie/ok/tool"
 )
 
-type Task struct {
-	tool.Task
-	Tool     *tool.Tool
-	FilePath string
-}
-
 type Application struct {
 	workingDirectory string
 	Tools            []tool.Tool
