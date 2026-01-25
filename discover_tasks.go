@@ -9,7 +9,7 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-func (o *Application) DiscoverTasks(ctx context.Context) error {
+func (o *Ok) DiscoverTasks(ctx context.Context) error {
 	group, ctx := errgroup.WithContext(ctx)
 	for _, tl := range o.tools {
 		for _, filePath := range tl.FilePaths {
@@ -25,7 +25,7 @@ func (o *Application) DiscoverTasks(ctx context.Context) error {
 	return group.Wait()
 }
 
-func (o *Application) processFile(ctx context.Context, tl Tool, filePath string) func() error {
+func (o *Ok) processFile(ctx context.Context, tl Tool, filePath string) func() error {
 	return func() error {
 		toolTasks, err := tl.ProcessFile(ctx, filePath)
 		if err != nil {

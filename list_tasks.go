@@ -8,7 +8,7 @@ import (
 	"github.com/broothie/ok/table"
 )
 
-func (o *Application) ListTasks(w io.Writer) error {
+func (o *Ok) ListTasks(w io.Writer) error {
 	rows := [][]string{{"TASK", "TOOL", "FILE"}}
 
 	for _, task := range o.Tasks {

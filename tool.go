@@ -24,7 +24,7 @@ type Tool struct {
 	FilePathsErr   error
 }
 
-func (o *Application) SetUpTools(ctx context.Context, tls []tool.Tool) error {
+func (o *Ok) SetUpTools(ctx context.Context, tls []tool.Tool) error {
 	group, ctx := errgroup.WithContext(ctx)
 
 	for _, tl := range tls {
@@ -59,7 +59,7 @@ func (o *Application) SetUpTools(ctx context.Context, tls []tool.Tool) error {
 	return group.Wait()
 }
 
-func (o *Application) PrintTools(w io.Writer) error {
+func (o *Ok) PrintTools(w io.Writer) error {
 	rows := [][]string{{"TOOL", "EXECUTABLE", "FILES"}}
 
 	for _, tl := range o.tools {
