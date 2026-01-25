@@ -26,7 +26,7 @@ type taskInfo struct {
 }
 
 func (o *Ok) ListTasks(w io.Writer) error {
-	rows := lo.Map(o.Tasks, func(tsk taskInfo, _ int) []string { return []string{tsk.Name, tsk.tool.Name, tsk.filePath} })
+	rows := lo.Map(o.tasks, func(tsk taskInfo, _ int) []string { return []string{tsk.Name, tsk.tool.Name, tsk.filePath} })
 	sort.Slice(rows, func(i, j int) bool { return rows[i][0] < rows[j][0] })
 
 	rows = append([][]string{{"TASK", "TOOL", "FILE"}}, rows...)
@@ -70,7 +70,7 @@ func (o *Ok) processFile(ctx context.Context, tl toolInfo, filePath string) func
 		})
 
 		o.tasksLock.Lock()
-		o.Tasks = append(o.Tasks, tasks...)
+		o.tasks = append(o.tasks, tasks...)
 		o.tasksLock.Unlock()
 		return nil
 	}

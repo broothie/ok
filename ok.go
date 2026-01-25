@@ -14,7 +14,7 @@ type Ok struct {
 	toolsLock *sync.Mutex
 	tools     []toolInfo
 	tasksLock *sync.Mutex
-	Tasks     []taskInfo
+	tasks     []taskInfo
 }
 
 func New() *Ok {
@@ -25,7 +25,7 @@ func New() *Ok {
 }
 
 func (o *Ok) RunTask(ctx context.Context, taskName string, remainingArgs []string) error {
-	tsk, found := lo.Find(o.Tasks, func(tsk taskInfo) bool { return tsk.Name == taskName })
+	tsk, found := lo.Find(o.tasks, func(tsk taskInfo) bool { return tsk.Name == taskName })
 	if !found {
 		return errors.Errorf("no task found with name %q", taskName)
 	}
