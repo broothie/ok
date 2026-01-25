@@ -14,6 +14,7 @@ A unified task runner that discovers and executes tasks from multiple build tool
   - Just (Justfile)
   - Make (Makefile)
   - NPM (package.json scripts)
+  - Yarn (yarn.lock + package.json scripts)
   - Rake (Rakefile)
   - Task (Taskfile.yml / Taskfile.yaml)
 
@@ -61,6 +62,10 @@ ok start
 ### NPM
 - Discovers scripts from `package.json`
 - Runs tasks using `npm run <script>`
+
+### Yarn
+- Discovers scripts from `package.json` when `yarn.lock` is present
+- Runs tasks using `yarn run <script> -- [args...]`
 
 ### Rake
 - Discovers tasks from `Rakefile`
