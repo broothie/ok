@@ -41,10 +41,10 @@ func (o *Ok) processTool(tl Tool) func() error {
 		o.toolsLock.Lock()
 		o.tools = append(o.tools, toolInfo{
 			Tool:           tl,
-			CommandPath:    commandPath,
-			CommandPathErr: commandPathErr,
-			FilePaths:      filePaths,
-			FilePathsErr:   filePathsErr,
+			commandPath:    commandPath,
+			commandPathErr: commandPathErr,
+			filePaths:      filePaths,
+			filePathsErr:   filePathsErr,
 		})
 		o.toolsLock.Unlock()
 		return nil

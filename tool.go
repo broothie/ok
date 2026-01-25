@@ -2,9 +2,8 @@ package ok
 
 import (
 	"context"
-	"os/exec"
 
-	"github.com/broothie/option"
+	"github.com/bobg/errors"
 )
 
 type Tool struct {
@@ -14,8 +13,14 @@ type Tool struct {
 	ProcessFile func(ctx context.Context, filePath string) ([]Task, error)
 }
 
-type Task struct {
-	Name       string
-	RunOptions func(ctx context.Context, args []string) (option.Options[*exec.Cmd], error)
+type toolInfo struct {
+	Tool
+	commandPath    string
+	commandPathErr error
+	filePaths      []string
+	filePathsErr   error
 }
 
+func (i toolInfo) err() error {
+	return errors.Join(i.commandPathErr, i.filePathsErr)
+}

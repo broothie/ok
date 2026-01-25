@@ -1,22 +1,6 @@
 package ok
 
-import (
-	"sync"
-)
-
-type toolInfo struct {
-	Tool
-	CommandPath    string
-	CommandPathErr error
-	FilePaths      []string
-	FilePathsErr   error
-}
-
-type taskInfo struct {
-	Task
-	Tool     *toolInfo
-	FilePath string
-}
+import "sync"
 
 type Ok struct {
 	toolsLock *sync.Mutex

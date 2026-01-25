@@ -34,8 +34,8 @@ func (o *Ok) processFile(ctx context.Context, tl toolInfo, filePath string) func
 		tasks := lo.Map(toolTasks, func(task Task, _ int) taskInfo {
 			return taskInfo{
 				Task:     task,
-				Tool:     &tl,
-				FilePath: filePath,
+				tool:     &tl,
+				filePath: filePath,
 			}
 		})
 

@@ -1,6 +1,7 @@
 package ok
 
 import (
+	"fmt"
 	"io"
 	"sort"
 	"strings"
@@ -9,18 +10,18 @@ import (
 	"github.com/broothie/ok/table"
 )
 
-func (o *Ok) PrintTools(w io.Writer) error {
+func (o *Ok) ListTools(w io.Writer) error {
 	rows := [][]string{{"TOOL", "EXECUTABLE", "FILES"}}
 
 	for _, tl := range o.tools {
-		executable := tl.CommandPath
-		if tl.CommandPathErr != nil {
-			executable = tl.CommandPathErr.Error()
+		executable := fmt.Sprintf("✔ %s", tl.commandPath)
+		if tl.commandPathErr != nil {
+			executable = fmt.Sprintf("✘ %v", tl.commandPathErr)
 		}
 
-		files := strings.Join(tl.FilePaths, ",")
-		if tl.FilePathsErr != nil {
-			files = tl.FilePathsErr.Error()
+		files := fmt.Sprintf("✔ %s", strings.Join(tl.filePaths, ","))
+		if tl.filePathsErr != nil {
+			files = fmt.Sprintf("✘ %v", tl.filePathsErr)
 		}
 
 		rows = append(rows, []string{tl.Name, executable, files})
