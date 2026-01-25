@@ -15,7 +15,7 @@ func New() tool.Tool {
 	return tool.Tool{
 		Name:        "Just",
 		CommandName: "just",
-		FileGlobs:   []string{"justfile", "Justfile"},
+		FileGlobs:   []string{"Justfile", "justfile"},
 		ParseFile: func(ctx context.Context, filePath string) ([]tool.Task, error) {
 			output, _, _, err := cob.Output(ctx, "just",
 				cob.AddArgs("--justfile", filePath),

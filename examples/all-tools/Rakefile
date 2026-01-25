@@ -1,0 +1,3 @@
+task :"test-rake" do
+  puts "from rake"
+end
