@@ -43,7 +43,6 @@ func run() error {
 		Name:         "timeout",
 		Type:         cli.FlagTypeDuration,
 		Help:         "Command timeout.",
-		Shorts:       []rune{'t'},
 		DefaultValue: time.Second,
 	}
 
@@ -63,7 +62,7 @@ func run() error {
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutFlag.Value().(time.Duration))
 	defer cancel()
 
-	app := application.New(directoryFlag.Value().(string), tools.All())
+	app := application.New(tools.All())
 	if err := app.DiscoverTasks(ctx); err != nil {
 		return errors.Wrap(err, "discovering tasks")
 	}

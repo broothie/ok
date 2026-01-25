@@ -7,16 +7,14 @@ import (
 )
 
 type Application struct {
-	workingDirectory string
-	Tools            []tool.Tool
-	tasksLock        *sync.Mutex
-	Tasks            []Task
+	Tools     []tool.Tool
+	tasksLock *sync.Mutex
+	Tasks     []Task
 }
 
-func New(workingDirectory string, tools []tool.Tool) *Application {
+func New(tools []tool.Tool) *Application {
 	return &Application{
-		workingDirectory: workingDirectory,
-		Tools:            tools,
-		tasksLock:        new(sync.Mutex),
+		Tools:     tools,
+		tasksLock: new(sync.Mutex),
 	}
 }
