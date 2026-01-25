@@ -2,6 +2,7 @@ package rake
 
 import (
 	"context"
+	"fmt"
 	"os/exec"
 	"strings"
 
@@ -41,10 +42,20 @@ func New() ok.Tool {
 				tasks = append(tasks, ok.Task{
 					Name: taskName,
 					RunOptions: func(ctx context.Context, args []string) (option.Options[*exec.Cmd], error) {
+						taskArgs, rakeVars, err := splitRakeArgs(args)
+						if err != nil {
+							return nil, errors.Wrap(err, "parsing rake args")
+						}
+
+						invocation := taskName
+						if len(taskArgs) > 0 {
+							invocation = fmt.Sprintf("%s[%s]", invocation, strings.Join(taskArgs, ","))
+						}
+
 						return option.NewOptions(
 							cob.AddArgs("--rakefile", filePath),
-							cob.AddArgs(taskName),
-							cob.AddArgs(args...),
+							cob.AddArgs(invocation),
+							cob.AddArgs(rakeVars...),
 						), nil
 					},
 				})
@@ -53,4 +64,25 @@ func New() ok.Tool {
 			return tasks, nil
 		},
 	}
+}
+
+func splitRakeArgs(args []string) (taskArgs []string, rakeVars []string, err error) {
+	for _, arg := range args {
+		// Common rake CLI usage: `rake task FOO=bar`
+		// Treat KEY=VALUE tokens as rake vars, not task args.
+		if !strings.HasPrefix(arg, "-") && strings.Contains(arg, "=") {
+			rakeVars = append(rakeVars, arg)
+			continue
+		}
+
+		// Rake task args are comma-separated inside `task[ ... ]`.
+		// We can't represent literal commas in a single argument unambiguously.
+		if strings.ContainsAny(arg, "],") {
+			return nil, nil, errors.Errorf("rake task argument %q contains ',' or ']' which cannot be encoded in task[arg1,arg2] form", arg)
+		}
+
+		taskArgs = append(taskArgs, arg)
+	}
+
+	return taskArgs, rakeVars, nil
 }
