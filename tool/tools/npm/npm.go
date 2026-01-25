@@ -43,7 +43,7 @@ func NewNPM() tool.Tool {
 							cob.SetStderr(os.Stderr),
 						)
 
-						return err
+						return errors.Wrapf(err, "running npm script %q", taskName)
 					},
 				})
 			}

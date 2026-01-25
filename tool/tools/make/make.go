@@ -50,7 +50,7 @@ func NewMake() tool.Tool {
 							cob.SetStderr(os.Stderr),
 						)
 
-						return err
+						return errors.Wrapf(err, "running make target %q", taskName)
 					},
 				})
 			}
