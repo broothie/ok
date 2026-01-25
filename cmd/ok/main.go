@@ -3,13 +3,17 @@ package main
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/bobg/errors"
 	"github.com/broothie/ok"
 	"github.com/broothie/ok/cli"
 	"github.com/broothie/ok/tools"
+	"github.com/joho/godotenv"
+	"github.com/samber/lo"
 )
 
 const version = "v0.1.0"
@@ -29,6 +33,16 @@ func run() error {
 		return errors.Wrap(err, "parsing flags")
 	}
 
+	if flags.Debug.Value().(bool) {
+		slog.SetLogLoggerLevel(slog.LevelDebug)
+	}
+
+	if flags.LoadDotEnv.Value().(bool) {
+		if err := godotenv.Load(); err != nil && !os.IsNotExist(err) {
+			return errors.Wrap(err, "loading .env")
+		}
+	}
+
 	if err := os.Chdir(flags.Directory.Value().(string)); err != nil {
 		return errors.Wrapf(err, "changing dir to %q", flags.Directory.Value().(string))
 	}
@@ -40,14 +54,21 @@ func run() error {
 	ctx, cancel := context.WithTimeout(context.Background(), flags.Timeout.Value().(time.Duration))
 	defer cancel()
 
-	app := ok.New()
+	tls := tools.All()
+	if filterTools := flags.FilterTools.Value().(string); filterTools != "" {
+		selectTools := strings.Split(filterTools, ",")
+		tls = lo.Filter(tools.All(), func(tl ok.Tool, _ int) bool {
+			return lo.ContainsBy(selectTools, func(toolName string) bool { return strings.EqualFold(toolName, tl.Name) })
+		})
+	}
 
-	if err := app.SetUpTools(ctx, tools.All()); err != nil {
+	app := ok.New()
+	if err := app.SetUpTools(ctx, tls); err != nil {
 		return errors.Wrap(err, "setting up tools")
 	}
 
-	if flags.Tools.Value().(bool) {
-		return errors.Wrap(app.PrintTools(os.Stdout), "listing tools")
+	if flags.ListTools.Value().(bool) {
+		return errors.Wrap(app.ListTools(os.Stdout), "listing tools")
 	}
 
 	if err := app.SetUpTasks(ctx); err != nil {
@@ -67,10 +88,13 @@ func run() error {
 }
 
 type Flags struct {
-	Help      *cli.Flag
-	Directory *cli.Flag
-	Timeout   *cli.Flag
-	Tools     *cli.Flag
+	Help        *cli.Flag
+	Directory   *cli.Flag
+	Timeout     *cli.Flag
+	FilterTools *cli.Flag
+	ListTools   *cli.Flag
+	LoadDotEnv  *cli.Flag
+	Debug       *cli.Flag
 }
 
 func (f *Flags) All() []*cli.Flag {
@@ -78,7 +102,10 @@ func (f *Flags) All() []*cli.Flag {
 		f.Help,
 		f.Directory,
 		f.Timeout,
-		f.Tools,
+		f.FilterTools,
+		f.ListTools,
+		f.LoadDotEnv,
+		f.Debug,
 	}
 }
 
@@ -104,10 +131,29 @@ func NewFlags() *Flags {
 			Help:         "Command timeout.",
 			DefaultValue: time.Second,
 		},
-		Tools: &cli.Flag{
-			Name:         "tools",
+		FilterTools: &cli.Flag{
+			Name:         "filter-tools",
+			Type:         cli.FlagTypeString,
+			Help:         "Filter tools by case-insensitive name. Use commas for multiple values",
+			Aliases:      []string{"ft"},
+			DefaultValue: "",
+		},
+		ListTools: &cli.Flag{
+			Name:         "list-tools",
 			Type:         cli.FlagTypeBool,
 			Help:         "List tools.",
+			DefaultValue: false,
+		},
+		LoadDotEnv: &cli.Flag{
+			Name:         "load-dot-env",
+			Type:         cli.FlagTypeBool,
+			Help:         "Pick up local .env files.",
+			DefaultValue: true,
+		},
+		Debug: &cli.Flag{
+			Name:         "debug",
+			Type:         cli.FlagTypeBool,
+			Help:         "Output debug logs.",
 			DefaultValue: false,
 		},
 	}

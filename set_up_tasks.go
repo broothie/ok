@@ -2,6 +2,7 @@ package ok
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/bobg/errors"
 	"github.com/samber/lo"
@@ -11,7 +12,12 @@ import (
 func (o *Ok) SetUpTasks(ctx context.Context) error {
 	group, ctx := errgroup.WithContext(ctx)
 	for _, tl := range o.tools {
-		for _, filePath := range tl.FilePaths {
+		if err := tl.err(); err != nil {
+			slog.Debug("skipping task setup for errored tool", slog.String("tool", tl.Name), slog.Any("error", err))
+			continue
+		}
+
+		for _, filePath := range tl.filePaths {
 			if err := ctx.Err(); err != nil {
 				return err
 			}
