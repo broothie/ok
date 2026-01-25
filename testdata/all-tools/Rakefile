@@ -1,0 +1,3 @@
+task "rake-test" do
+  puts "from Rakefile"
+end

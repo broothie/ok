@@ -3,6 +3,7 @@ package application
 import (
 	"context"
 	"os"
+	"strings"
 
 	"github.com/bmatcuk/doublestar/v4"
 	"github.com/bobg/errors"
@@ -26,6 +27,8 @@ func (a *Application) DiscoverTasks(ctx context.Context) error {
 
 func (a *Application) globFiles(ctx context.Context, tl tool.Tool, group *errgroup.Group) func() error {
 	return func() error {
+		seen := make(map[string]bool)
+
 		for _, glob := range tl.FileGlobs {
 			if err := ctx.Err(); err != nil {
 				return err
@@ -40,6 +43,13 @@ func (a *Application) globFiles(ctx context.Context, tl tool.Tool, group *errgro
 				if err := ctx.Err(); err != nil {
 					return err
 				}
+
+				// Dedupe by lowercase path for case-insensitive filesystems
+				key := strings.ToLower(filePath)
+				if seen[key] {
+					continue
+				}
+				seen[key] = true
 
 				group.Go(a.parseFile(ctx, tl, filePath))
 			}

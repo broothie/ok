@@ -15,7 +15,7 @@ func NewMake() tool.Tool {
 	return tool.Tool{
 		Name:        "Make",
 		CommandName: "make",
-		FileGlobs:   []string{"Makefile"},
+		FileGlobs:   []string{"GNUmakefile", "Makefile", "makefile"},
 		ParseFile: func(ctx context.Context, filePath string) ([]tool.Task, error) {
 			// https://stackoverflow.com/questions/4219255/how-do-you-get-the-list-of-targets-in-a-makefile
 			output, _, _, err := cob.Output(ctx, "make",
