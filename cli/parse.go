@@ -1,4 +1,4 @@
-package argparser
+package cli
 
 import (
 	"strings"
@@ -7,15 +7,15 @@ import (
 	"github.com/samber/lo"
 )
 
-func (p *ArgParser) TaskName() string {
+func (p *Parser) TaskName() string {
 	return p.taskName
 }
 
-func (p *ArgParser) RemainingArgs() []string {
+func (p *Parser) RemainingArgs() []string {
 	return p.tokens[p.index:]
 }
 
-func (p *ArgParser) Parse() error {
+func (p *Parser) Parse() error {
 	var errs []error
 	for token, tokensRemaining := p.current(); tokensRemaining; token, tokensRemaining = p.current() {
 		if err := p.parseToken(token); err != nil {
@@ -31,7 +31,7 @@ func (p *ArgParser) Parse() error {
 	return errors.Join(errs...)
 }
 
-func (p *ArgParser) parseToken(token string) error {
+func (p *Parser) parseToken(token string) error {
 	fullFlag, rhs, _ := strings.Cut(token, "=")
 
 	flag, err := p.parseLongFlag(fullFlag)
@@ -59,7 +59,7 @@ func (p *ArgParser) parseToken(token string) error {
 	return nil
 }
 
-func (p *ArgParser) parseLongFlag(fullFlag string) (*Flag, error) {
+func (p *Parser) parseLongFlag(fullFlag string) (*Flag, error) {
 	name, isLongFlag := strings.CutPrefix(fullFlag, "--")
 	if !isLongFlag {
 		return nil, nil
@@ -73,7 +73,7 @@ func (p *ArgParser) parseLongFlag(fullFlag string) (*Flag, error) {
 	return flag, nil
 }
 
-func (p *ArgParser) parseShortFlag(fullFlag string) (*Flag, error) {
+func (p *Parser) parseShortFlag(fullFlag string) (*Flag, error) {
 	short, isShortFlag := strings.CutPrefix(fullFlag, "-")
 	if !isShortFlag {
 		return nil, nil
@@ -87,7 +87,7 @@ func (p *ArgParser) parseShortFlag(fullFlag string) (*Flag, error) {
 	return flag, nil
 }
 
-func (p *ArgParser) parseFlagValue(flag *Flag, rhs string) error {
+func (p *Parser) parseFlagValue(flag *Flag, rhs string) error {
 	if flag.IsBool() {
 		return p.parseFlagBoolValue(flag, rhs)
 	} else {
@@ -95,7 +95,7 @@ func (p *ArgParser) parseFlagValue(flag *Flag, rhs string) error {
 	}
 }
 
-func (p *ArgParser) parseFlagBoolValue(flag *Flag, rhs string) error {
+func (p *Parser) parseFlagBoolValue(flag *Flag, rhs string) error {
 	value := "true"
 	if rhs != "" {
 		value = rhs
@@ -109,7 +109,7 @@ func (p *ArgParser) parseFlagBoolValue(flag *Flag, rhs string) error {
 	return nil
 }
 
-func (p *ArgParser) parseFlagNonBoolValue(flag *Flag, rhs string) error {
+func (p *Parser) parseFlagNonBoolValue(flag *Flag, rhs string) error {
 	value := rhs
 	advance := 1
 	if rhs == "" {
@@ -130,15 +130,15 @@ func (p *ArgParser) parseFlagNonBoolValue(flag *Flag, rhs string) error {
 	return nil
 }
 
-func (p *ArgParser) next() (string, bool) {
+func (p *Parser) next() (string, bool) {
 	return p.at(p.index + 1)
 }
 
-func (p *ArgParser) current() (string, bool) {
+func (p *Parser) current() (string, bool) {
 	return p.at(p.index)
 }
 
-func (p *ArgParser) at(index int) (string, bool) {
+func (p *Parser) at(index int) (string, bool) {
 	if !p.isInBounds(index) {
 		return "", false
 	}
@@ -146,10 +146,6 @@ func (p *ArgParser) at(index int) (string, bool) {
 	return p.tokens[index], true
 }
 
-func (p *ArgParser) isInBounds(index int) bool {
+func (p *Parser) isInBounds(index int) bool {
 	return 0 <= index && index < len(p.tokens)
-}
-
-func toPointer[T any](value T) *T {
-	return &value
 }

@@ -1,4 +1,4 @@
-package ok
+package npm
 
 import (
 	"context"
@@ -7,14 +7,15 @@ import (
 
 	"github.com/bobg/errors"
 	"github.com/broothie/cob"
+	"github.com/broothie/ok/tool"
 )
 
-func NewNPM() Tool {
-	return Tool{
+func NewNPM() tool.Tool {
+	return tool.Tool{
 		Name:        "NPM",
 		CommandName: "npm",
 		FileGlobs:   []string{"package.json"},
-		ParseFile: func(ctx context.Context, filePath string) ([]Task, error) {
+		ParseFile: func(ctx context.Context, filePath string) ([]tool.Task, error) {
 			packageJSONFile, err := os.Open(filePath)
 			if err != nil {
 				return nil, errors.Wrapf(err, "opening %q", filePath)
@@ -28,9 +29,9 @@ func NewNPM() Tool {
 				return nil, errors.Wrapf(err, "parsing %q", filePath)
 			}
 
-			var tasks []Task
+			var tasks []tool.Task
 			for taskName := range packageJSONSchema.Scripts {
-				tasks = append(tasks, Task{
+				tasks = append(tasks, tool.Task{
 					Name: taskName,
 					Run: func(ctx context.Context, args []string) error {
 						_, err := cob.Run(ctx, "npm",

@@ -1,4 +1,4 @@
-package ok
+package make
 
 import (
 	"context"
@@ -8,14 +8,15 @@ import (
 
 	"github.com/bobg/errors"
 	"github.com/broothie/cob"
+	"github.com/broothie/ok/tool"
 )
 
-func NewMake() Tool {
-	return Tool{
+func NewMake() tool.Tool {
+	return tool.Tool{
 		Name:        "Make",
 		CommandName: "make",
 		FileGlobs:   []string{"Makefile"},
-		ParseFile: func(ctx context.Context, filePath string) ([]Task, error) {
+		ParseFile: func(ctx context.Context, filePath string) ([]tool.Task, error) {
 			// https://stackoverflow.com/questions/4219255/how-do-you-get-the-list-of-targets-in-a-makefile
 			output, _, _, err := cob.Output(ctx, "make",
 				cob.AddArgs("--file", filePath),
@@ -29,7 +30,7 @@ func NewMake() Tool {
 				return nil, errors.Wrapf(err, "parsing make targets from %q", filePath)
 			}
 
-			var tasks []Task
+			var tasks []tool.Task
 			for block := range strings.SplitSeq(output.String(), "\n\n") {
 				if !strings.Contains(block, "commands to execute") {
 					continue
@@ -37,7 +38,7 @@ func NewMake() Tool {
 
 				lines := strings.Split(block, "\n")
 				taskName := strings.TrimSuffix(lines[0], ":")
-				tasks = append(tasks, Task{
+				tasks = append(tasks, tool.Task{
 					Name: taskName,
 					Run: func(ctx context.Context, args []string) error {
 						_, err := cob.Run(ctx, "make",

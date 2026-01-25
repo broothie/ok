@@ -1,4 +1,4 @@
-package argparser
+package cli
 
 import (
 	"testing"
@@ -104,7 +104,7 @@ func TestArgParser_Parse(t *testing.T) {
 		flags := lo.Map(lo.Values(flagCases), func(fc FlagCase, _ int) *Flag { return fc.flag })
 		tokens := lo.FlatMap(lo.Values(flagCases), func(fc FlagCase, _ int) []string { return fc.tokens })
 
-		parser := New("v0.1.0", append(append(tokens, taskName), remainingArgs...), flags...)
+		parser := NewParser("v0.1.0", append(append(tokens, taskName), remainingArgs...), flags...)
 		require.NoError(t, parser.Parse())
 
 		assert.Equal(t, taskName, parser.taskName)
@@ -120,7 +120,7 @@ func TestArgParser_Parse(t *testing.T) {
 
 		for name, fc := range flagCases {
 			t.Run(name, func(t *testing.T) {
-				parser := New("v0.1.0", append(append(fc.tokens, taskName), remainingArgs...), fc.flag)
+				parser := NewParser("v0.1.0", append(append(fc.tokens, taskName), remainingArgs...), fc.flag)
 				require.NoError(t, parser.Parse())
 
 				assert.Equal(t, fc.expectedValue, fc.flag.Value())

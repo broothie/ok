@@ -1,4 +1,4 @@
-package argparser
+package cli
 
 import (
 	"strconv"
