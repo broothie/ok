@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/bobg/errors"
-	"github.com/broothie/ok/application"
+	"github.com/broothie/ok"
 	"github.com/broothie/ok/cli"
 	"github.com/broothie/ok/tool/tools"
 	"github.com/samber/lo"
@@ -69,7 +69,7 @@ func run() error {
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutFlag.Value().(time.Duration))
 	defer cancel()
 
-	app := application.New()
+	app := ok.New()
 
 	if err := app.SetUpTools(ctx, tools.All()); err != nil {
 		return errors.Wrap(err, "setting up tools")
@@ -88,7 +88,7 @@ func run() error {
 		return errors.Wrap(app.ListTasks(os.Stdout), "listing tasks")
 	}
 
-	tsk, found := lo.Find(app.Tasks, func(task application.Task) bool { return task.Name == taskName })
+	tsk, found := lo.Find(app.Tasks, func(task ok.Task) bool { return task.Name == taskName })
 	if !found {
 		return errors.Errorf("no task found with name %q", taskName)
 	}
