@@ -22,50 +22,22 @@ func main() {
 }
 
 func run() error {
-	helpFlag := &cli.Flag{
-		Name:         "help",
-		Type:         cli.FlagTypeBool,
-		Help:         "Show command help.",
-		Shorts:       []rune{'h'},
-		DefaultValue: false,
-	}
+	flags := NewFlags()
 
-	directoryFlag := &cli.Flag{
-		Name:         "directory",
-		Type:         cli.FlagTypeString,
-		Help:         "Directory to run command from.",
-		Shorts:       []rune{'d'},
-		DefaultValue: ".",
-	}
-
-	timeoutFlag := &cli.Flag{
-		Name:         "timeout",
-		Type:         cli.FlagTypeDuration,
-		Help:         "Command timeout.",
-		DefaultValue: time.Second,
-	}
-
-	toolFlag := &cli.Flag{
-		Name:         "tools",
-		Type:         cli.FlagTypeBool,
-		Help:         "List tools.",
-		DefaultValue: false,
-	}
-
-	parser := cli.NewParser(version, os.Args[1:], helpFlag, directoryFlag, timeoutFlag, toolFlag)
+	parser := cli.NewParser(version, os.Args[1:], flags.All()...)
 	if err := parser.Parse(); err != nil {
 		return errors.Wrap(err, "parsing flags")
 	}
 
-	if err := os.Chdir(directoryFlag.Value().(string)); err != nil {
-		return errors.Wrapf(err, "changing dir to %q", directoryFlag.Value().(string))
+	if err := os.Chdir(flags.Directory.Value().(string)); err != nil {
+		return errors.Wrapf(err, "changing dir to %q", flags.Directory.Value().(string))
 	}
 
-	if helpFlag.Value().(bool) {
+	if flags.Help.Value().(bool) {
 		return errors.Wrap(parser.WriteHelp(os.Stdout), "printing help")
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutFlag.Value().(time.Duration))
+	ctx, cancel := context.WithTimeout(context.Background(), flags.Timeout.Value().(time.Duration))
 	defer cancel()
 
 	app := ok.New()
@@ -74,7 +46,7 @@ func run() error {
 		return errors.Wrap(err, "setting up tools")
 	}
 
-	if toolFlag.Value().(bool) {
+	if flags.Tools.Value().(bool) {
 		return errors.Wrap(app.PrintTools(os.Stdout), "listing tools")
 	}
 
@@ -92,4 +64,51 @@ func run() error {
 	}
 
 	return nil
+}
+
+type Flags struct {
+	Help      *cli.Flag
+	Directory *cli.Flag
+	Timeout   *cli.Flag
+	Tools     *cli.Flag
+}
+
+func (f *Flags) All() []*cli.Flag {
+	return []*cli.Flag{
+		f.Help,
+		f.Directory,
+		f.Timeout,
+		f.Tools,
+	}
+}
+
+func NewFlags() *Flags {
+	return &Flags{
+		Help: &cli.Flag{
+			Name:         "help",
+			Type:         cli.FlagTypeBool,
+			Help:         "Show command help.",
+			Shorts:       []rune{'h'},
+			DefaultValue: false,
+		},
+		Directory: &cli.Flag{
+			Name:         "directory",
+			Type:         cli.FlagTypeString,
+			Help:         "Directory to run command from.",
+			Shorts:       []rune{'d'},
+			DefaultValue: ".",
+		},
+		Timeout: &cli.Flag{
+			Name:         "timeout",
+			Type:         cli.FlagTypeDuration,
+			Help:         "Command timeout.",
+			DefaultValue: time.Second,
+		},
+		Tools: &cli.Flag{
+			Name:         "tools",
+			Type:         cli.FlagTypeBool,
+			Help:         "List tools.",
+			DefaultValue: false,
+		},
+	}
 }
