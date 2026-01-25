@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/bobg/errors"
@@ -96,7 +97,7 @@ func (p *Parser) parseFlagValue(flag *Flag, rhs string) error {
 }
 
 func (p *Parser) parseFlagBoolValue(flag *Flag, rhs string) error {
-	value := "true"
+	value := fmt.Sprint(!flag.DefaultValue.(bool))
 	if rhs != "" {
 		value = rhs
 	}
