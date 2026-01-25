@@ -8,10 +8,10 @@ import (
 	"github.com/broothie/ok/table"
 )
 
-func (a *Application) ListTasks(w io.Writer) error {
+func (o *Application) ListTasks(w io.Writer) error {
 	rows := [][]string{{"TASK", "TOOL", "FILE"}}
 
-	for _, task := range a.Tasks {
+	for _, task := range o.Tasks {
 		rows = append(rows, []string{task.Name, task.Tool.Name, task.FilePath})
 	}
 

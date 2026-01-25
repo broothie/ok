@@ -24,7 +24,7 @@ type Tool struct {
 	FilePathsErr   error
 }
 
-func (a *Application) SetUpTools(ctx context.Context, tls []tool.Tool) error {
+func (o *Application) SetUpTools(ctx context.Context, tls []tool.Tool) error {
 	group, ctx := errgroup.WithContext(ctx)
 
 	for _, tl := range tls {
@@ -43,15 +43,15 @@ func (a *Application) SetUpTools(ctx context.Context, tls []tool.Tool) error {
 			filePaths = lo.UniqBy(filePaths, func(filePath string) string { return strings.ToLower(filePath) })
 			filePathsErr := errors.Join(filePathErrs...)
 
-			a.toolsLock.Lock()
-			a.tools = append(a.tools, Tool{
+			o.toolsLock.Lock()
+			o.tools = append(o.tools, Tool{
 				Tool:           tl,
 				CommandPath:    commandPath,
 				CommandPathErr: commandPathErr,
 				FilePaths:      filePaths,
 				FilePathsErr:   filePathsErr,
 			})
-			a.toolsLock.Unlock()
+			o.toolsLock.Unlock()
 			return nil
 		})
 	}
@@ -59,10 +59,10 @@ func (a *Application) SetUpTools(ctx context.Context, tls []tool.Tool) error {
 	return group.Wait()
 }
 
-func (a *Application) PrintTools(w io.Writer) error {
+func (o *Application) PrintTools(w io.Writer) error {
 	rows := [][]string{{"TOOL", "EXECUTABLE", "FILES"}}
 
-	for _, tl := range a.tools {
+	for _, tl := range o.tools {
 		executable := tl.CommandPath
 		if tl.CommandPathErr != nil {
 			executable = tl.CommandPathErr.Error()

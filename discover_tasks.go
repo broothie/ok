@@ -9,15 +9,15 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-func (a *Application) DiscoverTasks(ctx context.Context) error {
+func (o *Application) DiscoverTasks(ctx context.Context) error {
 	group, ctx := errgroup.WithContext(ctx)
-	for _, tl := range a.tools {
+	for _, tl := range o.tools {
 		for _, filePath := range tl.FilePaths {
 			if err := ctx.Err(); err != nil {
 				return err
 			}
 
-			group.Go(a.processFile(ctx, tl, filePath))
+			group.Go(o.processFile(ctx, tl, filePath))
 		}
 
 	}
@@ -25,7 +25,7 @@ func (a *Application) DiscoverTasks(ctx context.Context) error {
 	return group.Wait()
 }
 
-func (a *Application) processFile(ctx context.Context, tl Tool, filePath string) func() error {
+func (o *Application) processFile(ctx context.Context, tl Tool, filePath string) func() error {
 	return func() error {
 		toolTasks, err := tl.ProcessFile(ctx, filePath)
 		if err != nil {
@@ -40,9 +40,9 @@ func (a *Application) processFile(ctx context.Context, tl Tool, filePath string)
 			}
 		})
 
-		a.tasksLock.Lock()
-		a.Tasks = append(a.Tasks, tasks...)
-		a.tasksLock.Unlock()
+		o.tasksLock.Lock()
+		o.Tasks = append(o.Tasks, tasks...)
+		o.tasksLock.Unlock()
 		return nil
 	}
 }
