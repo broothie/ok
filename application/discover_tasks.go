@@ -14,6 +14,10 @@ import (
 func (a *Application) DiscoverTasks(ctx context.Context) error {
 	group, ctx := errgroup.WithContext(ctx)
 	for _, tl := range a.Tools {
+		if err := ctx.Err(); err != nil {
+			return err
+		}
+
 		group.Go(a.globFiles(ctx, tl, group))
 	}
 
@@ -23,8 +27,8 @@ func (a *Application) DiscoverTasks(ctx context.Context) error {
 func (a *Application) globFiles(ctx context.Context, tl tool.Tool, group *errgroup.Group) func() error {
 	return func() error {
 		for _, glob := range tl.FileGlobs {
-			if ctx.Err() != nil {
-				return nil
+			if err := ctx.Err(); err != nil {
+				return err
 			}
 
 			filePaths, err := doublestar.Glob(os.DirFS("."), glob)
@@ -33,8 +37,8 @@ func (a *Application) globFiles(ctx context.Context, tl tool.Tool, group *errgro
 			}
 
 			for _, filePath := range filePaths {
-				if ctx.Err() != nil {
-					return nil
+				if err := ctx.Err(); err != nil {
+					return err
 				}
 
 				group.Go(a.parseFile(ctx, tl, filePath))

@@ -20,6 +20,7 @@ func NewNPM() tool.Tool {
 			if err != nil {
 				return nil, errors.Wrapf(err, "opening %q", filePath)
 			}
+			defer packageJSONFile.Close()
 
 			var packageJSONSchema struct {
 				Scripts map[string]string `json:"scripts"`

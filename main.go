@@ -47,8 +47,8 @@ func run() error {
 		DefaultValue: time.Second,
 	}
 
-	cli := cli.NewParser(version, os.Args[1:], helpFlag, directoryFlag, timeoutFlag)
-	if err := cli.Parse(); err != nil {
+	parser := cli.NewParser(version, os.Args[1:], helpFlag, directoryFlag, timeoutFlag)
+	if err := parser.Parse(); err != nil {
 		return errors.Wrap(err, "parsing flags")
 	}
 
@@ -57,7 +57,7 @@ func run() error {
 	}
 
 	if helpFlag.Value().(bool) {
-		return errors.Wrap(cli.WriteHelp(os.Stdout), "printing help")
+		return errors.Wrap(parser.WriteHelp(os.Stdout), "printing help")
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutFlag.Value().(time.Duration))
@@ -68,7 +68,7 @@ func run() error {
 		return errors.Wrap(err, "discovering tasks")
 	}
 
-	taskName := cli.TaskName()
+	taskName := parser.TaskName()
 	if taskName == "" {
 		return errors.Wrap(app.ListTasks(os.Stdout), "listing tasks")
 	}
@@ -78,7 +78,7 @@ func run() error {
 		return errors.Errorf("no task found with name %q", taskName)
 	}
 
-	if err := task.Run(ctx, cli.RemainingArgs()); err != nil {
+	if err := task.Run(ctx, parser.RemainingArgs()); err != nil {
 		return errors.Wrapf(err, "running task %q", task.Name)
 	}
 

@@ -24,13 +24,6 @@ func (p *Parser) WriteHelp(w io.Writer) error {
 	return helpTemplate.Execute(w, map[string]any{
 		"version":   p.version,
 		"flagTable": p.flagTable,
-		// "flags": lo.Map(p.flags, func(f *Flag, _ int) map[string]any {
-		// 	return map[string]any{
-		// 		"shorts": fmt.Sprintf("-%s", string(f.Shorts)),
-		// 		"longs":  strings.Join(lo.Map(append([]string{f.Name}, f.Aliases...), func(long string, _ int) string { return fmt.Sprintf("--%s", long) }), " "),
-		// 		"help":   f.Help,
-		// 	}
-		// }),
 	})
 }
 
@@ -67,8 +60,8 @@ func (p *Parser) flagTable() (string, error) {
 			cells = []string{row["longs"], row["help"], row["defaultValue"]}
 		}
 
-		if _, err := fmt.Fprintln(table, fmt.Sprintf("\t%s", strings.Join(cells, "\t"))); err != nil {
-			return "", errors.Wrap(err, "")
+		if _, err := fmt.Fprintf(table, "\t%s\n", strings.Join(cells, "\t")); err != nil {
+			return "", errors.Wrap(err, "writing table row")
 		}
 	}
 
