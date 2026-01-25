@@ -1,3 +1,4 @@
-task :"test-rake" do
+
+task "test-rake" do
   puts "from rake"
 end

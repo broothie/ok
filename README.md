@@ -11,10 +11,11 @@ A unified task runner that discovers and executes tasks from multiple build tool
 - **Automatic task discovery** - Scans your project for supported build tool files
 - **Unified interface** - Run tasks from any tool using the same command
 - **Multiple tool support** - Currently supports:
+  - Just (Justfile)
   - Make (Makefile)
   - NPM (package.json scripts)
-- **Fast concurrent discovery** - Uses goroutines to discover tasks in parallel
-- **Simple CLI** - Minimal flags, maximum productivity
+  - Rake (Rakefile)
+  - Task (Taskfile.yml / Taskfile.yaml)
 
 ## Installation
 
@@ -49,39 +50,9 @@ ok start
 
 `ok` will automatically find the task and run it with the appropriate tool, passing along any additional arguments.
 
-### Options
-
-- `-h, --help` - Show command help
-- `-d, --directory <path>` - Directory to run command from (default: `.`)
-- `-t, --timeout <duration>` - Command timeout (default: `1s`)
-
-### Examples
-
-```bash
-# List all tasks in current directory
-ok
-
-# Run a build task
-ok build
-
-# Run tests with arguments
-ok test --coverage
-
-# Run from a different directory
-ok -d ./my-project build
-
-# Set a longer timeout
-ok -t 5m integration-test
-```
-
-## How It Works
-
-1. `ok` scans your project for supported build tool files
-2. For each file found, it parses the available tasks
-3. When you run a task, `ok` executes it using the appropriate underlying tool
-4. All output is streamed directly to your terminal
-
-## Supported Tools
+### Just
+- Discovers recipes from `Justfile`
+- Runs tasks using `just <recipe>`
 
 ### Make
 - Discovers targets from `Makefile`
@@ -90,6 +61,14 @@ ok -t 5m integration-test
 ### NPM
 - Discovers scripts from `package.json`
 - Runs tasks using `npm run <script>`
+
+### Rake
+- Discovers tasks from `Rakefile`
+- Runs tasks using `rake <task>`
+
+### Task
+- Discovers tasks from `Taskfile.yml` / `Taskfile.yaml`
+- Runs tasks using `task <task> -- [args...]` (extra args become `CLI_ARGS`)
 
 ## Development
 
@@ -108,7 +87,3 @@ go build
 ```bash
 go test ./...
 ```
-
-## License
-
-See LICENSE file for details.

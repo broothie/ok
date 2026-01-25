@@ -6,6 +6,7 @@ import (
 	"github.com/broothie/ok/tool/tools/make"
 	"github.com/broothie/ok/tool/tools/npm"
 	"github.com/broothie/ok/tool/tools/rake"
+	"github.com/broothie/ok/tool/tools/task"
 )
 
 func All() []tool.Tool {
@@ -14,5 +15,6 @@ func All() []tool.Tool {
 		make.New(),
 		npm.New(),
 		rake.New(),
+		task.New(),
 	}
 }
