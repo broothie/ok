@@ -21,7 +21,7 @@ func New() tool.Tool {
 			"taskfile.yml",
 			"taskfile.yaml",
 		},
-		ParseFile: func(ctx context.Context, filePath string) ([]tool.Task, error) {
+		ProcessFile: func(ctx context.Context, filePath string) ([]tool.Task, error) {
 			output, _, _, err := cob.Output(ctx, "task",
 				cob.AddArgs("--taskfile", filePath),
 				cob.AddArgs("--list-all"),

@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"io"
 	"strings"
-	"text/tabwriter"
 	"text/template"
 
 	"github.com/bobg/errors"
+	"github.com/broothie/ok/table"
 	"github.com/samber/lo"
 )
 
@@ -28,13 +28,11 @@ func (p *Parser) WriteHelp(w io.Writer) error {
 }
 
 func (p *Parser) flagTable() (string, error) {
-	var rows []map[string]string
-	shortsPresent := false
+	var rows [][]string
 	for _, flag := range p.flags {
 		shorts := ""
 		if len(flag.Shorts) > 0 {
 			shorts = fmt.Sprintf("-%s", string(flag.Shorts))
-			shortsPresent = true
 		}
 
 		longNames := []string{flag.Name}
@@ -42,30 +40,14 @@ func (p *Parser) flagTable() (string, error) {
 		dashedLongs := lo.Map(longNames, func(long string, _ int) string { return fmt.Sprintf("--%s", long) })
 		longs := strings.Join(dashedLongs, " ")
 
-		rows = append(rows, map[string]string{
-			"shorts":       shorts,
-			"longs":        longs,
-			"help":         flag.Help,
-			"defaultValue": fmt.Sprintf("(default: %v)", flag.DefaultValue),
-		})
+		rows = append(rows, []string{shorts, longs, flag.Help, fmt.Sprintf("(default: %v)", flag.DefaultValue)})
 	}
+
+	rows = table.CollapseColumns(rows)
+	rows = lo.Map(rows, func(row []string, _ int) []string { return append([]string{""}, row...) })
 
 	buffer := new(bytes.Buffer)
-	table := tabwriter.NewWriter(buffer, 0, 0, 2, ' ', 0)
-	for _, row := range rows {
-		var cells []string
-		if shortsPresent {
-			cells = []string{row["shorts"], row["longs"], row["help"], row["defaultValue"]}
-		} else {
-			cells = []string{row["longs"], row["help"], row["defaultValue"]}
-		}
-
-		if _, err := fmt.Fprintf(table, "\t%s\n", strings.Join(cells, "\t")); err != nil {
-			return "", errors.Wrap(err, "writing table row")
-		}
-	}
-
-	if err := table.Flush(); err != nil {
+	if err := table.Write(buffer, rows); err != nil {
 		return "", errors.Wrap(err, "writing table")
 	}
 

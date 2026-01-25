@@ -16,7 +16,7 @@ func New() tool.Tool {
 		Name:        "Just",
 		CommandName: "just",
 		FileGlobs:   []string{"Justfile", "justfile"},
-		ParseFile: func(ctx context.Context, filePath string) ([]tool.Task, error) {
+		ProcessFile: func(ctx context.Context, filePath string) ([]tool.Task, error) {
 			output, _, _, err := cob.Output(ctx, "just",
 				cob.AddArgs("--justfile", filePath),
 				cob.AddArgs("--dump", "--dump-format", "json"),

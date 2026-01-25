@@ -1,20 +1,17 @@
 package application
 
-import (
-	"sync"
-
-	"github.com/broothie/ok/tool"
-)
+import "sync"
 
 type Application struct {
-	Tools     []tool.Tool
+	toolsLock *sync.Mutex
+	tools     []Tool
 	tasksLock *sync.Mutex
 	Tasks     []Task
 }
 
-func New(tools []tool.Tool) *Application {
+func New() *Application {
 	return &Application{
-		Tools:     tools,
+		toolsLock: new(sync.Mutex),
 		tasksLock: new(sync.Mutex),
 	}
 }

@@ -17,7 +17,7 @@ func New() tool.Tool {
 		Name:        "NPM",
 		CommandName: "npm",
 		FileGlobs:   []string{"package.json"},
-		ParseFile: func(ctx context.Context, filePath string) ([]tool.Task, error) {
+		ProcessFile: func(ctx context.Context, filePath string) ([]tool.Task, error) {
 			packageJSONFile, err := os.Open(filePath)
 			if err != nil {
 				return nil, errors.Wrapf(err, "opening %q", filePath)

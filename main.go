@@ -46,7 +46,14 @@ func run() error {
 		DefaultValue: time.Second,
 	}
 
-	parser := cli.NewParser(version, os.Args[1:], helpFlag, directoryFlag, timeoutFlag)
+	toolFlag := &cli.Flag{
+		Name:         "tools",
+		Type:         cli.FlagTypeBool,
+		Help:         "List tools.",
+		DefaultValue: false,
+	}
+
+	parser := cli.NewParser(version, os.Args[1:], helpFlag, directoryFlag, timeoutFlag, toolFlag)
 	if err := parser.Parse(); err != nil {
 		return errors.Wrap(err, "parsing flags")
 	}
@@ -62,7 +69,16 @@ func run() error {
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutFlag.Value().(time.Duration))
 	defer cancel()
 
-	app := application.New(tools.All())
+	app := application.New()
+
+	if err := app.SetUpTools(ctx, tools.All()); err != nil {
+		return errors.Wrap(err, "setting up tools")
+	}
+
+	if toolFlag.Value().(bool) {
+		return errors.Wrap(app.PrintTools(os.Stdout), "listing tools")
+	}
+
 	if err := app.DiscoverTasks(ctx); err != nil {
 		return errors.Wrap(err, "discovering tasks")
 	}
@@ -72,13 +88,13 @@ func run() error {
 		return errors.Wrap(app.ListTasks(os.Stdout), "listing tasks")
 	}
 
-	task, found := lo.Find(app.Tasks, func(task application.Task) bool { return task.Name == taskName })
+	tsk, found := lo.Find(app.Tasks, func(task application.Task) bool { return task.Name == taskName })
 	if !found {
 		return errors.Errorf("no task found with name %q", taskName)
 	}
 
-	if err := task.Run(ctx, parser.RemainingArgs()); err != nil {
-		return errors.Wrapf(err, "running task %q", task.Name)
+	if err := tsk.Run(ctx, parser.RemainingArgs()); err != nil {
+		return errors.Wrapf(err, "running task %q", tsk.Name)
 	}
 
 	return nil

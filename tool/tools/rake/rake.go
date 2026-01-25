@@ -16,7 +16,7 @@ func New() tool.Tool {
 		Name:        "Rake",
 		CommandName: "rake",
 		FileGlobs:   []string{"Rakefile", "rakefile", "Rakefile.rb", "rakefile.rb"},
-		ParseFile: func(ctx context.Context, filePath string) ([]tool.Task, error) {
+		ProcessFile: func(ctx context.Context, filePath string) ([]tool.Task, error) {
 			output, _, _, err := cob.Output(ctx, "rake",
 				cob.AddArgs("--rakefile", filePath),
 				cob.AddArgs("--tasks"),

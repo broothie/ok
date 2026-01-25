@@ -3,7 +3,6 @@ package application
 import (
 	"context"
 	"os"
-	"os/exec"
 
 	"github.com/bobg/errors"
 	"github.com/broothie/cob"
@@ -12,17 +11,12 @@ import (
 
 type Task struct {
 	tool.Task
-	Tool     *tool.Tool
+	Tool     *Tool
 	FilePath string
 }
 
-func (t Task) Run(ctx context.Context, args []string) error {
-	commandPath, err := exec.LookPath(t.Tool.CommandName)
-	if err != nil {
-		return errors.Wrapf(err, "looking up command %q", t.Tool.CommandName)
-	}
-
-	options, err := t.RunOptions(ctx, args)
+func (t Task) Run(ctx context.Context, remainingArgs []string) error {
+	options, err := t.RunOptions(ctx, remainingArgs)
 	if err != nil {
 		return errors.Wrapf(err, "getting run options for %s task %q", t.Tool.Name, t.Name)
 	}
@@ -33,6 +27,6 @@ func (t Task) Run(ctx context.Context, args []string) error {
 		cob.SetStderr(os.Stderr),
 	)
 
-	_, err = cob.Run(ctx, commandPath, options...)
+	_, err = cob.Run(ctx, t.Tool.CommandPath, options...)
 	return errors.Wrapf(err, "running %s task %q", t.Tool.Name, t.Name)
 }

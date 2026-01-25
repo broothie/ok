@@ -11,7 +11,7 @@ type Tool struct {
 	Name        string
 	CommandName string
 	FileGlobs   []string
-	ParseFile   func(ctx context.Context, filePath string) ([]Task, error)
+	ProcessFile func(ctx context.Context, filePath string) ([]Task, error)
 }
 
 type Task struct {

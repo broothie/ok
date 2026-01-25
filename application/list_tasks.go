@@ -1,12 +1,11 @@
 package application
 
 import (
-	"fmt"
 	"io"
-	"strings"
-	"text/tabwriter"
+	"sort"
 
 	"github.com/bobg/errors"
+	"github.com/broothie/ok/table"
 )
 
 func (a *Application) ListTasks(w io.Writer) error {
@@ -16,16 +15,6 @@ func (a *Application) ListTasks(w io.Writer) error {
 		rows = append(rows, []string{task.Name, task.Tool.Name, task.FilePath})
 	}
 
-	table := tabwriter.NewWriter(w, 0, 0, 2, ' ', 0)
-	for index, row := range rows {
-		if _, err := fmt.Fprintf(table, "%s\n", strings.Join(row, "\t")); err != nil {
-			return errors.Wrapf(err, "writing table row %d", index)
-		}
-	}
-
-	if err := table.Flush(); err != nil {
-		return errors.Wrap(err, "flushing table")
-	}
-
-	return nil
+	sort.Slice(rows[1:], func(i, j int) bool { return rows[1:][i][0] < rows[1:][j][0] })
+	return errors.Wrap(table.Write(w, rows), "writing table")
 }
