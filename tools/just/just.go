@@ -9,7 +9,16 @@ import (
 	"github.com/broothie/cob"
 	"github.com/broothie/ok"
 	"github.com/broothie/option"
+	"github.com/samber/lo"
 )
+
+type schema struct {
+	Recipes map[string]recipeSchema `json:"recipes"`
+}
+
+type recipeSchema struct {
+	Name string `json:"name"`
+}
 
 func New() ok.Tool {
 	return ok.Tool{
@@ -25,18 +34,13 @@ func New() ok.Tool {
 				return nil, errors.Wrapf(err, "listing just recipes from %q", filePath)
 			}
 
-			var justfile struct {
-				Recipes map[string]struct {
-					Name string `json:"name"`
-				} `json:"recipes"`
-			}
-			if err := json.NewDecoder(output).Decode(&justfile); err != nil {
+			var payload schema
+			if err := json.NewDecoder(output).Decode(&payload); err != nil {
 				return nil, errors.Wrapf(err, "parsing just recipes from %q", filePath)
 			}
 
-			var tasks []ok.Task
-			for _, recipe := range justfile.Recipes {
-				tasks = append(tasks, ok.Task{
+			return lo.Map(lo.Values(payload.Recipes), func(recipe recipeSchema, _ int) ok.Task {
+				return ok.Task{
 					Name: recipe.Name,
 					RunOptions: func(ctx context.Context, args []string) (option.Options[*exec.Cmd], error) {
 						return option.NewOptions(
@@ -45,10 +49,8 @@ func New() ok.Tool {
 							cob.AddArgs(args...),
 						), nil
 					},
-				})
-			}
-
-			return tasks, nil
+				}
+			}), nil
 		},
 	}
 }

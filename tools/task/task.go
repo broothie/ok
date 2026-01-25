@@ -9,7 +9,17 @@ import (
 	"github.com/broothie/cob"
 	"github.com/broothie/ok"
 	"github.com/broothie/option"
+	"github.com/samber/lo"
 )
+
+type schema struct {
+	Tasks []taskSchema `json:"tasks"`
+}
+
+type taskSchema struct {
+	Name string `json:"name"`
+	Task string `json:"task"` // Some versions also include a "task" field; accept it as fallback.
+}
 
 func New() ok.Tool {
 	return ok.Tool{
@@ -31,29 +41,18 @@ func New() ok.Tool {
 				return nil, errors.Wrapf(err, "listing task tasks from %q", filePath)
 			}
 
-			var payload struct {
-				Tasks []struct {
-					Name string `json:"name"`
-					Task string `json:"task"` // Some versions also include a "task" field; accept it as fallback.
-				} `json:"tasks"`
-			}
+			var payload schema
 			if err := json.NewDecoder(output).Decode(&payload); err != nil {
 				return nil, errors.Wrapf(err, "parsing task task list from %q", filePath)
 			}
 
-			var tasks []ok.Task
-			for _, task := range payload.Tasks {
-				taskName := task.Name
-				if taskName == "" {
-					taskName = task.Task
-				}
-
-				tasks = append(tasks, ok.Task{
-					Name: taskName,
+			return lo.Map(payload.Tasks, func(tsk taskSchema, _ int) ok.Task {
+				return ok.Task{
+					Name: tsk.Name,
 					RunOptions: func(ctx context.Context, args []string) (option.Options[*exec.Cmd], error) {
 						opts := option.NewOptions(
 							cob.AddArgs("--taskfile", filePath),
-							cob.AddArgs(taskName),
+							cob.AddArgs(tsk.Name),
 						)
 
 						// Extra args should become CLI_ARGS, not additional tasks/flags.
@@ -65,10 +64,8 @@ func New() ok.Tool {
 						}
 						return opts, nil
 					},
-				})
-			}
-
-			return tasks, nil
+				}
+			}), nil
 		},
 	}
 }
