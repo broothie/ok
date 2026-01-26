@@ -21,7 +21,7 @@ builds:
       - -s -w
 
 archives:
-  - format: tar.gz
+  - formats: [tar.gz]
     # this name template makes the OS and Arch compatible with the results of uname.
     name_template: >-
       {{ .ProjectName }}_
@@ -32,11 +32,11 @@ archives:
       {{- if .Arm }}v{{ .Arm }}{{ end }}
     # use zip for windows archives
     format_overrides:
-    - goos: windows
-      format: zip
+      - goos: windows
+        formats: [zip]
 
 checksum:
-  name_template: 'checksums.txt'
+  name_template: "checksums.txt"
 
 snapshot:
   version_template: "{{ .Tag }}-next"
@@ -45,15 +45,15 @@ changelog:
   sort: asc
   filters:
     exclude:
-      - '^docs:'
-      - '^test:'
+      - "^docs:"
+      - "^test:"
 
-brews:
+homebrew_casks:
   - repository:
       owner: broothie
       name: homebrew-ok
       token: "{{ .Env.TAP_GITHUB_TOKEN }}"
-    
-    directory: Formula
+
+    directory: Casks
     homepage: "https://github.com/broothie/ok"
     description: "A unified task runner that discovers and executes tasks from multiple build tools."
