@@ -1,2 +1,0 @@
-
-echo "from sh"

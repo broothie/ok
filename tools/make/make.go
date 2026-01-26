@@ -32,7 +32,7 @@ func New() ok.Tool {
 
 			var tasks []ok.Task
 			for block := range strings.SplitSeq(output.String(), "\n\n") {
-				if !strings.Contains(block, "commands to execute") {
+				if !strings.Contains(block, "commands to execute") && !strings.Contains(block, "recipe to execute") {
 					continue
 				}
 
