@@ -1,0 +1,14 @@
+{
+  "name": "integration-test",
+  "root": ".",
+  "sourceRoot": ".",
+  "projectType": "application",
+  "targets": {
+    "test-nx": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'from nx'"
+      }
+    }
+  }
+}

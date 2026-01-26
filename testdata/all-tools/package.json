@@ -1,6 +1,10 @@
 {
+  "name": "all-tools",
   "scripts": {
     "test-npm": "echo 'from npm'",
     "test-yarn": "echo 'from yarn'"
+  },
+  "dependencies": {
+    "nx": "latest"
   }
 }

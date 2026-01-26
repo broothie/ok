@@ -19,6 +19,9 @@ func Test_integration(t *testing.T) {
 			t.Parallel()
 
 			taskName := fmt.Sprintf("test-%s", strings.ToLower(tl.Name))
+			if tl.Name == "Nx" {
+				taskName = "integration-test:test-nx"
+			}
 			taskOutput := fmt.Sprintf("from %s", strings.ToLower(tl.Name))
 
 			t.Run("shows up in tool list", func(t *testing.T) {
@@ -62,6 +65,7 @@ func startContainer(t *testing.T) testcontainers.Container {
 				PrintBuildLog: true,
 				KeepImage:     true,
 			},
+			Cmd: []string{"sleep", "infinity"},
 		},
 		Started: true,
 	})

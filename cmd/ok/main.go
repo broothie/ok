@@ -33,6 +33,11 @@ func run() error {
 		return errors.Wrap(err, "parsing flags")
 	}
 
+	if flags.Version.Value().(bool) {
+		fmt.Printf("ok %s\n", version)
+		return nil
+	}
+
 	if flags.Debug.Value().(bool) {
 		slog.SetLogLoggerLevel(slog.LevelDebug)
 	}
@@ -88,6 +93,7 @@ func run() error {
 }
 
 type Flags struct {
+	Version     *cli.Flag
 	Help        *cli.Flag
 	Directory   *cli.Flag
 	Timeout     *cli.Flag
@@ -99,6 +105,7 @@ type Flags struct {
 
 func (f *Flags) All() []*cli.Flag {
 	return []*cli.Flag{
+		f.Version,
 		f.Help,
 		f.Directory,
 		f.Timeout,
@@ -111,6 +118,13 @@ func (f *Flags) All() []*cli.Flag {
 
 func NewFlags() *Flags {
 	return &Flags{
+		Version: &cli.Flag{
+			Name:         "version",
+			Type:         cli.FlagTypeBool,
+			Help:         "Print command version.",
+			Shorts:       []rune{'V'},
+			DefaultValue: false,
+		},
 		Help: &cli.Flag{
 			Name:         "help",
 			Type:         cli.FlagTypeBool,
