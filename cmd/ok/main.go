@@ -16,8 +16,6 @@ import (
 	"github.com/samber/lo"
 )
 
-const version = "v0.1.0"
-
 func main() {
 	if err := run(); err != nil {
 		fmt.Println("error:", err)
@@ -28,13 +26,13 @@ func main() {
 func run() error {
 	flags := NewFlags()
 
-	parser := cli.NewParser(version, os.Args[1:], flags.All()...)
+	parser := cli.NewParser(ok.Version(), os.Args[1:], flags.All()...)
 	if err := parser.Parse(); err != nil {
 		return errors.Wrap(err, "parsing flags")
 	}
 
 	if flags.Version.Value().(bool) {
-		fmt.Printf("ok %s\n", version)
+		fmt.Printf("ok %s\n", ok.Version())
 		return nil
 	}
 
