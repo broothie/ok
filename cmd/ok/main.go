@@ -143,7 +143,7 @@ func NewFlags() *Flags {
 			Name:         "timeout",
 			Type:         cli.FlagTypeDuration,
 			Help:         "Command timeout.",
-			DefaultValue: time.Second,
+			DefaultValue: 5 * time.Second,
 		},
 		FilterTools: &cli.Flag{
 			Name:         "filter-tools",
