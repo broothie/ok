@@ -22,7 +22,7 @@ RUN npm install -g yarn
 RUN npm install -g nx
 
 # Install Task (go-task)
-RUN sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
+RUN curl -sL https://github.com/go-task/task/releases/latest/download/task_linux_amd64.tar.gz | tar xz -C /usr/local/bin task
 
 # Install Just
 RUN curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to /usr/local/bin
