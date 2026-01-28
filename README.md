@@ -20,6 +20,14 @@ A unified task runner that discovers and executes tasks from multiple build tool
 
 ## Installation
 
+### Homebrew
+
+```bash
+brew install broothie/ok/ok
+```
+
+### Go Install
+
 ```bash
 go install github.com/broothie/ok@latest
 ```
