@@ -42,7 +42,7 @@ func (o *Ok) ListTools(w io.Writer) error {
 			executable = fmt.Sprintf("✘ %v", tl.commandPathErr)
 		}
 
-		files := fmt.Sprintf("✔ %s", strings.Join(tl.filePaths, ","))
+		files := strings.Join(tl.filePaths, ",")
 		if tl.filePathsErr != nil {
 			files = fmt.Sprintf("✘ %v", tl.filePathsErr)
 		}
