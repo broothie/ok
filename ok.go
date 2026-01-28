@@ -40,6 +40,9 @@ func (i taskInfo) Run(ctx context.Context, remainingArgs []string) error {
 	}
 
 	options = append(options,
+		cob.AddEnv("OK_TASK", i.Task.Name),
+		cob.AddEnv("OK_TOOL", i.tool.Name),
+		cob.AddEnv("OK_VERSION", Version()),
 		cob.SetStdin(os.Stdin),
 		cob.SetStdout(os.Stdout),
 		cob.SetStderr(os.Stderr),
