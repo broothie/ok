@@ -48,12 +48,12 @@ changelog:
       - "^docs:"
       - "^test:"
 
-homebrew_casks:
+brews:
   - repository:
       owner: broothie
       name: homebrew-ok
       token: "{{ .Env.TAP_GITHUB_TOKEN }}"
 
-    directory: Casks
+    directory: Formula
     homepage: "https://github.com/broothie/ok"
     description: "A unified task runner that discovers and executes tasks from multiple build tools."
