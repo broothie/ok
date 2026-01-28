@@ -19,41 +19,26 @@ func Test_integration(t *testing.T) {
 		t.SkipNow()
 	}
 
-	for _, tl := range tools.All() {
-		t.Run(tl.Name, func(t *testing.T) {
-			t.Parallel()
+	container := startContainer(t)
 
+	for _, tl := range tools.All() {
+
+		t.Run(tl.Name, func(t *testing.T) {
 			taskName := fmt.Sprintf("test-%s", strings.ToLower(tl.Name))
 			if tl.Name == "Nx" {
 				taskName = "integration-test:test-nx"
 			}
-			taskOutput := fmt.Sprintf("from %s", strings.ToLower(tl.Name))
 
 			t.Run("shows up in tool list", func(t *testing.T) {
-				t.Parallel()
-
-				container := startContainer(t)
-				defer require.NoError(t, container.Terminate(context.Background()))
-
 				assertCommandOutputContains(t, container, []string{"ok", "--list-tools"}, tl.Name)
 			})
 
 			t.Run("shows up in task list", func(t *testing.T) {
-				t.Parallel()
-
-				container := startContainer(t)
-				defer require.NoError(t, container.Terminate(context.Background()))
-
 				assertCommandOutputContains(t, container, []string{"ok"}, taskName)
 			})
 
 			t.Run("run task", func(t *testing.T) {
-				t.Parallel()
-
-				container := startContainer(t)
-				defer require.NoError(t, container.Terminate(context.Background()))
-
-				assertCommandOutputContains(t, container, []string{"ok", taskName}, taskOutput)
+				assertCommandOutputContains(t, container, []string{"ok", taskName}, fmt.Sprintf("from %s", strings.ToLower(tl.Name)))
 			})
 		})
 	}
@@ -76,6 +61,11 @@ func startContainer(t *testing.T) testcontainers.Container {
 	})
 
 	require.NoError(t, err)
+
+	t.Cleanup(func() {
+		require.NoError(t, container.Terminate(context.Background()))
+	})
+
 	return container
 }
 
