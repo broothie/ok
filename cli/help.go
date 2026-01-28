@@ -21,10 +21,10 @@ var (
 )
 
 func (p *Parser) WriteHelp(w io.Writer) error {
-	return helpTemplate.Execute(w, map[string]any{
+	return errors.Wrap(helpTemplate.Execute(w, map[string]any{
 		"version":   p.version,
 		"flagTable": p.flagTable,
-	})
+	}), "writing help")
 }
 
 func (p *Parser) flagTable() (string, error) {

@@ -30,7 +30,7 @@ func (o *Ok) RunTask(ctx context.Context, taskName string, remainingArgs []strin
 		return errors.Errorf("no task found with name %q", taskName)
 	}
 
-	return errors.Wrapf(tsk.Run(ctx, remainingArgs), "running task %q", taskName)
+	return tsk.Run(ctx, remainingArgs)
 }
 
 func (i taskInfo) Run(ctx context.Context, remainingArgs []string) error {

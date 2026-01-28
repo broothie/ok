@@ -33,7 +33,7 @@ func Test_integration(t *testing.T) {
 				t.Parallel()
 
 				container := startContainer(t)
-				defer container.Terminate(context.Background())
+				defer require.NoError(t, container.Terminate(context.Background()))
 
 				assertCommandOutputContains(t, container, []string{"ok", "--list-tools"}, tl.Name)
 			})
@@ -42,7 +42,7 @@ func Test_integration(t *testing.T) {
 				t.Parallel()
 
 				container := startContainer(t)
-				defer container.Terminate(context.Background())
+				defer require.NoError(t, container.Terminate(context.Background()))
 
 				assertCommandOutputContains(t, container, []string{"ok"}, taskName)
 			})
@@ -51,7 +51,7 @@ func Test_integration(t *testing.T) {
 				t.Parallel()
 
 				container := startContainer(t)
-				defer container.Terminate(context.Background())
+				defer require.NoError(t, container.Terminate(context.Background()))
 
 				assertCommandOutputContains(t, container, []string{"ok", taskName}, taskOutput)
 			})
