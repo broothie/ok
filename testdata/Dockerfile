@@ -27,6 +27,11 @@ RUN curl -sL https://github.com/go-task/task/releases/latest/download/task_linux
 # Install Just
 RUN curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to /usr/local/bin
 
+# Install Mise
+RUN curl https://mise.run | sh
+ENV PATH="/root/.local/bin:${PATH}"
+ENV MISE_TRUSTED_CONFIG_PATHS="/workdir"
+
 WORKDIR /workdir
 ENV PATH="/root/go/bin:${PATH}"
 COPY . .
@@ -40,6 +45,7 @@ RUN echo "Verifying tools installation..." && \
     ok --version && \
     just --version && \
     make --version && \
+    mise --version && \
     npm --version && \
     yarn --version && \
     nx --version && \

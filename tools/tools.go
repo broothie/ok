@@ -4,6 +4,7 @@ import (
 	"github.com/broothie/ok"
 	"github.com/broothie/ok/tools/just"
 	"github.com/broothie/ok/tools/make"
+	"github.com/broothie/ok/tools/mise"
 	"github.com/broothie/ok/tools/nx"
 	"github.com/broothie/ok/tools/packagejson"
 	"github.com/broothie/ok/tools/rake"
@@ -15,6 +16,7 @@ func All() []ok.Tool {
 	return []ok.Tool{
 		just.New(),
 		make.New(),
+		mise.New(),
 		nx.New(),
 		packagejson.NewNPM(),
 		packagejson.NewYarn(),

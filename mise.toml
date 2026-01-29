@@ -1,2 +1,15 @@
 [tools]
-go = "latest"
+go = "1.25.6"
+just = "1.46.0"
+npm = "11.8.0"
+task = "3.48.0"
+yarn = "4.12.0"
+
+[tasks.test]
+description = "Run all tests"
+run = "go test ./..."
+
+[tasks."test:all"]
+description = "Run all tests including integration tests"
+run = "go test ./..."
+env = { RUN_INTEGRATION_TESTS = "true" }
