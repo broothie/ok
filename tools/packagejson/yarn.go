@@ -17,7 +17,7 @@ func NewYarn() ok.Tool {
 		Name:        yarnToolName,
 		CommandName: "yarn",
 		FileGlobs:   []string{packageJSONFileName},
-		ProcessFile: func(ctx context.Context, filePath string) ([]ok.Task, error) {
+		ProcessFile: func(ctx context.Context, filePath string, toolCfg ok.ToolConfig) ([]ok.Task, error) {
 			schema, err := read(filePath)
 			if err != nil {
 				return nil, err
@@ -26,7 +26,7 @@ func NewYarn() ok.Tool {
 			return lo.Map(lo.Keys(schema.Scripts), func(scriptName string, _ int) ok.Task {
 				return ok.Task{
 					Name: scriptName,
-					RunOptions: func(ctx context.Context, args []string) (option.Options[*exec.Cmd], error) {
+					RunOptions: func(ctx context.Context, args []string, toolCfg ok.ToolConfig) (option.Options[*exec.Cmd], error) {
 						opts := option.NewOptions(
 							cob.AddArgs("run", scriptName),
 						)

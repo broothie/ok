@@ -33,9 +33,9 @@ func New() ok.Tool {
 		Name:        "Nx",
 		CommandName: "nx",
 		FileGlobs:   []string{"nx.json"},
-		ProcessFile: func(ctx context.Context, filePath string) ([]ok.Task, error) {
+		ProcessFile: func(ctx context.Context, filePath string, toolCfg ok.ToolConfig) ([]ok.Task, error) {
 			// Generate the graph and output to stdout
-			output, stderr, _, err := cob.Output(ctx, "nx",
+			output, stderr, _, err := cob.Output(ctx, toolCfg.Executable,
 				cob.AddArgs("graph"),
 				cob.AddArgs("--print"),
 			)
@@ -54,7 +54,7 @@ func New() ok.Tool {
 					fullTaskName := fmt.Sprintf("%s:%s", projectName, targetName)
 					tasks = append(tasks, ok.Task{
 						Name: fullTaskName,
-						RunOptions: func(ctx context.Context, args []string) (option.Options[*exec.Cmd], error) {
+						RunOptions: func(ctx context.Context, args []string, toolCfg ok.ToolConfig) (option.Options[*exec.Cmd], error) {
 							return option.NewOptions(
 								cob.AddArgs("run"),
 								cob.AddArgs(fullTaskName),

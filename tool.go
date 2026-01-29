@@ -20,7 +20,12 @@ type Tool struct {
 	Name        string
 	CommandName string
 	FileGlobs   []string
-	ProcessFile func(ctx context.Context, filePath string) ([]Task, error)
+	ProcessFile func(ctx context.Context, filePath string, toolCfg ToolConfig) ([]Task, error)
+}
+
+type ToolConfig struct {
+	Executable string
+	Rest       map[string]string
 }
 
 type toolInfo struct {

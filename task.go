@@ -4,10 +4,12 @@ import (
 	"context"
 	"io"
 	"log/slog"
+	"os"
 	"os/exec"
 	"sort"
 
 	"github.com/bobg/errors"
+	"github.com/broothie/cob"
 	"github.com/broothie/ok/table"
 	"github.com/broothie/option"
 	"github.com/samber/lo"
@@ -16,13 +18,35 @@ import (
 
 type Task struct {
 	Name       string
-	RunOptions func(ctx context.Context, args []string) (option.Options[*exec.Cmd], error)
+	RunOptions func(ctx context.Context, args []string, toolCfg ToolConfig) (option.Options[*exec.Cmd], error)
 }
 
 type taskInfo struct {
 	Task
 	tool     *toolInfo
 	filePath string
+}
+
+func (i taskInfo) Run(ctx context.Context, remainingArgs []string) error {
+	options, err := i.RunOptions(ctx, remainingArgs, ToolConfig{
+		Executable: i.tool.commandPath,
+	})
+	if err != nil {
+		return errors.Wrapf(err, "getting run options for %s task %q", i.tool.Name, i.Name)
+	}
+
+	options = append(options,
+		cob.SetEnv(os.Environ()...),
+		cob.AddEnv("OK_TASK", i.Task.Name),
+		cob.AddEnv("OK_TOOL", i.tool.Name),
+		cob.AddEnv("OK_VERSION", Version()),
+		cob.SetStdin(os.Stdin),
+		cob.SetStdout(os.Stdout),
+		cob.SetStderr(os.Stderr),
+	)
+
+	_, err = cob.Run(ctx, i.tool.commandPath, options...)
+	return errors.Wrapf(err, "running %s task %q", i.tool.Name, i.Name)
 }
 
 func (o *Ok) ListTasks(w io.Writer) error {
@@ -56,22 +80,54 @@ func (o *Ok) SetUpTasks(ctx context.Context) error {
 
 func (o *Ok) processFile(ctx context.Context, tl toolInfo, filePath string) func() error {
 	return func() error {
-		toolTasks, err := tl.ProcessFile(ctx, filePath)
-		if err != nil {
-			return errors.Wrapf(err, "parsing file %q for tool %q", filePath, tl.Name)
+		type Result struct {
+			tasks []Task
+			err   error
 		}
 
-		tasks := lo.Map(toolTasks, func(task Task, _ int) taskInfo {
-			return taskInfo{
-				Task:     task,
-				tool:     &tl,
-				filePath: filePath,
-			}
-		})
+		resultChan := make(chan Result, 1)
+		go func() {
+			tasks, err := tl.ProcessFile(ctx, filePath, ToolConfig{
+				Executable: tl.commandPath,
+			})
 
-		o.tasksLock.Lock()
-		o.tasks = append(o.tasks, tasks...)
-		o.tasksLock.Unlock()
-		return nil
+			resultChan <- Result{tasks: tasks, err: err}
+		}()
+
+		select {
+		case result := <-resultChan:
+			if result.err != nil {
+				return errors.Wrapf(result.err, "parsing file %q for tool %q", filePath, tl.Name)
+			}
+
+			tasks := lo.Map(result.tasks, func(task Task, _ int) taskInfo {
+				return taskInfo{
+					Task:     task,
+					tool:     &tl,
+					filePath: filePath,
+				}
+			})
+
+			o.tasksLock.Lock()
+			o.tasks = append(o.tasks, tasks...)
+			o.tasksLock.Unlock()
+			return nil
+
+		case <-ctx.Done():
+			if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+				slog.Warn("timeout parsing tool file", slog.String("file", filePath), slog.String("tool", tl.Name))
+			}
+
+			return nil
+		}
 	}
+}
+
+func (o *Ok) RunTask(ctx context.Context, taskName string, remainingArgs []string) error {
+	tsk, found := lo.Find(o.tasks, func(tsk taskInfo) bool { return tsk.Name == taskName })
+	if !found {
+		return errors.Errorf("no task found with name %q", taskName)
+	}
+
+	return tsk.Run(ctx, remainingArgs)
 }

@@ -25,10 +25,11 @@ func New() ok.Tool {
 		Name:        "Just",
 		CommandName: "just",
 		FileGlobs:   []string{"Justfile", "justfile"},
-		ProcessFile: func(ctx context.Context, filePath string) ([]ok.Task, error) {
-			output, _, _, err := cob.Output(ctx, "just",
+		ProcessFile: func(ctx context.Context, filePath string, toolCfg ok.ToolConfig) ([]ok.Task, error) {
+			output, _, _, err := cob.Output(ctx, toolCfg.Executable,
 				cob.AddArgs("--justfile", filePath),
-				cob.AddArgs("--dump", "--dump-format", "json"),
+				cob.AddArgs("--dump"),
+				cob.AddArgs("--dump-format", "json"),
 			)
 			if err != nil {
 				return nil, errors.Wrapf(err, "listing just recipes from %q", filePath)
@@ -42,7 +43,7 @@ func New() ok.Tool {
 			return lo.Map(lo.Values(payload.Recipes), func(recipe recipeSchema, _ int) ok.Task {
 				return ok.Task{
 					Name: recipe.Name,
-					RunOptions: func(ctx context.Context, args []string) (option.Options[*exec.Cmd], error) {
+					RunOptions: func(ctx context.Context, args []string, toolCfg ok.ToolConfig) (option.Options[*exec.Cmd], error) {
 						return option.NewOptions(
 							cob.AddArgs("--justfile", filePath),
 							cob.AddArgs(recipe.Name),

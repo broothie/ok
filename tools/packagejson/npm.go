@@ -15,7 +15,7 @@ func NewNPM() ok.Tool {
 		Name:        "NPM",
 		CommandName: "npm",
 		FileGlobs:   []string{packageJSONFileName},
-		ProcessFile: func(ctx context.Context, filePath string) ([]ok.Task, error) {
+		ProcessFile: func(ctx context.Context, filePath string, toolCfg ok.ToolConfig) ([]ok.Task, error) {
 			schema, err := read(filePath)
 			if err != nil {
 				return nil, err
@@ -24,7 +24,7 @@ func NewNPM() ok.Tool {
 			return lo.Map(lo.Keys(schema.Scripts), func(scriptName string, _ int) ok.Task {
 				return ok.Task{
 					Name: scriptName,
-					RunOptions: func(ctx context.Context, args []string) (option.Options[*exec.Cmd], error) {
+					RunOptions: func(ctx context.Context, args []string, toolCfg ok.ToolConfig) (option.Options[*exec.Cmd], error) {
 						return option.NewOptions(
 							cob.AddArgs("run", scriptName),
 							cob.AddArgs(args...),

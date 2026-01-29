@@ -30,12 +30,12 @@ func New() ok.Tool {
 			"**/*.sh",
 			"**/*.zsh",
 		},
-		ProcessFile: func(ctx context.Context, filePath string) ([]ok.Task, error) {
+		ProcessFile: func(ctx context.Context, filePath string, toolCfg ok.ToolConfig) ([]ok.Task, error) {
 			ext := filepath.Ext(filePath)
 
 			return []ok.Task{{
 				Name: strings.ReplaceAll(strings.TrimSuffix(filePath, ext), string(filepath.Separator), "."),
-				RunOptions: func(ctx context.Context, args []string) (option.Options[*exec.Cmd], error) {
+				RunOptions: func(ctx context.Context, args []string, toolCfg ok.ToolConfig) (option.Options[*exec.Cmd], error) {
 					return option.NewOptions(
 						cob.AddArgs(filePath),
 						cob.AddArgs(args...),

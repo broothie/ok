@@ -22,7 +22,6 @@ func Test_integration(t *testing.T) {
 	container := startContainer(t)
 
 	for _, tl := range tools.All() {
-
 		t.Run(tl.Name, func(t *testing.T) {
 			taskName := fmt.Sprintf("test-%s", strings.ToLower(tl.Name))
 			if tl.Name == "Nx" {

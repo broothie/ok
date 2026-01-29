@@ -17,8 +17,8 @@ func New() ok.Tool {
 		Name:        "Rake",
 		CommandName: "rake",
 		FileGlobs:   []string{"Rakefile", "rakefile", "Rakefile.rb", "rakefile.rb"},
-		ProcessFile: func(ctx context.Context, filePath string) ([]ok.Task, error) {
-			output, _, _, err := cob.Output(ctx, "rake",
+		ProcessFile: func(ctx context.Context, filePath string, toolCfg ok.ToolConfig) ([]ok.Task, error) {
+			output, _, _, err := cob.Output(ctx, toolCfg.Executable,
 				cob.AddArgs("--rakefile", filePath),
 				cob.AddArgs("--tasks"),
 				cob.AddArgs("--all"),
@@ -41,7 +41,7 @@ func New() ok.Tool {
 
 				tasks = append(tasks, ok.Task{
 					Name: taskName,
-					RunOptions: func(ctx context.Context, args []string) (option.Options[*exec.Cmd], error) {
+					RunOptions: func(ctx context.Context, args []string, toolCfg ok.ToolConfig) (option.Options[*exec.Cmd], error) {
 						taskArgs, rakeVars, err := splitRakeArgs(args)
 						if err != nil {
 							return nil, errors.Wrap(err, "parsing rake args")

@@ -31,8 +31,8 @@ func New() ok.Tool {
 			"taskfile.yml",
 			"taskfile.yaml",
 		},
-		ProcessFile: func(ctx context.Context, filePath string) ([]ok.Task, error) {
-			output, _, _, err := cob.Output(ctx, "task",
+		ProcessFile: func(ctx context.Context, filePath string, toolCfg ok.ToolConfig) ([]ok.Task, error) {
+			output, _, _, err := cob.Output(ctx, toolCfg.Executable,
 				cob.AddArgs("--taskfile", filePath),
 				cob.AddArgs("--list-all"),
 				cob.AddArgs("--json"),
@@ -49,7 +49,7 @@ func New() ok.Tool {
 			return lo.Map(payload.Tasks, func(tsk taskSchema, _ int) ok.Task {
 				return ok.Task{
 					Name: tsk.Name,
-					RunOptions: func(ctx context.Context, args []string) (option.Options[*exec.Cmd], error) {
+					RunOptions: func(ctx context.Context, args []string, toolCfg ok.ToolConfig) (option.Options[*exec.Cmd], error) {
 						opts := option.NewOptions(
 							cob.AddArgs("--taskfile", filePath),
 							cob.AddArgs(tsk.Name),
