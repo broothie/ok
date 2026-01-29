@@ -15,7 +15,7 @@ func NewNPM() ok.Tool {
 		Name:        "NPM",
 		CommandName: "npm",
 		FileGlobs:   []string{packageJSONFileName},
-		ProcessFile: func(ctx context.Context, filePath string) ([]ok.Task, error) {
+		ProcessFile: func(ctx context.Context, filePath string, toolCfg ok.ToolConfig) ([]ok.Task, error) {
 			schema, err := read(filePath)
 			if err != nil {
 				return nil, err

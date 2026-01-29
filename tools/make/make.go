@@ -16,9 +16,9 @@ func New() ok.Tool {
 		Name:        "Make",
 		CommandName: "make",
 		FileGlobs:   []string{"GNUmakefile", "Makefile", "makefile"},
-		ProcessFile: func(ctx context.Context, filePath string) ([]ok.Task, error) {
+		ProcessFile: func(ctx context.Context, filePath string, toolCfg ok.ToolConfig) ([]ok.Task, error) {
 			// https://stackoverflow.com/questions/4219255/how-do-you-get-the-list-of-targets-in-a-makefile
-			output, _, _, err := cob.Output(ctx, "make",
+			output, _, _, err := cob.Output(ctx, toolCfg.Executable,
 				cob.AddArgs("--file", filePath),
 				cob.AddArgs("--print-data-base"),      // prints the database
 				cob.AddArgs("--no-builtin-variables"), // suppresses inclusion of built-in variables

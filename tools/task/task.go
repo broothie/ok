@@ -31,8 +31,8 @@ func New() ok.Tool {
 			"taskfile.yml",
 			"taskfile.yaml",
 		},
-		ProcessFile: func(ctx context.Context, filePath string) ([]ok.Task, error) {
-			output, _, _, err := cob.Output(ctx, "task",
+		ProcessFile: func(ctx context.Context, filePath string, toolCfg ok.ToolConfig) ([]ok.Task, error) {
+			output, _, _, err := cob.Output(ctx, toolCfg.Executable,
 				cob.AddArgs("--taskfile", filePath),
 				cob.AddArgs("--list-all"),
 				cob.AddArgs("--json"),

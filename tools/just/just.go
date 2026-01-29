@@ -25,8 +25,8 @@ func New() ok.Tool {
 		Name:        "Just",
 		CommandName: "just",
 		FileGlobs:   []string{"Justfile", "justfile"},
-		ProcessFile: func(ctx context.Context, filePath string) ([]ok.Task, error) {
-			output, _, _, err := cob.Output(ctx, "just",
+		ProcessFile: func(ctx context.Context, filePath string, toolCfg ok.ToolConfig) ([]ok.Task, error) {
+			output, _, _, err := cob.Output(ctx, toolCfg.Executable,
 				cob.AddArgs("--justfile", filePath),
 				cob.AddArgs("--dump", "--dump-format", "json"),
 			)

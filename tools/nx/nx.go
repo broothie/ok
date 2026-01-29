@@ -33,9 +33,9 @@ func New() ok.Tool {
 		Name:        "Nx",
 		CommandName: "nx",
 		FileGlobs:   []string{"nx.json"},
-		ProcessFile: func(ctx context.Context, filePath string) ([]ok.Task, error) {
+		ProcessFile: func(ctx context.Context, filePath string, toolCfg ok.ToolConfig) ([]ok.Task, error) {
 			// Generate the graph and output to stdout
-			output, stderr, _, err := cob.Output(ctx, "nx",
+			output, stderr, _, err := cob.Output(ctx, toolCfg.Executable,
 				cob.AddArgs("graph"),
 				cob.AddArgs("--print"),
 			)

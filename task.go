@@ -56,7 +56,9 @@ func (o *Ok) SetUpTasks(ctx context.Context) error {
 
 func (o *Ok) processFile(ctx context.Context, tl toolInfo, filePath string) func() error {
 	return func() error {
-		toolTasks, err := tl.ProcessFile(ctx, filePath)
+		toolTasks, err := tl.ProcessFile(ctx, filePath, ToolConfig{
+			Executable: tl.commandPath,
+		})
 		if err != nil {
 			return errors.Wrapf(err, "parsing file %q for tool %q", filePath, tl.Name)
 		}
