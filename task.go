@@ -16,7 +16,7 @@ import (
 
 type Task struct {
 	Name       string
-	RunOptions func(ctx context.Context, args []string) (option.Options[*exec.Cmd], error)
+	RunOptions func(ctx context.Context, args []string, toolCfg ToolConfig) (option.Options[*exec.Cmd], error)
 }
 
 type taskInfo struct {

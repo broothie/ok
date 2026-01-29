@@ -54,7 +54,7 @@ func New() ok.Tool {
 					fullTaskName := fmt.Sprintf("%s:%s", projectName, targetName)
 					tasks = append(tasks, ok.Task{
 						Name: fullTaskName,
-						RunOptions: func(ctx context.Context, args []string) (option.Options[*exec.Cmd], error) {
+						RunOptions: func(ctx context.Context, args []string, toolCfg ok.ToolConfig) (option.Options[*exec.Cmd], error) {
 							return option.NewOptions(
 								cob.AddArgs("run"),
 								cob.AddArgs(fullTaskName),

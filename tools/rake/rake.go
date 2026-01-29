@@ -41,7 +41,7 @@ func New() ok.Tool {
 
 				tasks = append(tasks, ok.Task{
 					Name: taskName,
-					RunOptions: func(ctx context.Context, args []string) (option.Options[*exec.Cmd], error) {
+					RunOptions: func(ctx context.Context, args []string, toolCfg ok.ToolConfig) (option.Options[*exec.Cmd], error) {
 						taskArgs, rakeVars, err := splitRakeArgs(args)
 						if err != nil {
 							return nil, errors.Wrap(err, "parsing rake args")

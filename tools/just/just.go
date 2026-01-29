@@ -43,7 +43,7 @@ func New() ok.Tool {
 			return lo.Map(lo.Values(payload.Recipes), func(recipe recipeSchema, _ int) ok.Task {
 				return ok.Task{
 					Name: recipe.Name,
-					RunOptions: func(ctx context.Context, args []string) (option.Options[*exec.Cmd], error) {
+					RunOptions: func(ctx context.Context, args []string, toolCfg ok.ToolConfig) (option.Options[*exec.Cmd], error) {
 						return option.NewOptions(
 							cob.AddArgs("--justfile", filePath),
 							cob.AddArgs(recipe.Name),

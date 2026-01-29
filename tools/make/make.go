@@ -40,7 +40,7 @@ func New() ok.Tool {
 				taskName := strings.TrimSuffix(lines[0], ":")
 				tasks = append(tasks, ok.Task{
 					Name: taskName,
-					RunOptions: func(ctx context.Context, args []string) (option.Options[*exec.Cmd], error) {
+					RunOptions: func(ctx context.Context, args []string, toolCfg ok.ToolConfig) (option.Options[*exec.Cmd], error) {
 						return option.NewOptions(
 							cob.AddArgs("--file", filePath),
 							cob.AddArgs(taskName),

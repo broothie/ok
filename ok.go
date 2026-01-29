@@ -34,7 +34,10 @@ func (o *Ok) RunTask(ctx context.Context, taskName string, remainingArgs []strin
 }
 
 func (i taskInfo) Run(ctx context.Context, remainingArgs []string) error {
-	options, err := i.RunOptions(ctx, remainingArgs)
+	toolCfg := ToolConfig{
+		Executable: i.tool.commandPath,
+	}
+	options, err := i.RunOptions(ctx, remainingArgs, toolCfg)
 	if err != nil {
 		return errors.Wrapf(err, "getting run options for %s task %q", i.tool.Name, i.Name)
 	}
