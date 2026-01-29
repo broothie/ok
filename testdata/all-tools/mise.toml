@@ -1,0 +1,3 @@
+[tasks.test-mise]
+run = "echo 'from mise'"
+description = "Test task for mise"
