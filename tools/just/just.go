@@ -28,7 +28,8 @@ func New() ok.Tool {
 		ProcessFile: func(ctx context.Context, filePath string, toolCfg ok.ToolConfig) ([]ok.Task, error) {
 			output, _, _, err := cob.Output(ctx, toolCfg.Executable,
 				cob.AddArgs("--justfile", filePath),
-				cob.AddArgs("--dump", "--dump-format", "json"),
+				cob.AddArgs("--dump"),
+				cob.AddArgs("--dump-format", "json"),
 			)
 			if err != nil {
 				return nil, errors.Wrapf(err, "listing just recipes from %q", filePath)
