@@ -36,6 +36,7 @@ func (i taskInfo) Run(ctx context.Context, remainingArgs []string) error {
 	}
 
 	options = append(options,
+		cob.SetEnv(os.Environ()...),
 		cob.AddEnv("OK_TASK", i.Task.Name),
 		cob.AddEnv("OK_TOOL", i.tool.Name),
 		cob.AddEnv("OK_VERSION", Version()),
@@ -79,25 +80,46 @@ func (o *Ok) SetUpTasks(ctx context.Context) error {
 
 func (o *Ok) processFile(ctx context.Context, tl toolInfo, filePath string) func() error {
 	return func() error {
-		toolTasks, err := tl.ProcessFile(ctx, filePath, ToolConfig{
-			Executable: tl.commandPath,
-		})
-		if err != nil {
-			return errors.Wrapf(err, "parsing file %q for tool %q", filePath, tl.Name)
+		type Result struct {
+			tasks []Task
+			err   error
 		}
 
-		tasks := lo.Map(toolTasks, func(task Task, _ int) taskInfo {
-			return taskInfo{
-				Task:     task,
-				tool:     &tl,
-				filePath: filePath,
-			}
-		})
+		resultChan := make(chan Result, 1)
+		go func() {
+			tasks, err := tl.ProcessFile(ctx, filePath, ToolConfig{
+				Executable: tl.commandPath,
+			})
 
-		o.tasksLock.Lock()
-		o.tasks = append(o.tasks, tasks...)
-		o.tasksLock.Unlock()
-		return nil
+			resultChan <- Result{tasks: tasks, err: err}
+		}()
+
+		select {
+		case result := <-resultChan:
+			if result.err != nil {
+				return errors.Wrapf(result.err, "parsing file %q for tool %q", filePath, tl.Name)
+			}
+
+			tasks := lo.Map(result.tasks, func(task Task, _ int) taskInfo {
+				return taskInfo{
+					Task:     task,
+					tool:     &tl,
+					filePath: filePath,
+				}
+			})
+
+			o.tasksLock.Lock()
+			o.tasks = append(o.tasks, tasks...)
+			o.tasksLock.Unlock()
+			return nil
+
+		case <-ctx.Done():
+			if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+				slog.Warn("timeout parsing tool file", slog.String("file", filePath), slog.String("tool", tl.Name))
+			}
+
+			return nil
+		}
 	}
 }
 

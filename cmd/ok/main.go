@@ -54,9 +54,6 @@ func run() error {
 		return errors.Wrap(parser.WriteHelp(os.Stdout), "printing help")
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), flags.Timeout.Value().(time.Duration))
-	defer cancel()
-
 	tls := tools.All()
 	if filterTools := flags.FilterTools.Value().(string); filterTools != "" {
 		selectTools := strings.Split(filterTools, ",")
@@ -65,8 +62,12 @@ func run() error {
 		})
 	}
 
+	ctx := context.Background()
+	setupCtx, cancel := context.WithTimeout(ctx, flags.Timeout.Value().(time.Duration))
+	defer cancel()
+
 	app := ok.New()
-	if err := app.SetUpTools(ctx, tls); err != nil {
+	if err := app.SetUpTools(setupCtx, tls); err != nil {
 		return errors.Wrap(err, "setting up tools")
 	}
 
@@ -74,7 +75,7 @@ func run() error {
 		return errors.Wrap(app.ListTools(os.Stdout), "listing tools")
 	}
 
-	if err := app.SetUpTasks(ctx); err != nil {
+	if err := app.SetUpTasks(setupCtx); err != nil {
 		return errors.Wrap(err, "discovering tasks")
 	}
 
@@ -138,10 +139,10 @@ func NewFlags() *Flags {
 			DefaultValue: ".",
 		},
 		Timeout: &cli.Flag{
-			Name:         "timeout",
+			Name:         "setup-timeout",
 			Type:         cli.FlagTypeDuration,
-			Help:         "Command timeout.",
-			DefaultValue: 5 * time.Second,
+			Help:         "Timeout for setup phase. Setup comprises task file and task discovery.",
+			DefaultValue: time.Second,
 		},
 		FilterTools: &cli.Flag{
 			Name:         "filter-tools",
