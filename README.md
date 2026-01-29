@@ -5,6 +5,7 @@ A unified task runner that discovers and executes tasks from multiple build tool
 Currently supports:
 - [Just (`Justfile`)](https://github.com/casey/just)
 - [Make (`Makefile`)](https://www.gnu.org/software/make/manual/make.html)
+- [Mise (`mise.toml`)](https://mise.jdx.dev/)
 - [NPM (`package.json` scripts)](https://docs.npmjs.com/cli/v8/using-npm/scripts)
 - [Yarn (`yarn.lock` + `package.json` scripts)](https://classic.yarnpkg.com/lang/en/docs/package-json/#toc-scripts)
 - [Rake (`Rakefile`)](https://github.com/ruby/rake)
