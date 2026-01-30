@@ -21,9 +21,10 @@ func NewNPM() ok.Tool {
 				return nil, err
 			}
 
-			return lo.Map(lo.Keys(schema.Scripts), func(scriptName string, _ int) ok.Task {
+			return lo.MapToSlice(schema.Scripts, func(scriptName, scriptValue string) ok.Task {
 				return ok.Task{
-					Name: scriptName,
+					Name:        scriptName,
+					Description: scriptValue,
 					RunOptions: func(ctx context.Context, args []string, toolCfg ok.ToolConfig) (option.Options[*exec.Cmd], error) {
 						return option.NewOptions(
 							cob.AddArgs("run", scriptName),

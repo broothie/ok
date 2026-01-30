@@ -13,7 +13,8 @@ import (
 )
 
 type taskSchema struct {
-	Name string `json:"name"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }
 
 func New() ok.Tool {
@@ -36,7 +37,8 @@ func New() ok.Tool {
 
 			return lo.Map(payload, func(task taskSchema, _ int) ok.Task {
 				return ok.Task{
-					Name: task.Name,
+					Name:        task.Name,
+					Description: task.Description,
 					RunOptions: func(ctx context.Context, args []string, toolCfg ok.ToolConfig) (option.Options[*exec.Cmd], error) {
 						opts := option.NewOptions(
 							cob.AddArgs("run"),

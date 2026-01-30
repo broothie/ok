@@ -1,4 +1,5 @@
 
+desc "Test task for rake"
 task "test-rake" do
   puts "from rake"
 end

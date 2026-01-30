@@ -17,7 +17,8 @@ type schema struct {
 }
 
 type recipeSchema struct {
-	Name string `json:"name"`
+	Name string  `json:"name"`
+	Doc  *string `json:"doc"`
 }
 
 func New() ok.Tool {
@@ -41,8 +42,14 @@ func New() ok.Tool {
 			}
 
 			return lo.Map(lo.Values(payload.Recipes), func(recipe recipeSchema, _ int) ok.Task {
+				var description string
+				if recipe.Doc != nil {
+					description = *recipe.Doc
+				}
+
 				return ok.Task{
-					Name: recipe.Name,
+					Name:        recipe.Name,
+					Description: description,
 					RunOptions: func(ctx context.Context, args []string, toolCfg ok.ToolConfig) (option.Options[*exec.Cmd], error) {
 						return option.NewOptions(
 							cob.AddArgs("--justfile", filePath),

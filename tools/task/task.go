@@ -19,6 +19,7 @@ type schema struct {
 type taskSchema struct {
 	Name string `json:"name"`
 	Task string `json:"task"` // Some versions also include a "task" field; accept it as fallback.
+	Desc string `json:"desc"`
 }
 
 func New() ok.Tool {
@@ -48,7 +49,8 @@ func New() ok.Tool {
 
 			return lo.Map(payload.Tasks, func(tsk taskSchema, _ int) ok.Task {
 				return ok.Task{
-					Name: tsk.Name,
+					Name:        tsk.Name,
+					Description: tsk.Desc,
 					RunOptions: func(ctx context.Context, args []string, toolCfg ok.ToolConfig) (option.Options[*exec.Cmd], error) {
 						opts := option.NewOptions(
 							cob.AddArgs("--taskfile", filePath),

@@ -17,8 +17,9 @@ import (
 )
 
 type Task struct {
-	Name       string
-	RunOptions func(ctx context.Context, args []string, toolCfg ToolConfig) (option.Options[*exec.Cmd], error)
+	Name        string
+	Description string
+	RunOptions  func(ctx context.Context, args []string, toolCfg ToolConfig) (option.Options[*exec.Cmd], error)
 }
 
 type taskInfo struct {
@@ -50,10 +51,10 @@ func (i taskInfo) Run(ctx context.Context, remainingArgs []string) error {
 }
 
 func (o *Ok) ListTasks(w io.Writer) error {
-	rows := lo.Map(o.tasks, func(tsk taskInfo, _ int) []string { return []string{tsk.Name, tsk.tool.Name, tsk.filePath} })
+	rows := lo.Map(o.tasks, func(tsk taskInfo, _ int) []string { return []string{tsk.Name, tsk.tool.Name, tsk.filePath, tsk.Description} })
 	sort.Slice(rows, func(i, j int) bool { return rows[i][0] < rows[j][0] })
 
-	rows = append([][]string{{"TASK", "TOOL", "FILE"}}, rows...)
+	rows = append([][]string{{"TASK", "TOOL", "FILE", "DESCRIPTION"}}, rows...)
 	return errors.Wrap(table.Write(w, rows), "writing table")
 }
 

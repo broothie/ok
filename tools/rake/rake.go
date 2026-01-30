@@ -36,11 +36,17 @@ func New() ok.Tool {
 
 				// Format: "rake task_name[args]  # Description"
 				line = strings.TrimPrefix(line, "rake ")
-				taskName, _, _ := strings.Cut(line, " ")
+				taskName, rest, _ := strings.Cut(line, " ")
 				taskName, _, _ = strings.Cut(taskName, "[") // strip arg placeholders
 
+				var description string
+				if _, after, found := strings.Cut(rest, "# "); found {
+					description = after
+				}
+
 				tasks = append(tasks, ok.Task{
-					Name: taskName,
+					Name:        taskName,
+					Description: description,
 					RunOptions: func(ctx context.Context, args []string, toolCfg ok.ToolConfig) (option.Options[*exec.Cmd], error) {
 						taskArgs, rakeVars, err := splitRakeArgs(args)
 						if err != nil {

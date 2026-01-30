@@ -1,8 +1,7 @@
-version: '3'
+version: "3"
 
 tasks:
   test-task:
-    desc: "from task"
+    desc: "Test task from task"
     cmds:
       - echo 'from task'
-
