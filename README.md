@@ -15,6 +15,19 @@ Currently supports:
 
 ## Installation
 
+### Install Script (Linux/macOS)
+
+```bash
+curl -sSL https://raw.githubusercontent.com/broothie/ok/main/install.sh | sh
+```
+
+Or download and inspect first:
+
+```bash
+curl -sSL https://raw.githubusercontent.com/broothie/ok/main/install.sh -o install.sh
+sh install.sh
+```
+
 ### Homebrew
 
 ```bash
