@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"os/exec"
 	"sort"
@@ -15,6 +16,41 @@ import (
 	"github.com/samber/lo"
 	"golang.org/x/sync/errgroup"
 )
+
+// ignoredDirs contains directory names that should be skipped during file discovery.
+var ignoredDirs = map[string]bool{
+	".git":         true,
+	".hg":          true,
+	".svn":         true,
+	"node_modules": true,
+}
+
+// skipDirsFS wraps an fs.FS to skip ignored directories during traversal.
+type skipDirsFS struct {
+	inner fs.FS
+}
+
+func (f skipDirsFS) Open(name string) (fs.File, error) {
+	return f.inner.Open(name)
+}
+
+func (f skipDirsFS) ReadDir(name string) ([]fs.DirEntry, error) {
+	entries, err := fs.ReadDir(f.inner, name)
+	if err != nil {
+		return nil, err
+	}
+
+	filtered := make([]fs.DirEntry, 0, len(entries))
+	for _, entry := range entries {
+		if entry.IsDir() && ignoredDirs[entry.Name()] {
+			continue
+		}
+
+		filtered = append(filtered, entry)
+	}
+
+	return filtered, nil
+}
 
 type Tool struct {
 	Name        string
@@ -77,8 +113,9 @@ func (o *Ok) processTool(tl Tool) func() error {
 
 		var filePaths []string
 		var filePathErrs []error
+		fsys := skipDirsFS{inner: os.DirFS(".")}
 		for _, fileGlob := range tl.FileGlobs {
-			globFilePaths, err := doublestar.Glob(os.DirFS("."), fileGlob)
+			globFilePaths, err := doublestar.Glob(fsys, fileGlob)
 
 			filePaths = append(filePaths, globFilePaths...)
 			filePathErrs = append(filePathErrs, err)
